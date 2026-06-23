@@ -1,0 +1,3969 @@
+[
+    {
+        "employeeId": 1,
+        "name": "Employee 1",
+        "age": 22,
+        "city": "Mumbai",
+        "salary": 50000,
+        "email": "employee1@example.com",
+        "phone": "+91-9810000000",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2019-12-31T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 1",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400000"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 2,
+        "name": "Employee 2",
+        "age": 23,
+        "city": "Delhi",
+        "salary": 52500,
+        "email": "employee2@example.com",
+        "phone": "+91-9810000001",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2021-02-01T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 2",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400001"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 3,
+        "name": "Employee 3",
+        "age": 24,
+        "city": "Bengaluru",
+        "salary": 55000,
+        "email": "employee3@example.com",
+        "phone": "+91-9810000002",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2022-03-02T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 3",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400002"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 4,
+        "name": "Employee 4",
+        "age": 25,
+        "city": "Pune",
+        "salary": 57500,
+        "email": "employee4@example.com",
+        "phone": "+91-9810000003",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2023-04-03T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 4",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400003"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 5,
+        "name": "Employee 5",
+        "age": 26,
+        "city": "Chennai",
+        "salary": 60000,
+        "email": "employee5@example.com",
+        "phone": "+91-9810000004",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2024-05-04T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 5",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400004"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 6,
+        "name": "Employee 6",
+        "age": 27,
+        "city": "Hyderabad",
+        "salary": 62500,
+        "email": "employee6@example.com",
+        "phone": "+91-9810000005",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2020-06-05T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 6",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400005"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 7,
+        "name": "Employee 7",
+        "age": 28,
+        "city": "Mumbai",
+        "salary": 65000,
+        "email": "employee7@example.com",
+        "phone": "+91-9810000006",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2021-07-06T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 7",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400006"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 8,
+        "name": "Employee 8",
+        "age": 29,
+        "city": "Delhi",
+        "salary": 67500,
+        "email": "employee8@example.com",
+        "phone": "+91-9810000007",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2022-08-07T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 8",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400007"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 9,
+        "name": "Employee 9",
+        "age": 30,
+        "city": "Bengaluru",
+        "salary": 70000,
+        "email": "employee9@example.com",
+        "phone": "+91-9810000008",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2023-09-08T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 9",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400008"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 10,
+        "name": "Employee 10",
+        "age": 31,
+        "city": "Pune",
+        "salary": 72500,
+        "email": "employee10@example.com",
+        "phone": "+91-9810000009",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2024-10-09T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 10",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400009"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 11,
+        "name": "Employee 11",
+        "age": 32,
+        "city": "Chennai",
+        "salary": 75000,
+        "email": "employee11@example.com",
+        "phone": "+91-9810000010",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2020-11-10T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 11",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400010"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 12,
+        "name": "Employee 12",
+        "age": 33,
+        "city": "Hyderabad",
+        "salary": 77500,
+        "email": "employee12@example.com",
+        "phone": "+91-9810000011",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2021-12-11T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 12",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400011"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 13,
+        "name": "Employee 13",
+        "age": 34,
+        "city": "Mumbai",
+        "salary": 80000,
+        "email": "employee13@example.com",
+        "phone": "+91-9810000012",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2022-01-12T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 13",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400012"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 14,
+        "name": "Employee 14",
+        "age": 35,
+        "city": "Delhi",
+        "salary": 82500,
+        "email": "employee14@example.com",
+        "phone": "+91-9810000013",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2023-02-13T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 14",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400013"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 15,
+        "name": "Employee 15",
+        "age": 36,
+        "city": "Bengaluru",
+        "salary": 85000,
+        "email": "employee15@example.com",
+        "phone": "+91-9810000014",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2024-03-14T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 15",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400014"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 16,
+        "name": "Employee 16",
+        "age": 22,
+        "city": "Pune",
+        "salary": 87500,
+        "email": "employee16@example.com",
+        "phone": "+91-9810000015",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2020-04-15T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 16",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400015"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 17,
+        "name": "Employee 17",
+        "age": 23,
+        "city": "Chennai",
+        "salary": 90000,
+        "email": "employee17@example.com",
+        "phone": "+91-9810000016",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2021-05-16T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 17",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400016"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 18,
+        "name": "Employee 18",
+        "age": 24,
+        "city": "Hyderabad",
+        "salary": 92500,
+        "email": "employee18@example.com",
+        "phone": "+91-9810000017",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2022-06-17T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 18",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400017"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 19,
+        "name": "Employee 19",
+        "age": 25,
+        "city": "Mumbai",
+        "salary": 95000,
+        "email": "employee19@example.com",
+        "phone": "+91-9810000018",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2023-07-18T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 19",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400018"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 20,
+        "name": "Employee 20",
+        "age": 26,
+        "city": "Delhi",
+        "salary": 97500,
+        "email": "employee20@example.com",
+        "phone": "+91-9810000019",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2024-08-19T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 20",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400019"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 21,
+        "name": "Employee 21",
+        "age": 27,
+        "city": "Bengaluru",
+        "salary": 100000,
+        "email": "employee21@example.com",
+        "phone": "+91-9810000020",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2020-09-20T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 21",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400020"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 22,
+        "name": "Employee 22",
+        "age": 28,
+        "city": "Pune",
+        "salary": 102500,
+        "email": "employee22@example.com",
+        "phone": "+91-9810000021",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2021-10-21T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 22",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400021"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 23,
+        "name": "Employee 23",
+        "age": 29,
+        "city": "Chennai",
+        "salary": 105000,
+        "email": "employee23@example.com",
+        "phone": "+91-9810000022",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2022-11-22T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 23",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400022"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 24,
+        "name": "Employee 24",
+        "age": 30,
+        "city": "Hyderabad",
+        "salary": 107500,
+        "email": "employee24@example.com",
+        "phone": "+91-9810000023",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2023-12-23T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 24",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400023"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 25,
+        "name": "Employee 25",
+        "age": 31,
+        "city": "Mumbai",
+        "salary": 110000,
+        "email": "employee25@example.com",
+        "phone": "+91-9810000024",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2024-01-24T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 25",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400024"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 26,
+        "name": "Employee 26",
+        "age": 32,
+        "city": "Delhi",
+        "salary": 112500,
+        "email": "employee26@example.com",
+        "phone": "+91-9810000025",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2020-02-25T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 26",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400025"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 27,
+        "name": "Employee 27",
+        "age": 33,
+        "city": "Bengaluru",
+        "salary": 115000,
+        "email": "employee27@example.com",
+        "phone": "+91-9810000026",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2021-03-26T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 27",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400026"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 28,
+        "name": "Employee 28",
+        "age": 34,
+        "city": "Pune",
+        "salary": 117500,
+        "email": "employee28@example.com",
+        "phone": "+91-9810000027",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2022-04-27T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 28",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400027"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 29,
+        "name": "Employee 29",
+        "age": 35,
+        "city": "Chennai",
+        "salary": 120000,
+        "email": "employee29@example.com",
+        "phone": "+91-9810000028",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2023-04-30T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 29",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400028"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 30,
+        "name": "Employee 30",
+        "age": 36,
+        "city": "Hyderabad",
+        "salary": 122500,
+        "email": "employee30@example.com",
+        "phone": "+91-9810000029",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2024-06-01T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 30",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400029"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 31,
+        "name": "Employee 31",
+        "age": 22,
+        "city": "Mumbai",
+        "salary": 125000,
+        "email": "employee31@example.com",
+        "phone": "+91-9810000030",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2020-07-02T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 31",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400030"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 32,
+        "name": "Employee 32",
+        "age": 23,
+        "city": "Delhi",
+        "salary": 127500,
+        "email": "employee32@example.com",
+        "phone": "+91-9810000031",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2021-08-03T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 32",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400031"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 33,
+        "name": "Employee 33",
+        "age": 24,
+        "city": "Bengaluru",
+        "salary": 130000,
+        "email": "employee33@example.com",
+        "phone": "+91-9810000032",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2022-09-04T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 33",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400032"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 34,
+        "name": "Employee 34",
+        "age": 25,
+        "city": "Pune",
+        "salary": 132500,
+        "email": "employee34@example.com",
+        "phone": "+91-9810000033",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2023-10-05T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 34",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400033"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 35,
+        "name": "Employee 35",
+        "age": 26,
+        "city": "Chennai",
+        "salary": 135000,
+        "email": "employee35@example.com",
+        "phone": "+91-9810000034",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2024-11-06T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 35",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400034"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 36,
+        "name": "Employee 36",
+        "age": 27,
+        "city": "Hyderabad",
+        "salary": 137500,
+        "email": "employee36@example.com",
+        "phone": "+91-9810000035",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2020-12-07T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 36",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400035"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 37,
+        "name": "Employee 37",
+        "age": 28,
+        "city": "Mumbai",
+        "salary": 140000,
+        "email": "employee37@example.com",
+        "phone": "+91-9810000036",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2021-01-08T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 37",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400036"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 38,
+        "name": "Employee 38",
+        "age": 29,
+        "city": "Delhi",
+        "salary": 142500,
+        "email": "employee38@example.com",
+        "phone": "+91-9810000037",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2022-02-09T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 38",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400037"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 39,
+        "name": "Employee 39",
+        "age": 30,
+        "city": "Bengaluru",
+        "salary": 145000,
+        "email": "employee39@example.com",
+        "phone": "+91-9810000038",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2023-03-10T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 39",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400038"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 40,
+        "name": "Employee 40",
+        "age": 31,
+        "city": "Pune",
+        "salary": 147500,
+        "email": "employee40@example.com",
+        "phone": "+91-9810000039",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2024-04-11T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 40",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400039"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 41,
+        "name": "Employee 41",
+        "age": 32,
+        "city": "Chennai",
+        "salary": 150000,
+        "email": "employee41@example.com",
+        "phone": "+91-9810000040",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2020-05-12T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 41",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400040"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 42,
+        "name": "Employee 42",
+        "age": 33,
+        "city": "Hyderabad",
+        "salary": 152500,
+        "email": "employee42@example.com",
+        "phone": "+91-9810000041",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2021-06-13T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 42",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400041"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 43,
+        "name": "Employee 43",
+        "age": 34,
+        "city": "Mumbai",
+        "salary": 155000,
+        "email": "employee43@example.com",
+        "phone": "+91-9810000042",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2022-07-14T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 43",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400042"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 44,
+        "name": "Employee 44",
+        "age": 35,
+        "city": "Delhi",
+        "salary": 157500,
+        "email": "employee44@example.com",
+        "phone": "+91-9810000043",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2023-08-15T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 44",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400043"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 45,
+        "name": "Employee 45",
+        "age": 36,
+        "city": "Bengaluru",
+        "salary": 160000,
+        "email": "employee45@example.com",
+        "phone": "+91-9810000044",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2024-09-16T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 45",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400044"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 46,
+        "name": "Employee 46",
+        "age": 22,
+        "city": "Pune",
+        "salary": 162500,
+        "email": "employee46@example.com",
+        "phone": "+91-9810000045",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2020-10-17T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 46",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400045"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 47,
+        "name": "Employee 47",
+        "age": 23,
+        "city": "Chennai",
+        "salary": 165000,
+        "email": "employee47@example.com",
+        "phone": "+91-9810000046",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2021-11-18T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 47",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400046"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 48,
+        "name": "Employee 48",
+        "age": 24,
+        "city": "Hyderabad",
+        "salary": 167500,
+        "email": "employee48@example.com",
+        "phone": "+91-9810000047",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2022-12-19T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 48",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400047"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 49,
+        "name": "Employee 49",
+        "age": 25,
+        "city": "Mumbai",
+        "salary": 170000,
+        "email": "employee49@example.com",
+        "phone": "+91-9810000048",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2023-01-20T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 49",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400048"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 50,
+        "name": "Employee 50",
+        "age": 26,
+        "city": "Delhi",
+        "salary": 172500,
+        "email": "employee50@example.com",
+        "phone": "+91-9810000049",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2024-02-21T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 50",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400049"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 51,
+        "name": "Employee 51",
+        "age": 27,
+        "city": "Bengaluru",
+        "salary": 175000,
+        "email": "employee51@example.com",
+        "phone": "+91-9810000050",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2020-03-22T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 51",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400050"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 52,
+        "name": "Employee 52",
+        "age": 28,
+        "city": "Pune",
+        "salary": 177500,
+        "email": "employee52@example.com",
+        "phone": "+91-9810000051",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2021-04-23T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 52",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400051"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 53,
+        "name": "Employee 53",
+        "age": 29,
+        "city": "Chennai",
+        "salary": 180000,
+        "email": "employee53@example.com",
+        "phone": "+91-9810000052",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2022-05-24T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 53",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400052"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 54,
+        "name": "Employee 54",
+        "age": 30,
+        "city": "Hyderabad",
+        "salary": 182500,
+        "email": "employee54@example.com",
+        "phone": "+91-9810000053",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2023-06-25T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 54",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400053"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 55,
+        "name": "Employee 55",
+        "age": 31,
+        "city": "Mumbai",
+        "salary": 185000,
+        "email": "employee55@example.com",
+        "phone": "+91-9810000054",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2024-07-26T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 55",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400054"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 56,
+        "name": "Employee 56",
+        "age": 32,
+        "city": "Delhi",
+        "salary": 187500,
+        "email": "employee56@example.com",
+        "phone": "+91-9810000055",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2020-08-27T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 56",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400055"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 57,
+        "name": "Employee 57",
+        "age": 33,
+        "city": "Bengaluru",
+        "salary": 190000,
+        "email": "employee57@example.com",
+        "phone": "+91-9810000056",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2021-08-31T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 57",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400056"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 58,
+        "name": "Employee 58",
+        "age": 34,
+        "city": "Pune",
+        "salary": 192500,
+        "email": "employee58@example.com",
+        "phone": "+91-9810000057",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2022-10-01T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 58",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400057"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 59,
+        "name": "Employee 59",
+        "age": 35,
+        "city": "Chennai",
+        "salary": 195000,
+        "email": "employee59@example.com",
+        "phone": "+91-9810000058",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2023-11-02T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 59",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400058"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 60,
+        "name": "Employee 60",
+        "age": 36,
+        "city": "Hyderabad",
+        "salary": 197500,
+        "email": "employee60@example.com",
+        "phone": "+91-9810000059",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2024-12-03T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 60",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400059"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 61,
+        "name": "Employee 61",
+        "age": 22,
+        "city": "Mumbai",
+        "salary": 200000,
+        "email": "employee61@example.com",
+        "phone": "+91-9810000060",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2020-01-04T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 61",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400060"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 62,
+        "name": "Employee 62",
+        "age": 23,
+        "city": "Delhi",
+        "salary": 202500,
+        "email": "employee62@example.com",
+        "phone": "+91-9810000061",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2021-02-05T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 62",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400061"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 63,
+        "name": "Employee 63",
+        "age": 24,
+        "city": "Bengaluru",
+        "salary": 205000,
+        "email": "employee63@example.com",
+        "phone": "+91-9810000062",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2022-03-06T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 63",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400062"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 64,
+        "name": "Employee 64",
+        "age": 25,
+        "city": "Pune",
+        "salary": 207500,
+        "email": "employee64@example.com",
+        "phone": "+91-9810000063",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2023-04-07T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 64",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400063"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 65,
+        "name": "Employee 65",
+        "age": 26,
+        "city": "Chennai",
+        "salary": 210000,
+        "email": "employee65@example.com",
+        "phone": "+91-9810000064",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2024-05-08T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 65",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400064"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 66,
+        "name": "Employee 66",
+        "age": 27,
+        "city": "Hyderabad",
+        "salary": 212500,
+        "email": "employee66@example.com",
+        "phone": "+91-9810000065",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2020-06-09T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 66",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400065"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 67,
+        "name": "Employee 67",
+        "age": 28,
+        "city": "Mumbai",
+        "salary": 215000,
+        "email": "employee67@example.com",
+        "phone": "+91-9810000066",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2021-07-10T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 67",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400066"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 68,
+        "name": "Employee 68",
+        "age": 29,
+        "city": "Delhi",
+        "salary": 217500,
+        "email": "employee68@example.com",
+        "phone": "+91-9810000067",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2022-08-11T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 68",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400067"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 69,
+        "name": "Employee 69",
+        "age": 30,
+        "city": "Bengaluru",
+        "salary": 220000,
+        "email": "employee69@example.com",
+        "phone": "+91-9810000068",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2023-09-12T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 69",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400068"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 70,
+        "name": "Employee 70",
+        "age": 31,
+        "city": "Pune",
+        "salary": 222500,
+        "email": "employee70@example.com",
+        "phone": "+91-9810000069",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2024-10-13T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 70",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400069"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 71,
+        "name": "Employee 71",
+        "age": 32,
+        "city": "Chennai",
+        "salary": 225000,
+        "email": "employee71@example.com",
+        "phone": "+91-9810000070",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2020-11-14T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 71",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400070"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 72,
+        "name": "Employee 72",
+        "age": 33,
+        "city": "Hyderabad",
+        "salary": 227500,
+        "email": "employee72@example.com",
+        "phone": "+91-9810000071",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2021-12-15T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 72",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400071"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 73,
+        "name": "Employee 73",
+        "age": 34,
+        "city": "Mumbai",
+        "salary": 230000,
+        "email": "employee73@example.com",
+        "phone": "+91-9810000072",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2022-01-16T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 73",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400072"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 74,
+        "name": "Employee 74",
+        "age": 35,
+        "city": "Delhi",
+        "salary": 232500,
+        "email": "employee74@example.com",
+        "phone": "+91-9810000073",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2023-02-17T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 74",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400073"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 75,
+        "name": "Employee 75",
+        "age": 36,
+        "city": "Bengaluru",
+        "salary": 235000,
+        "email": "employee75@example.com",
+        "phone": "+91-9810000074",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2024-03-18T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 75",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400074"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 76,
+        "name": "Employee 76",
+        "age": 22,
+        "city": "Pune",
+        "salary": 237500,
+        "email": "employee76@example.com",
+        "phone": "+91-9810000075",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2020-04-19T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 76",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400075"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 77,
+        "name": "Employee 77",
+        "age": 23,
+        "city": "Chennai",
+        "salary": 240000,
+        "email": "employee77@example.com",
+        "phone": "+91-9810000076",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2021-05-20T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 77",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400076"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 78,
+        "name": "Employee 78",
+        "age": 24,
+        "city": "Hyderabad",
+        "salary": 242500,
+        "email": "employee78@example.com",
+        "phone": "+91-9810000077",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2022-06-21T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 78",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400077"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 79,
+        "name": "Employee 79",
+        "age": 25,
+        "city": "Mumbai",
+        "salary": 245000,
+        "email": "employee79@example.com",
+        "phone": "+91-9810000078",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2023-07-22T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 79",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400078"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 80,
+        "name": "Employee 80",
+        "age": 26,
+        "city": "Delhi",
+        "salary": 247500,
+        "email": "employee80@example.com",
+        "phone": "+91-9810000079",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2024-08-23T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 80",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400079"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 81,
+        "name": "Employee 81",
+        "age": 27,
+        "city": "Bengaluru",
+        "salary": 250000,
+        "email": "employee81@example.com",
+        "phone": "+91-9810000080",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2020-09-24T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 81",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400080"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 82,
+        "name": "Employee 82",
+        "age": 28,
+        "city": "Pune",
+        "salary": 252500,
+        "email": "employee82@example.com",
+        "phone": "+91-9810000081",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2021-10-25T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 82",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400081"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 83,
+        "name": "Employee 83",
+        "age": 29,
+        "city": "Chennai",
+        "salary": 255000,
+        "email": "employee83@example.com",
+        "phone": "+91-9810000082",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2022-11-26T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 83",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400082"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 84,
+        "name": "Employee 84",
+        "age": 30,
+        "city": "Hyderabad",
+        "salary": 257500,
+        "email": "employee84@example.com",
+        "phone": "+91-9810000083",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2023-12-27T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 84",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400083"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 85,
+        "name": "Employee 85",
+        "age": 31,
+        "city": "Mumbai",
+        "salary": 260000,
+        "email": "employee85@example.com",
+        "phone": "+91-9810000084",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2023-12-31T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 85",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400084"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 86,
+        "name": "Employee 86",
+        "age": 32,
+        "city": "Delhi",
+        "salary": 262500,
+        "email": "employee86@example.com",
+        "phone": "+91-9810000085",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2020-02-01T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 86",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400085"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 87,
+        "name": "Employee 87",
+        "age": 33,
+        "city": "Bengaluru",
+        "salary": 265000,
+        "email": "employee87@example.com",
+        "phone": "+91-9810000086",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 2,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2021-03-02T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 87",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400086"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 88,
+        "name": "Employee 88",
+        "age": 34,
+        "city": "Pune",
+        "salary": 267500,
+        "email": "employee88@example.com",
+        "phone": "+91-9810000087",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 3,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2022-04-03T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 88",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400087"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 89,
+        "name": "Employee 89",
+        "age": 35,
+        "city": "Chennai",
+        "salary": 270000,
+        "email": "employee89@example.com",
+        "phone": "+91-9810000088",
+        "gender": "Male",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 4,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2023-05-04T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 89",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400088"
+        },
+        "projects": [
+            "Project 9",
+            "Project 10"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 9",
+            "passingYear": 2023
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 90,
+        "name": "Employee 90",
+        "age": 36,
+        "city": "Hyderabad",
+        "salary": 272500,
+        "email": "employee90@example.com",
+        "phone": "+91-9810000089",
+        "gender": "Female",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 5,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2024-06-05T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 90",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400089"
+        },
+        "projects": [
+            "Project 10",
+            "Project 1"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 10",
+            "passingYear": 2024
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 91,
+        "name": "Employee 91",
+        "age": 22,
+        "city": "Mumbai",
+        "salary": 275000,
+        "email": "employee91@example.com",
+        "phone": "+91-9810000090",
+        "gender": "Male",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 6,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2020-07-06T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 91",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400090"
+        },
+        "projects": [
+            "Project 1",
+            "Project 2"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 1",
+            "passingYear": 2015
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 92,
+        "name": "Employee 92",
+        "age": 23,
+        "city": "Delhi",
+        "salary": 277500,
+        "email": "employee92@example.com",
+        "phone": "+91-9810000091",
+        "gender": "Female",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 7,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2021-08-07T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 92",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400091"
+        },
+        "projects": [
+            "Project 2",
+            "Project 3"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 2",
+            "passingYear": 2016
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 93,
+        "name": "Employee 93",
+        "age": 24,
+        "city": "Bengaluru",
+        "salary": 280000,
+        "email": "employee93@example.com",
+        "phone": "+91-9810000092",
+        "gender": "Male",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 8,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2022-09-08T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 93",
+            "city": "Bengaluru",
+            "state": "India",
+            "pincode": "400092"
+        },
+        "projects": [
+            "Project 3",
+            "Project 4"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 3",
+            "passingYear": 2017
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 94,
+        "name": "Employee 94",
+        "age": 25,
+        "city": "Pune",
+        "salary": 282500,
+        "email": "employee94@example.com",
+        "phone": "+91-9810000093",
+        "gender": "Female",
+        "department": "Marketing",
+        "designation": "QA Engineer",
+        "experience": 9,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2023-10-09T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Neha Gupta",
+        "address": {
+            "street": "Street 94",
+            "city": "Pune",
+            "state": "India",
+            "pincode": "400093"
+        },
+        "projects": [
+            "Project 4",
+            "Project 5"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 4",
+            "passingYear": 2018
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 95,
+        "name": "Employee 95",
+        "age": 26,
+        "city": "Chennai",
+        "salary": 285000,
+        "email": "employee95@example.com",
+        "phone": "+91-9810000094",
+        "gender": "Male",
+        "department": "Sales",
+        "designation": "Business Analyst",
+        "experience": 10,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB"
+        ],
+        "joiningDate": "2024-11-10T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Vikas Kumar",
+        "address": {
+            "street": "Street 95",
+            "city": "Chennai",
+            "state": "India",
+            "pincode": "400094"
+        },
+        "projects": [
+            "Project 5",
+            "Project 6"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 5",
+            "passingYear": 2019
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 96,
+        "name": "Employee 96",
+        "age": 27,
+        "city": "Hyderabad",
+        "salary": 287500,
+        "email": "employee96@example.com",
+        "phone": "+91-9810000095",
+        "gender": "Female",
+        "department": "Engineering",
+        "designation": "Software Developer",
+        "experience": 11,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "MongoDB",
+            "React"
+        ],
+        "joiningDate": "2020-12-11T18:30:00.000Z",
+        "isActive": false,
+        "manager": "Rahul Sharma",
+        "address": {
+            "street": "Street 96",
+            "city": "Hyderabad",
+            "state": "India",
+            "pincode": "400095"
+        },
+        "projects": [
+            "Project 6",
+            "Project 7"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 6",
+            "passingYear": 2020
+        },
+        "performanceRating": 4,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 97,
+        "name": "Employee 97",
+        "age": 28,
+        "city": "Mumbai",
+        "salary": 290000,
+        "email": "employee97@example.com",
+        "phone": "+91-9810000096",
+        "gender": "Male",
+        "department": "HR",
+        "designation": "Senior Developer",
+        "experience": 0,
+        "skills": [
+            "JavaScript"
+        ],
+        "joiningDate": "2021-01-12T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Amit Verma",
+        "address": {
+            "street": "Street 97",
+            "city": "Mumbai",
+            "state": "India",
+            "pincode": "400096"
+        },
+        "projects": [
+            "Project 7",
+            "Project 8"
+        ],
+        "education": {
+            "degree": "B.Tech",
+            "specialization": "Computer Science",
+            "university": "University 7",
+            "passingYear": 2021
+        },
+        "performanceRating": 3,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    },
+    {
+        "employeeId": 98,
+        "name": "Employee 98",
+        "age": 29,
+        "city": "Delhi",
+        "salary": 292500,
+        "email": "employee98@example.com",
+        "phone": "+91-9810000097",
+        "gender": "Female",
+        "department": "Finance",
+        "designation": "Tech Lead",
+        "experience": 1,
+        "skills": [
+            "JavaScript",
+            "Node.js"
+        ],
+        "joiningDate": "2022-02-13T18:30:00.000Z",
+        "isActive": true,
+        "manager": "Priya Singh",
+        "address": {
+            "street": "Street 98",
+            "city": "Delhi",
+            "state": "India",
+            "pincode": "400097"
+        },
+        "projects": [
+            "Project 8",
+            "Project 9"
+        ],
+        "education": {
+            "degree": "MCA",
+            "specialization": "Computer Science",
+            "university": "University 8",
+            "passingYear": 2022
+        },
+        "performanceRating": 3.5,
+        "lastLogin": "2026-06-23T10:37:10.460Z",
+        "createdAt": "2026-06-23T10:37:10.460Z",
+        "updatedAt": "2026-06-23T10:37:10.460Z"
+    }
+]
