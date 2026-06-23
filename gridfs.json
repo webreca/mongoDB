@@ -1,0 +1,101 @@
+{
+  "title": "MongoDB GridFS - Complete Guide (Beginner to Advanced)",
+  "description": "Storing and retrieving large files in MongoDB",
+  "date": "2024-06-23",
+  "overview": {
+    "definition": "MongoDB specification for storing files larger than 16MB",
+    "concept": "Split large files into chunks and store in collections",
+    "purpose": [
+      "Store files larger than 16MB BSON document limit",
+      "Store video files",
+      "Store audio files",
+      "Store images",
+      "Store documents (PDFs, Word)",
+      "Keep files with database for consistency",
+      "Retrieve file chunks on-demand"
+    ],
+    "how_it_works": "Divides file into chunks (255KB default), stores metadata separately",
+    "use_cases": [
+      "Media storage (images, videos, audio)",
+      "Document storage (PDFs, reports)",
+      "Backup files",
+      "Large dataset files",
+      "Archive storage"
+    ],
+    "alternatives": [
+      "External storage (S3, GCS) with metadata in MongoDB",
+      "Compressed storage",
+      "Dedicated file systems"
+    ]
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: GridFS Fundamentals",
+    "concepts": [
+      {
+        "concept": "GridFS",
+        "description": "File storage system for MongoDB"
+      },
+      {
+        "concept": "Chunk Size",
+        "description": "Default 255KB, can be customized",
+        "purpose": "Split file into manageable pieces"
+      },
+      {
+        "concept": "Metadata",
+        "description": "File info stored in fs.files collection"
+      },
+      {
+        "concept": "Chunks",
+        "description": "File data stored in fs.chunks collection"
+      }
+    ]
+  },
+  "section_2_beginner_upload": {
+    "title": "BEGINNER: Uploading Files",
+    "beginner_examples": [
+      {
+        "title": "Upload image file",
+        "query": "const bucket = new GridFSBucket(db);\nconst fs = require('fs');\n\nconst uploadStream = bucket.openUploadStream('image.jpg');\nfs.createReadStream('local_image.jpg').pipe(uploadStream);\n\nuploadStream.on('finish', () => {\n  console.log('File uploaded');\n});"
+      }
+    ]
+  },
+  "section_3_beginner_download": {
+    "title": "BEGINNER: Downloading Files",
+    "beginner_examples": [
+      {
+        "title": "Download file by filename",
+        "query": "const bucket = new GridFSBucket(db);\n\nconst downloadStream = bucket.openDownloadStreamByName('image.jpg');\ndownloadStream.pipe(fs.createWriteStream('downloaded_image.jpg'));"
+      }
+    ]
+  },
+  "section_4_intermediate_metadata": {
+    "title": "INTERMEDIATE: File Metadata",
+    "intermediate_examples": [
+      {
+        "title": "Upload with metadata",
+        "query": "const uploadStream = bucket.openUploadStream('image.jpg', {\n  metadata: {\n    originalName: 'user_photo.jpg',\n    uploadedBy: 'alice@example.com',\n    uploadedAt: new Date(),\n    size: 2048576\n  }\n});"
+      }
+    ]
+  },
+  "section_5_advanced_streaming": {
+    "title": "ADVANCED: Streaming & Performance",
+    "advanced_examples": [
+      {
+        "title": "Large file streaming",
+        "description": "Stream large files efficiently"
+      }
+    ]
+  },
+  "section_6_best_practices": {
+    "practices": [
+      {
+        "practice": "Consider external storage",
+        "why": "S3/GCS better for large-scale file storage"
+      },
+      {
+        "practice": "Use metadata for file info",
+        "why": "Easy retrieval and filtering"
+      }
+    ]
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "title": "MongoDB Change Streams - Complete Guide (Beginner to Advanced)",
+  "description": "Real-time monitoring of data changes in collections",
+  "date": "2024-06-23",
+  "overview": {
+    "definition": "Watch for real-time changes to documents in a collection",
+    "concept": "Stream notifications when documents are inserted, updated, or deleted",
+    "purpose": [
+      "Real-time data synchronization",
+      "Live dashboards and notifications",
+      "Trigger actions on data changes",
+      "Audit logging",
+      "Event-driven architecture",
+      "Database replication",
+      "Monitoring applications"
+    ],
+    "requirement": "Requires replica set (not standalone)",
+    "notification_types": [
+      "insert - Document inserted",
+      "update - Document updated",
+      "delete - Document deleted",
+      "replace - Document replaced",
+      "invalidate - Collection/db dropped"
+    ]
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Change Streams Fundamentals",
+    "concepts": [
+      {
+        "concept": "Change Stream",
+        "description": "Real-time stream of document changes",
+        "syntax": "db.collection.watch()"
+      },
+      {
+        "concept": "Pipeline",
+        "description": "Filter and transform changes",
+        "example": "$match to filter specific operations"
+      },
+      {
+        "concept": "Resume Token",
+        "description": "Resume watching from specific point",
+        "use": "Recovering from connection loss"
+      },
+      {
+        "concept": "Replica Set Requirement",
+        "description": "Change streams need replica set",
+        "standalone": "Not supported"
+      }
+    ]
+  },
+  "section_2_beginner_simple": {
+    "title": "BEGINNER: Simple Change Stream",
+    "beginner_examples": [
+      {
+        "title": "Watch all changes in collection",
+        "query": "const changeStream = db.students.watch();\nchangeStream.on('change', (change) => {\n  console.log('Change:', change);\n});",
+        "result": "Streams all inserts, updates, deletes in real-time",
+        "use_case": "Monitor all student collection changes"
+      },
+      {
+        "title": "Watch and print changes",
+        "query": "for (const change of db.students.watch()) {\n  print(JSON.stringify(change));\n}",
+        "result": "Blocking iteration over change stream"
+      }
+    ]
+  },
+  "section_3_beginner_filter": {
+    "title": "BEGINNER: Filter Changes",
+    "beginner_examples": [
+      {
+        "title": "Watch only insert operations",
+        "query": "db.students.watch([\n  { $match: { operationType: 'insert' } }\n])",
+        "result": "Only new documents inserted"
+      },
+      {
+        "title": "Watch updates to specific field",
+        "query": "db.students.watch([\n  { $match: { operationType: 'update' } },\n  { $match: { 'updateDescription.updatedFields.gpa': { $exists: true } } }\n])",
+        "result": "Only changes to GPA field"
+      }
+    ]
+  },
+  "section_4_intermediate_resume": {
+    "title": "INTERMEDIATE: Resume Token",
+    "intermediate_examples": [
+      {
+        "title": "Save and resume from token",
+        "query": "let resumeToken;\nconst changeStream = db.students.watch();\nchangeStream.on('change', (change) => {\n  resumeToken = change._id;\n  console.log('New document:', change.fullDocument);\n});\n\n// Later, resume from saved token\nconst resumedStream = db.students.watch([], { resumeAfter: resumeToken });"
+      }
+    ]
+  },
+  "section_5_advanced_complex": {
+    "title": "ADVANCED: Complex Change Streams",
+    "advanced_examples": [
+      {
+        "title": "Change stream with aggregation",
+        "description": "Complex pipeline for change monitoring"
+      }
+    ]
+  },
+  "section_6_best_practices": {
+    "practices": [
+      {
+        "practice": "Always use replica set",
+        "why": "Standalone doesn't support change streams"
+      },
+      {
+        "practice": "Save resume tokens",
+        "why": "Recover from connection loss"
+      },
+      {
+        "practice": "Use resumeAfter for recovery",
+        "why": "Don't lose change events"
+      }
+    ]
+  },
+  "section_7_common_mistakes": {
+    "mistakes": [
+      {
+        "mistake": "Using on standalone server",
+        "problem": "Change streams not supported",
+        "fix": "Set up replica set"
+      }
+    ]
+  }
+}

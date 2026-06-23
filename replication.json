@@ -1,0 +1,470 @@
+{
+  "title": "MongoDB Replication - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on replica sets, replication, failover, and high availability",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "replication_overview": {
+    "definition": "Replication maintains copies of data across multiple MongoDB servers for high availability and redundancy",
+    "concept": "Replica set: cluster of MongoDB servers where one is primary (writes) and others are secondaries (read-only copies)",
+    "purpose": [
+      "High availability (automatic failover)",
+      "Data redundancy (multiple copies)",
+      "Read scaling (distribute reads to secondaries)",
+      "Disaster recovery (restore from secondary)",
+      "Geographic distribution (data centers)",
+      "Backup without impacting primary"
+    ],
+    "key_components": [
+      "Primary: Accepts writes, replicates to secondaries",
+      "Secondary: Read-only copy, syncs with primary",
+      "Arbiter: Votes in elections, doesn't hold data",
+      "Oplog: Operation log (sequential record of all changes)",
+      "Heartbeat: Periodic communication to detect failures"
+    ],
+    "minimum_setup": "3 nodes (1 primary + 2 secondaries or 1 primary + 1 secondary + 1 arbiter)"
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Replication Concepts",
+    "definitions": [
+      {
+        "term": "Replica Set",
+        "definition": "Group of MongoDB instances maintaining same data",
+        "size": "Minimum 3 nodes for high availability"
+      },
+      {
+        "term": "Primary",
+        "definition": "Node that accepts all write operations",
+        "responsibility": "Replicates changes to secondaries"
+      },
+      {
+        "term": "Secondary",
+        "definition": "Node that replicates data from primary",
+        "behavior": "Read-only, can't accept writes"
+      },
+      {
+        "term": "Arbiter",
+        "definition": "Node that votes but doesn't store data",
+        "purpose": "Enables majority voting in elections"
+      },
+      {
+        "term": "Oplog",
+        "definition": "Capped collection storing all operations",
+        "use": "Secondaries read oplog to stay synchronized"
+      },
+      {
+        "term": "Heartbeat",
+        "definition": "Periodic message between replica set members",
+        "frequency": "Every 10 seconds by default"
+      },
+      {
+        "term": "Election",
+        "definition": "Process to select new primary if current fails",
+        "trigger": "Primary unavailable or primary-secondary connection lost"
+      }
+    ]
+  },
+  "section_2_beginner_setup": {
+    "title": "BEGINNER: Setting Up Replica Sets",
+    "definition": "Initialize replica set with configuration",
+    "beginner_examples": [
+      {
+        "title": "Start MongoDB instances as replica set",
+        "step1": "mongod --replSet rs0 --port 27017",
+        "step2": "mongod --replSet rs0 --port 27018",
+        "step3": "mongod --replSet rs0 --port 27019",
+        "description": "Start 3 instances on different ports"
+      },
+      {
+        "title": "Initialize replica set (from primary)",
+        "query": "rs.initiate({\n  _id: 'rs0',\n  members: [\n    { _id: 0, host: 'localhost:27017' },\n    { _id: 1, host: 'localhost:27018' },\n    { _id: 2, host: 'localhost:27019' }\n  ]\n})",
+        "result": "Replica set initialized with 3 members"
+      },
+      {
+        "title": "Check replica set status",
+        "query": "rs.status()",
+        "output": "Status of all members, their roles, oplog info"
+      }
+    ],
+    "important_notes": [
+      "All instances in replica set use same --replSet name",
+      "Initialization happens on primary (elected automatically)",
+      "Secondaries catch up by reading oplog",
+      "Configuration persists in local.system.replset"
+    ]
+  },
+  "section_3_beginner_failover": {
+    "title": "BEGINNER: Automatic Failover",
+    "definition": "Automatic selection of new primary when current primary fails",
+    "behavior": [
+      "Primary fails (unreachable)",
+      "Secondaries detect primary is down",
+      "Remaining members vote for new primary",
+      "New primary elected (majority needed)",
+      "Application redirects writes to new primary"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Primary node fails",
+        "scenario": "3-node replica set: Primary on node 1, Secondaries on nodes 2&3",
+        "event": "Node 1 crashes",
+        "detection": "Nodes 2&3 detect heartbeat failure",
+        "election": "Nodes 2&3 vote, node 2 becomes primary",
+        "recovery_time": "Typically 10-30 seconds"
+      },
+      {
+        "title": "Primary recovers",
+        "scenario": "Primary comes back online",
+        "behavior": "Rejoins as secondary, catches up on missed operations"
+      }
+    ],
+    "write_concern": "Determines how many replicas must acknowledge write before success"
+  },
+  "section_4_intermediate_read_preference": {
+    "title": "INTERMEDIATE: Read Preferences",
+    "definition": "Control which replica set member handles read operations",
+    "read_modes": [
+      {
+        "mode": "primary",
+        "default": true,
+        "reads_from": "Primary node only",
+        "consistency": "Most recent data"
+      },
+      {
+        "mode": "primaryPreferred",
+        "reads_from": "Primary if available, else secondary",
+        "use": "Prefer consistent but allow fallback"
+      },
+      {
+        "mode": "secondary",
+        "reads_from": "Secondary nodes only",
+        "consistency": "Possibly stale data"
+      },
+      {
+        "mode": "secondaryPreferred",
+        "reads_from": "Secondary if available, else primary",
+        "use": "Distribute reads, allow fallback"
+      },
+      {
+        "mode": "nearest",
+        "reads_from": "Lowest latency node (any)",
+        "use": "Geographic distribution"
+      }
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Read from primary (default)",
+        "query": "db.students.find().readPref('primary')",
+        "behavior": "All reads go to primary",
+        "data_freshness": "Most recent"
+      },
+      {
+        "title": "Read from secondary for analytics",
+        "query": "db.students.find().readPref('secondary')",
+        "query_alt": "db.students.find().readPref('secondaryPreferred')",
+        "use_case": "Heavy analytics don't impact primary"
+      },
+      {
+        "title": "Read from nearest (geographic)",
+        "query": "db.students.find().readPref('nearest')",
+        "use_case": "Global application, lowest latency"
+      }
+    ]
+  },
+  "section_5_intermediate_write_concern": {
+    "title": "INTERMEDIATE: Write Concern",
+    "definition": "Specify how many replicas must acknowledge write before declaring success",
+    "levels": [
+      {
+        "level": "0",
+        "name": "Unacknowledged",
+        "behavior": "No acknowledgment required",
+        "speed": "Fastest but risky"
+      },
+      {
+        "level": "1",
+        "name": "Acknowledged (default)",
+        "behavior": "Primary acknowledges write",
+        "safety": "Moderate (primary crash = data loss)"
+      },
+      {
+        "level": "majority",
+        "name": "Majority committed",
+        "behavior": "Majority of replica set acknowledges",
+        "safety": "High (data preserved even if primary fails)"
+      },
+      {
+        "level": "all",
+        "name": "All members",
+        "behavior": "All members must acknowledge",
+        "speed": "Slowest but safest"
+      }
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Write with default concern",
+        "query": "db.students.insertOne({ name: 'Alice' })",
+        "behavior": "Primary acknowledges, returns immediately"
+      },
+      {
+        "title": "Write with majority concern",
+        "query": "db.students.insertOne(\n  { name: 'Alice' },\n  { writeConcern: { w: 'majority' } }\n)",
+        "behavior": "Waits for majority confirmation",
+        "safety": "High - data survives primary failure"
+      },
+      {
+        "title": "Write with timeout",
+        "query": "db.students.insertOne(\n  { name: 'Alice' },\n  { writeConcern: { w: 'majority', wtimeout: 5000 } }\n)",
+        "timeout": "5 seconds",
+        "behavior": "Returns error if majority not confirmed in 5 seconds"
+      }
+    ]
+  },
+  "section_6_intermediate_oplog": {
+    "title": "INTERMEDIATE: Oplog (Operation Log)",
+    "definition": "Capped collection storing all operations for replication",
+    "characteristics": [
+      "Capped collection (fixed size)",
+      "Stores every write operation",
+      "Stores in sequence (chronological)",
+      "Secondaries read from oplog to replicate",
+      "Size: Configurable, default 5% of disk"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Check oplog status",
+        "query": "rs.printReplicationInfo()",
+        "shows": "Oplog size, data in oplog, replication lag"
+      },
+      {
+        "title": "Query oplog directly",
+        "query": "use local\ndb.oplog.rs.find().limit(1)",
+        "shows": "Single operation entry"
+      },
+      {
+        "title": "Monitor replication lag",
+        "query": "rs.status()",
+        "check": "optimeDate field on each member",
+        "lag": "Difference between primary and secondary times"
+      }
+    ],
+    "oplog_exhaustion": "Secondary too far behind to recover (oplog rolled over)"
+  },
+  "section_7_advanced_arbiter": {
+    "title": "ADVANCED: Arbiter Nodes",
+    "definition": "Node that votes but doesn't store data",
+    "use_cases": [
+      "Odd number of voting members (3-node: 2 data + 1 arbiter)",
+      "Cost reduction (cheap compute for voting)",
+      "Geographically distributed (vote at third location)"
+    ],
+    "advanced_examples": [
+      {
+        "title": "Add arbiter to replica set",
+        "query": "rs.addArb('localhost:27019')",
+        "result": "Node joins as arbiter, doesn't replicate data"
+      },
+      {
+        "title": "3-node setup with arbiter",
+        "nodes": [
+          "Node 1: Primary (full data)",
+          "Node 2: Secondary (full data)",
+          "Node 3: Arbiter (no data, votes only)"
+        ],
+        "benefit": "3-node voting with 2 data copies"
+      }
+    ],
+    "important_note": "Arbiter doesn't hold data, useful for cost savings but reduced redundancy"
+  },
+  "section_8_advanced_monitoring": {
+    "title": "ADVANCED: Monitoring & Troubleshooting",
+    "advanced_examples": [
+      {
+        "title": "Check replica set configuration",
+        "query": "rs.conf()"
+      },
+      {
+        "title": "Monitor replication in real-time",
+        "query": "rs.status()"
+      },
+      {
+        "title": "Check secondary lag",
+        "query": "db.adminCommand({ serverStatus: 1 }).repl.optime"
+      },
+      {
+        "title": "Force election (trigger failover)",
+        "query": "rs.stepDown()"
+      },
+      {
+        "title": "Reconfigure replica set",
+        "query": "var config = rs.conf()\nconfig.members[1].priority = 2\nrs.reconfig(config)"
+      }
+    ]
+  },
+  "section_9_use_cases": {
+    "beginner": [
+      {
+        "use_case": "High availability",
+        "example": "3-node replica set ensures uptime",
+        "benefit": "If primary fails, secondary takes over"
+      },
+      {
+        "use_case": "Data backup",
+        "example": "Secondary is always synchronized copy",
+        "benefit": "Can restore from secondary without impacting primary"
+      },
+      {
+        "use_case": "Read scaling",
+        "example": "Heavy queries run on secondaries",
+        "benefit": "Primary handles writes, secondaries handle analytics"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Geographic distribution",
+        "example": "Replicas in different data centers",
+        "benefit": "Local read performance, disaster recovery"
+      },
+      {
+        "use_case": "Majority write concern",
+        "example": "Financial transactions use w: majority",
+        "benefit": "Data survives primary failure"
+      },
+      {
+        "use_case": "Planned maintenance",
+        "example": "Stepdown primary for updates",
+        "benefit": "Failover to secondary with minimal downtime"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Multi-region setup",
+        "example": "Replicas in US, EU, Asia",
+        "benefit": "Highly available, geographically redundant"
+      },
+      {
+        "use_case": "Rolling updates",
+        "example": "Update one secondary at a time",
+        "benefit": "Zero downtime deployments"
+      },
+      {
+        "use_case": "Compliance/audit",
+        "example": "Replicas in compliant data centers",
+        "benefit": "Data sovereignty, regulatory compliance"
+      }
+    ]
+  },
+  "section_10_best_practices": {
+    "practice_1_minimum_three_nodes": {
+      "rule": "Minimum 3 nodes for high availability",
+      "why": "Need majority for elections and failover",
+      "setup": "1 primary + 2 secondaries OR 1 primary + 1 secondary + 1 arbiter"
+    },
+    "practice_2_use_majority_concern": {
+      "rule": "Use w: majority for important data",
+      "good": "Financial transactions with w: 'majority'",
+      "avoid": "w: 1 for critical data",
+      "why": "Survives primary failure"
+    },
+    "practice_3_monitor_oplog": {
+      "rule": "Monitor oplog to prevent exhaustion",
+      "check": "rs.printReplicationInfo() periodically",
+      "alert": "Secondary lag > 1 hour"
+    },
+    "practice_4_geographic_distribution": {
+      "rule": "Place replicas in different locations",
+      "benefit": "Disaster recovery, local performance",
+      "note": "Use readPref: 'nearest' for distributed apps"
+    },
+    "practice_5_plan_for_failover": {
+      "rule": "Design application to handle failover",
+      "note": "Connection pooling handles automatically",
+      "test": "Simulate primary failure in testing"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_two_node_setup": {
+      "mistake": "Replica set with only 2 nodes",
+      "problem": "If one fails, remaining node can't get majority",
+      "solution": "Add third node (data or arbiter)"
+    },
+    "mistake_2_ignore_replication_lag": {
+      "mistake": "Don't monitor secondary lag",
+      "problem": "Secondary falls too far behind, can't catch up",
+      "solution": "Monitor lag, alert on excessive delay"
+    },
+    "mistake_3_strong_consistency_on_secondary": {
+      "mistake": "Read from secondary for critical data",
+      "problem": "May get stale data",
+      "solution": "Use readPref: 'primary' for current data"
+    },
+    "mistake_4_no_write_concern": {
+      "mistake": "Use default w: 1",
+      "problem": "Data lost if primary fails",
+      "solution": "Use w: 'majority' for important writes"
+    },
+    "mistake_5_poor_network": {
+      "mistake": "Replicas on slow/unreliable network",
+      "problem": "High lag, election issues",
+      "solution": "Use reliable, low-latency network"
+    }
+  },
+  "section_12_recovery_scenarios": {
+    "title": "Recovery Scenarios",
+    "scenarios": [
+      {
+        "scenario": "Primary fails",
+        "recovery": "Election happens, secondary becomes primary (10-30s)"
+      },
+      {
+        "scenario": "Primary + secondary fail",
+        "recovery": "Only remaining member can't get majority, stuck (bring back one)"
+      },
+      {
+        "scenario": "All members fail",
+        "recovery": "Manual intervention needed (remove one, restart as primary)"
+      },
+      {
+        "scenario": "Network partition",
+        "recovery": "Majority continues, minority goes read-only"
+      },
+      {
+        "scenario": "Oplog exhaustion",
+        "recovery": "Secondary too far behind, must resync from primary"
+      }
+    ]
+  },
+  "section_13_progression": {
+    "beginner": [
+      "Replica set concepts (primary, secondary, arbiter)",
+      "Basic setup and initialization",
+      "Automatic failover behavior",
+      "Understanding oplog"
+    ],
+    "intermediate": [
+      "Read preferences (distribute reads to secondaries)",
+      "Write concern (ensure durability)",
+      "Monitoring replication lag",
+      "Oplog management"
+    ],
+    "advanced": [
+      "Arbiter nodes and topology",
+      "Reconfiguring replica sets",
+      "Monitoring and troubleshooting",
+      "Recovery procedures"
+    ]
+  },
+  "summary": {
+    "core_concept": "Replica set maintains multiple copies with automatic failover",
+    "minimum_setup": "3 nodes (1 primary + 2 secondaries or arbiter)",
+    "key_features": [
+      "Automatic failover (new primary elected)",
+      "Read scaling (reads on secondaries)",
+      "Data redundancy (multiple copies)",
+      "Oplog replication (sequential sync)"
+    ],
+    "write_path": "Write to primary → Primary records in oplog → Secondaries read oplog → Replication complete",
+    "read_path": "Application reads primary by default, can readPref secondary/nearest",
+    "best_practice": "3+ nodes, w: majority for important writes, monitor lag, reliable network",
+    "progression": "Beginner: Basic concepts and setup → Intermediate: Read/write preferences, monitoring → Advanced: Topology and recovery"
+  }
+}

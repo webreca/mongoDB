@@ -1,0 +1,361 @@
+{
+  "metadata": {
+    "collectionName": "timeSeries",
+    "description": "Time Series Collection Examples - MongoDB",
+    "timeField": "timestamp",
+    "metaField": "metadata"
+  },
+
+  "beginner_examples": {
+    "weather_data": [
+      {
+        "timestamp": "2026-06-23T08:00:00Z",
+        "metadata": {
+          "location": "New York",
+          "sensor_id": "NYC-001"
+        },
+        "temperature": 22.5,
+        "humidity": 65,
+        "pressure": 1013.25
+      },
+      {
+        "timestamp": "2026-06-23T09:00:00Z",
+        "metadata": {
+          "location": "New York",
+          "sensor_id": "NYC-001"
+        },
+        "temperature": 23.1,
+        "humidity": 62,
+        "pressure": 1013.20
+      },
+      {
+        "timestamp": "2026-06-23T10:00:00Z",
+        "metadata": {
+          "location": "New York",
+          "sensor_id": "NYC-001"
+        },
+        "temperature": 24.3,
+        "humidity": 58,
+        "pressure": 1013.15
+      }
+    ],
+
+    "stock_prices": [
+      {
+        "timestamp": "2026-06-23T09:30:00Z",
+        "metadata": {
+          "symbol": "AAPL",
+          "exchange": "NASDAQ"
+        },
+        "open": 150.25,
+        "high": 152.80,
+        "low": 149.90,
+        "close": 151.75,
+        "volume": 45000000
+      },
+      {
+        "timestamp": "2026-06-23T10:30:00Z",
+        "metadata": {
+          "symbol": "AAPL",
+          "exchange": "NASDAQ"
+        },
+        "open": 151.75,
+        "high": 153.40,
+        "low": 151.50,
+        "close": 152.95,
+        "volume": 32000000
+      }
+    ],
+
+    "user_activity": [
+      {
+        "timestamp": "2026-06-23T12:00:00Z",
+        "metadata": {
+          "user_id": "user123",
+          "device": "mobile"
+        },
+        "event_type": "login",
+        "session_duration": 1800
+      },
+      {
+        "timestamp": "2026-06-23T12:30:00Z",
+        "metadata": {
+          "user_id": "user123",
+          "device": "mobile"
+        },
+        "event_type": "page_view",
+        "page": "/dashboard"
+      }
+    ]
+  },
+
+  "intermediate_examples": {
+    "server_metrics": [
+      {
+        "timestamp": "2026-06-23T14:00:00Z",
+        "metadata": {
+          "server_id": "server-01",
+          "region": "us-east-1",
+          "environment": "production"
+        },
+        "cpu_usage": 45.2,
+        "memory_usage": 62.8,
+        "disk_io": 125.5,
+        "network_in": 1024,
+        "network_out": 2048,
+        "error_rate": 0.001
+      },
+      {
+        "timestamp": "2026-06-23T14:01:00Z",
+        "metadata": {
+          "server_id": "server-01",
+          "region": "us-east-1",
+          "environment": "production"
+        },
+        "cpu_usage": 47.8,
+        "memory_usage": 64.2,
+        "disk_io": 128.3,
+        "network_in": 1050,
+        "network_out": 2100,
+        "error_rate": 0.002
+      }
+    ],
+
+    "iot_sensor_data": [
+      {
+        "timestamp": "2026-06-23T15:00:00Z",
+        "metadata": {
+          "device_id": "sensor-temp-001",
+          "location": "Building-A-Floor-3",
+          "manufacturer": "TempSense"
+        },
+        "temperature": 21.5,
+        "humidity": 55,
+        "co2_level": 450,
+        "air_quality_index": 25,
+        "status": "operational"
+      },
+      {
+        "timestamp": "2026-06-23T15:05:00Z",
+        "metadata": {
+          "device_id": "sensor-temp-001",
+          "location": "Building-A-Floor-3",
+          "manufacturer": "TempSense"
+        },
+        "temperature": 21.8,
+        "humidity": 54,
+        "co2_level": 455,
+        "air_quality_index": 26,
+        "status": "operational"
+      }
+    ],
+
+    "application_logs": [
+      {
+        "timestamp": "2026-06-23T16:00:00Z",
+        "metadata": {
+          "service": "api-gateway",
+          "version": "2.1.0",
+          "pod_id": "pod-001"
+        },
+        "level": "INFO",
+        "message": "Request processed successfully",
+        "response_time_ms": 125,
+        "status_code": 200
+      },
+      {
+        "timestamp": "2026-06-23T16:00:15Z",
+        "metadata": {
+          "service": "api-gateway",
+          "version": "2.1.0",
+          "pod_id": "pod-001"
+        },
+        "level": "WARN",
+        "message": "High response time detected",
+        "response_time_ms": 850,
+        "status_code": 200
+      }
+    ]
+  },
+
+  "advanced_examples": {
+    "high_frequency_trading": [
+      {
+        "timestamp": "2026-06-23T17:30:45.123Z",
+        "metadata": {
+          "symbol": "BTC/USD",
+          "exchange": "Binance",
+          "trader_id": "trader_001",
+          "strategy": "arbitrage"
+        },
+        "bid": 42150.50,
+        "ask": 42151.75,
+        "spread": 1.25,
+        "bid_volume": 2.5,
+        "ask_volume": 3.2,
+        "vwap": 42150.95,
+        "signal_strength": 0.87
+      },
+      {
+        "timestamp": "2026-06-23T17:30:45.456Z",
+        "metadata": {
+          "symbol": "BTC/USD",
+          "exchange": "Binance",
+          "trader_id": "trader_001",
+          "strategy": "arbitrage"
+        },
+        "bid": 42151.00,
+        "ask": 42152.25,
+        "spread": 1.25,
+        "bid_volume": 2.3,
+        "ask_volume": 3.5,
+        "vwap": 42151.45,
+        "signal_strength": 0.89
+      }
+    ],
+
+    "distributed_trace_data": [
+      {
+        "timestamp": "2026-06-23T18:00:00.000Z",
+        "metadata": {
+          "trace_id": "trace-12345",
+          "span_id": "span-001",
+          "parent_span_id": null,
+          "service": "api-gateway",
+          "environment": "production"
+        },
+        "operation": "http.request",
+        "duration_ms": 250,
+        "status": "success",
+        "tags": {
+          "http.method": "GET",
+          "http.url": "/api/users",
+          "http.status_code": 200
+        },
+        "metrics": {
+          "db_queries": 3,
+          "cache_hits": 2,
+          "external_calls": 1
+        }
+      },
+      {
+        "timestamp": "2026-06-23T18:00:00.050Z",
+        "metadata": {
+          "trace_id": "trace-12345",
+          "span_id": "span-002",
+          "parent_span_id": "span-001",
+          "service": "database",
+          "environment": "production"
+        },
+        "operation": "db.query",
+        "duration_ms": 45,
+        "status": "success",
+        "tags": {
+          "db.system": "mongodb",
+          "db.operation": "find",
+          "db.collection": "users"
+        },
+        "metrics": {
+          "documents_scanned": 100,
+          "documents_returned": 25
+        }
+      }
+    ],
+
+    "anomaly_detection_input": [
+      {
+        "timestamp": "2026-06-23T19:00:00Z",
+        "metadata": {
+          "model_id": "anomaly-v3",
+          "dataset": "network-traffic",
+          "anomaly_score": 0.78,
+          "alert_threshold": 0.85
+        },
+        "raw_metrics": {
+          "packet_loss": 0.02,
+          "latency_ms": 45,
+          "jitter_ms": 8,
+          "throughput_mbps": 850
+        },
+        "statistical_features": {
+          "mean": 450.5,
+          "std_dev": 125.3,
+          "percentile_95": 650.2,
+          "percentile_99": 750.8
+        },
+        "ml_predictions": {
+          "probability_anomaly": 0.78,
+          "confidence": 0.92,
+          "predicted_root_cause": "traffic_spike"
+        },
+        "recommendations": [
+          "Scale up network capacity",
+          "Check for DDoS patterns",
+          "Review concurrent connections"
+        ]
+      }
+    ],
+
+    "financial_compliance_audit": [
+      {
+        "timestamp": "2026-06-23T20:00:00Z",
+        "metadata": {
+          "transaction_id": "txn-567890",
+          "compliance_region": "EU",
+          "regulatory_framework": "GDPR",
+          "audit_id": "audit-2026-001"
+        },
+        "transaction_details": {
+          "amount": 150000.00,
+          "currency": "EUR",
+          "from_account": "ACC-001",
+          "to_account": "ACC-002",
+          "type": "wire_transfer"
+        },
+        "risk_assessment": {
+          "aml_score": 0.15,
+          "kyc_verified": true,
+          "sanctions_check": "passed",
+          "pep_check": "passed",
+          "risk_level": "low"
+        },
+        "compliance_checks": {
+          "data_encryption": "AES-256",
+          "pii_masked": true,
+          "audit_logged": true,
+          "retention_policy": "7_years"
+        }
+      }
+    ]
+  },
+
+  "bulk_insert_example": {
+    "cpu_metrics_bulk": [
+      {
+        "timestamp": "2026-06-23T21:00:00Z",
+        "metadata": { "host": "server-1", "datacenter": "dc-1" },
+        "cpu": 45
+      },
+      {
+        "timestamp": "2026-06-23T21:01:00Z",
+        "metadata": { "host": "server-1", "datacenter": "dc-1" },
+        "cpu": 46
+      },
+      {
+        "timestamp": "2026-06-23T21:02:00Z",
+        "metadata": { "host": "server-1", "datacenter": "dc-1" },
+        "cpu": 44
+      },
+      {
+        "timestamp": "2026-06-23T21:03:00Z",
+        "metadata": { "host": "server-1", "datacenter": "dc-1" },
+        "cpu": 47
+      },
+      {
+        "timestamp": "2026-06-23T21:04:00Z",
+        "metadata": { "host": "server-1", "datacenter": "dc-1" },
+        "cpu": 48
+      }
+    ]
+  }
+}

@@ -1,0 +1,360 @@
+{
+  "title": "MongoDB Sort Document - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on sorting documents with simple and complex techniques",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "sort_overview": {
+    "definition": "Sorting organizes query results in specific order based on field values",
+    "purpose": [
+      "Order results by field value (ascending/descending)",
+      "Multi-field sorting (primary, secondary, etc.)",
+      "Pagination with sort",
+      "Result ranking",
+      "Performance optimization with indexes"
+    ],
+    "syntax_pattern": ".sort({ field: 1 } or { field: -1 })",
+    "sort_values": {
+      "1": "Ascending order (A-Z, 0-9, oldest-newest)",
+      "-1": "Descending order (Z-A, 9-0, newest-oldest)"
+    }
+  },
+  "section_1_beginner_simple": {
+    "title": "BEGINNER: Simple Sorting",
+    "definition": "Sort by single field in ascending or descending order",
+    "syntax": "db.collection.find().sort({ field: 1 or -1 })",
+    "beginner_examples": [
+      {
+        "title": "Sort by GPA ascending (lowest first)",
+        "query": "db.students.find().sort({ gpa: 1 })",
+        "result": "3.21 → 3.98 (lowest to highest)",
+        "use_case": "Find struggling students"
+      },
+      {
+        "title": "Sort by GPA descending (highest first)",
+        "query": "db.students.find().sort({ gpa: -1 })",
+        "result": "3.98 → 3.21 (highest to lowest)",
+        "use_case": "Honor roll (best students first)"
+      },
+      {
+        "title": "Sort by age ascending",
+        "query": "db.students.find().sort({ age: 1 })",
+        "result": "20, 20, 25, 25, 26... (youngest first)",
+        "use_case": "Age demographics"
+      },
+      {
+        "title": "Sort by name alphabetically",
+        "query": "db.students.find().sort({ 'name.first': 1 })",
+        "result": "Anaya, Arpit, Daksh... (A-Z)",
+        "use_case": "Directory listing"
+      },
+      {
+        "title": "Sort by major descending",
+        "query": "db.students.find().sort({ major: -1 })",
+        "result": "Reverse alphabetical majors",
+        "use_case": "Alternative ranking"
+      }
+    ]
+  },
+  "section_2_beginner_with_projection": {
+    "title": "BEGINNER: Sort with Projection",
+    "definition": "Sort and select specific fields simultaneously",
+    "syntax": "db.collection.find({}, projection).sort({ field: order })",
+    "beginner_examples": [
+      {
+        "title": "Sort by GPA, show only name and GPA",
+        "query": "db.students.find({}, { 'name.first': 1, gpa: 1, _id: 0 }).sort({ gpa: -1 })",
+        "result": "Top students with minimal data",
+        "use_case": "Honor roll report"
+      },
+      {
+        "title": "Sort by age, show age and major",
+        "query": "db.students.find({}, { age: 1, major: 1, _id: 0 }).sort({ age: 1 })",
+        "result": "Age distribution by major",
+        "use_case": "Demographic analysis"
+      }
+    ]
+  },
+  "section_3_intermediate_multi_field": {
+    "title": "INTERMEDIATE: Multi-Field Sorting",
+    "definition": "Sort by multiple fields (primary, secondary, tertiary)",
+    "syntax": "db.collection.find().sort({ field1: order1, field2: order2, ... })",
+    "meaning": "Sort by field1 first, then by field2 for equal field1 values",
+    "intermediate_examples": [
+      {
+        "title": "Sort by major (A-Z), then by GPA (high to low)",
+        "query": "db.students.find().sort({ major: 1, gpa: -1 })",
+        "result": "Students grouped by major, best GPA first within each major",
+        "use_case": "Department reports"
+      },
+      {
+        "title": "Sort by age ascending, then name",
+        "query": "db.students.find().sort({ age: 1, 'name.first': 1 })",
+        "result": "Age groups, alphabetical within each age",
+        "use_case": "Age-based directory"
+      },
+      {
+        "title": "Sort by international status, then GPA",
+        "query": "db.students.find().sort({ isInternational: 1, gpa: -1 })",
+        "result": "Domestic first (0/false), international second (1/true), each by GPA",
+        "use_case": "Visa status groups"
+      },
+      {
+        "title": "Three-field sort",
+        "query": "db.students.find().sort({ isInternational: 1, major: 1, gpa: -1 })",
+        "result": "Status → Major → GPA",
+        "use_case": "Complex grouping reports"
+      }
+    ]
+  },
+  "section_4_intermediate_limit_skip": {
+    "title": "INTERMEDIATE: Pagination (Sort + Skip + Limit)",
+    "definition": "Sort results and implement pagination with skip and limit",
+    "syntax": "db.collection.find().sort({ field: order }).skip(n).limit(n)",
+    "intermediate_examples": [
+      {
+        "title": "Top 10 students by GPA",
+        "query": "db.students.find().sort({ gpa: -1 }).limit(10)",
+        "result": "First 10 highest GPA students",
+        "use_case": "Honor roll top 10"
+      },
+      {
+        "title": "Page 2 of results (10 per page)",
+        "query": "db.students.find().sort({ gpa: -1 }).skip(10).limit(10)",
+        "result": "Students ranked 11-20 by GPA",
+        "use_case": "Pagination (page 2)"
+      },
+      {
+        "title": "Bottom 5 students by GPA",
+        "query": "db.students.find().sort({ gpa: 1 }).limit(5)",
+        "result": "5 lowest GPA students",
+        "use_case": "Struggling students (intervention)"
+      },
+      {
+        "title": "Students 21-30, sorted by age",
+        "query": "db.students.find().sort({ age: 1 }).skip(20).limit(10)",
+        "result": "Page 3 of age-sorted list",
+        "use_case": "Directory pagination"
+      }
+    ]
+  },
+  "section_5_intermediate_with_filter": {
+    "title": "INTERMEDIATE: Sort with Filter",
+    "definition": "Filter documents first, then sort results",
+    "syntax": "db.collection.find({ filter }).sort({ field: order })",
+    "intermediate_examples": [
+      {
+        "title": "International students sorted by GPA",
+        "query": "db.students.find({ isInternational: true }).sort({ gpa: -1 })",
+        "result": "International students ranked by GPA",
+        "use_case": "International student rankings"
+      },
+      {
+        "title": "Data Science majors sorted by age",
+        "query": "db.students.find({ major: 'Data Science' }).sort({ age: 1 })",
+        "result": "DS students youngest to oldest",
+        "use_case": "Department demographics"
+      },
+      {
+        "title": "Honor students sorted by major",
+        "query": "db.students.find({ gpa: { $gte: 3.9 } }).sort({ major: 1 })",
+        "result": "Top students grouped by major",
+        "use_case": "Honor roll by department"
+      }
+    ]
+  },
+  "section_6_advanced_text_score": {
+    "title": "ADVANCED: Text Score Sorting",
+    "definition": "Sort by text search relevance score",
+    "requirement": "Text index must exist",
+    "syntax": "db.collection.find({ $text: { $search: '...' } }).sort({ score: { $meta: 'textScore' } })",
+    "advanced_examples": [
+      {
+        "title": "Search notes, sort by relevance",
+        "query": "db.students.find({ $text: { $search: 'scholarship merit' } }).sort({ score: { $meta: 'textScore' } })",
+        "result": "Most relevant scholarship notes first",
+        "use_case": "Search result ranking"
+      }
+    ]
+  },
+  "section_7_advanced_compound_complex": {
+    "title": "ADVANCED: Complex Compound Sorting",
+    "definition": "Multi-field sort with filtering and pagination",
+    "advanced_examples": [
+      {
+        "title": "Complex real-world query",
+        "query": "db.students.find({ isInternational: true, gpa: { $gte: 3.5 } }).sort({ major: 1, gpa: -1 }).skip(0).limit(20)",
+        "breakdown": "Find international honor-level students, group by major with best GPAs first, page 1 of 20",
+        "use_case": "Scholarship report generation"
+      },
+      {
+        "title": "Department ranking with pagination",
+        "query": "db.students.find({ major: { $in: ['Data Science', 'Engineering'] } }).sort({ gpa: -1, 'name.first': 1 }).skip(10).limit(10)",
+        "breakdown": "STEM majors, ranked by GPA (then name for ties), page 2",
+        "use_case": "Department performance report"
+      }
+    ]
+  },
+  "section_8_use_cases": {
+    "beginner_uses": [
+      {
+        "use_case": "Honor roll",
+        "query": "sort({ gpa: -1 }).limit(17)",
+        "description": "Top performers first"
+      },
+      {
+        "use_case": "Struggling students",
+        "query": "sort({ gpa: 1 }).limit(10)",
+        "description": "Need intervention"
+      },
+      {
+        "use_case": "Directory listing",
+        "query": "sort({ 'name.first': 1 })",
+        "description": "Alphabetical order"
+      }
+    ],
+    "intermediate_uses": [
+      {
+        "use_case": "Department ranking",
+        "query": "sort({ major: 1, gpa: -1 })",
+        "description": "Majors A-Z, top GPA in each"
+      },
+      {
+        "use_case": "Pagination system",
+        "query": "sort({ field: 1 }).skip(n).limit(20)",
+        "description": "20 results per page"
+      },
+      {
+        "use_case": "Filtered ranking",
+        "query": "find({ international: true }).sort({ gpa: -1 })",
+        "description": "International students by GPA"
+      }
+    ],
+    "advanced_uses": [
+      {
+        "use_case": "Scholarship report",
+        "query": "find({...filter...}).sort({major:1, gpa:-1}).skip().limit()",
+        "description": "Complex filtering + multi-sort + pagination"
+      },
+      {
+        "use_case": "Text search ranking",
+        "query": "find({$text:{...}}).sort({score:{$meta:'textScore'}})",
+        "description": "Search relevance ranking"
+      }
+    ]
+  },
+  "section_9_performance": {
+    "title": "Performance and Indexing",
+    "sort_without_index": {
+      "performance": "Slow - sorts in memory",
+      "limitation": "In-memory sort limited to 32MB",
+      "impact": "Large result sets fail"
+    },
+    "sort_with_index": {
+      "performance": "Fast - uses index order",
+      "benefit": "No in-memory sorting needed",
+      "scaling": "Works on large datasets"
+    },
+    "create_index_for_sort": {
+      "example": "db.students.createIndex({ gpa: -1 })",
+      "benefit": "Queries with sort({ gpa: -1 }) use index"
+    },
+    "multi_field_index": {
+      "example": "db.students.createIndex({ major: 1, gpa: -1 })",
+      "benefit": "Efficient for sort({ major: 1, gpa: -1 })"
+    },
+    "performance_tips": [
+      "Create index matching sort order",
+      "Put sort field early in compound index",
+      "Avoid sorting non-indexed fields on large collections",
+      "Use limit() to reduce memory usage",
+      "Use explain() to verify index usage"
+    ]
+  },
+  "section_10_best_practices": {
+    "practice_1_index_for_sort": {
+      "rule": "Create index for frequently sorted fields",
+      "command": "db.students.createIndex({ gpa: -1 })",
+      "benefit": "Fast sorting on large collections"
+    },
+    "practice_2_sort_order_matching": {
+      "rule": "Sort order should match index direction",
+      "good": "Index: { gpa: -1 }, Query: sort({ gpa: -1 })",
+      "reason": "Uses index efficiently"
+    },
+    "practice_3_combine_with_limit": {
+      "rule": "Use limit() with sort for pagination",
+      "good": "sort({...}).limit(20)",
+      "reason": "Reduces memory usage"
+    },
+    "practice_4_verify_with_explain": {
+      "rule": "Test performance with explain()",
+      "command": "db.students.find().sort({...}).explain('executionStats')",
+      "reason": "Verify index usage"
+    },
+    "practice_5_avoid_large_sorts": {
+      "rule": "Avoid sorting large unindexed fields",
+      "limitation": "In-memory sort max 32MB",
+      "solution": "Add index or filter first"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_no_index": {
+      "mistake": "Sorting large collection without index",
+      "problem": "Slow, memory issues",
+      "solution": "Create index on sort field"
+    },
+    "mistake_2_wrong_sort_order": {
+      "mistake": "Index { gpa: 1 } but sorting { gpa: -1 }",
+      "problem": "Index not used efficiently",
+      "solution": "Match sort order to index"
+    },
+    "mistake_3_memory_overflow": {
+      "mistake": "Sorting unindexed field on 1M+ docs",
+      "problem": "Error: sort exceeded memory limit",
+      "solution": "Add index or filter first"
+    },
+    "mistake_4_forgetting_limit": {
+      "mistake": "sort().skip(1000).limit(10) without index",
+      "problem": "Slow (processes 1010 docs)",
+      "solution": "Use index"
+    },
+    "mistake_5_complex_sort_no_index": {
+      "mistake": "sort({ major: 1, gpa: -1 }) with no index",
+      "problem": "Full collection scan + memory sort",
+      "solution": "Create compound index"
+    }
+  },
+  "section_12_progression": {
+    "beginner": [
+      "Single field ascending/descending",
+      "Sort with find()",
+      "Sort with limit()"
+    ],
+    "intermediate": [
+      "Multi-field sorting",
+      "Sort with skip (pagination)",
+      "Sort with filter"
+    ],
+    "advanced": [
+      "Text score sorting",
+      "Complex compound sorts",
+      "Performance optimization with indexes"
+    ]
+  },
+  "summary": {
+    "syntax": "db.collection.find().sort({ field: 1 or -1 })",
+    "sort_order": "1 = ascending, -1 = descending",
+    "multi_field": "Sorts by first field, then second, etc.",
+    "pagination": "Use skip().limit() with sort",
+    "indexing": "Create index for performance",
+    "key_concepts": [
+      "1 = ascending (A-Z, 0-9)",
+      "-1 = descending (Z-A, 9-0)",
+      "Multi-field has precedence order",
+      "Index makes sort fast",
+      "32MB in-memory limit"
+    ],
+    "best_practice": "Create indexes for sorted fields; use limit() for pagination; verify with explain()",
+    "progression": "Beginner: Simple sort → Intermediate: Multi-field + pagination → Advanced: Indexing + complex"
+  }
+}

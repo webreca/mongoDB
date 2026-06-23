@@ -1,0 +1,403 @@
+{
+  "title": "MongoDB Collection Creation Using Real Student Data Examples",
+  "description": "Comprehensive guide showing all 15 collection creation methods using actual student data from data.json",
+  "totalStudents": 60,
+  "agePattern": "20, 20, 25, 25, 26, 26, 27, 27... up to 53, 53",
+  "methods": [
+    {
+      "method": 1,
+      "title": "Implicit Collection Creation - Insert Students",
+      "description": "Collections are created automatically when you insert the first student document",
+      "examples": [
+        {
+          "name": "Insert First Student (Create Collection)",
+          "query": "db.students.insertOne({ studentId: { $numberLong: '20260001' }, name: { first: 'Daksh', last: 'Chauhan' }, age: 20, enrollmentDate: { $date: '2022-08-15T09:00:00Z' }, major: 'Data Science', gpa: { $numberDecimal: '3.85' }, isInternational: false, skills: ['Python', 'SQL', 'TensorFlow'], courses: [{ courseCode: 'DS-401', credits: 4, grade: 'A' }, { courseCode: 'STAT-301', credits: 3, grade: 'A-' }], campusLocation: { type: 'Point', coordinates: [77.2095, 28.6144] }, scholarshipDetails: { scholarshipName: 'Merit Excellence', amount: 15000, renewable: true }, libraryCardToken: { $binary: { base64: 'c3R1ZGVudF9oYXNoXzAwMQ==', subType: '00' } } })",
+          "explanation": "Creates 'students' collection with first student (Daksh Chauhan)",
+          "result": "Collection 'students' automatically created"
+        },
+        {
+          "name": "Insert All 60 Students",
+          "query": "db.students.insertMany([...all 60 student documents from data.json...])",
+          "explanation": "Creates collection with all 60 students from data.json",
+          "result": "Complete students collection with all records"
+        }
+      ]
+    },
+    {
+      "method": 2,
+      "title": "Explicit Collection Creation - Students with Options",
+      "description": "Explicitly create students collection with specific configurations",
+      "examples": [
+        {
+          "name": "Basic Students Collection",
+          "query": "db.createCollection('students')",
+          "explanation": "Creates empty 'students' collection",
+          "result": "Empty collection ready for student data"
+        },
+        {
+          "name": "Students Collection with Size Limit",
+          "query": "db.createCollection('students', { size: 104857600, max: 10000 })",
+          "explanation": "Creates collection with 100MB size limit and max 10,000 documents",
+          "result": "Bounded students collection created"
+        },
+        {
+          "name": "Capped Students Archive",
+          "query": "db.createCollection('students_archive', { capped: true, size: 52428800, max: 5000 })",
+          "explanation": "Creates capped collection for archived students (auto-removes oldest when full)",
+          "result": "Capped archive collection for legacy student data"
+        }
+      ]
+    },
+    {
+      "method": 3,
+      "title": "Collection with Schema Validation - Student Data Integrity",
+      "description": "Create students collection with strict schema validation",
+      "examples": [
+        {
+          "name": "Basic Student Schema Validation",
+          "query": "db.createCollection('students', { validator: { $jsonSchema: { bsonType: 'object', required: ['studentId', 'name', 'age', 'major', 'gpa'], properties: { studentId: { bsonType: 'long' }, name: { bsonType: 'object', required: ['first', 'last'], properties: { first: { bsonType: 'string' }, last: { bsonType: 'string' } } }, age: { bsonType: 'int', minimum: 18, maximum: 65 }, major: { bsonType: 'string' }, gpa: { bsonType: 'decimal', minimum: 0, maximum: 4.0 }, isInternational: { bsonType: 'bool' }, skills: { bsonType: 'array', items: { bsonType: 'string' } } } } } })",
+          "explanation": "Creates students collection with schema validation for all required fields",
+          "result": "Students collection with enforced schema"
+        },
+        {
+          "name": "Comprehensive Student Validation with All Fields",
+          "query": "db.createCollection('students', { validator: { $jsonSchema: { bsonType: 'object', required: ['studentId', 'name', 'age', 'enrollmentDate', 'major', 'gpa', 'isInternational', 'skills', 'courses', 'campusLocation', 'libraryCardToken'], properties: { studentId: { bsonType: 'long' }, name: { bsonType: 'object', properties: { first: { bsonType: 'string', minLength: 1, maxLength: 100 }, last: { bsonType: 'string', minLength: 1, maxLength: 100 } } }, age: { bsonType: 'int', minimum: 18, maximum: 65 }, enrollmentDate: { bsonType: 'date' }, major: { enum: ['Data Science', 'Frontend Engineering', 'Machine Learning', 'Cloud Computing', 'Cybersecurity', 'Mobile Development', 'Backend Engineering', 'Artificial Intelligence', 'DevOps Engineering', 'Game Development', 'Full Stack Development', 'Blockchain Development', 'Software Architecture', 'QA Automation', 'Data Engineering', 'UI/UX Design', 'IoT Solutions', 'Technical Writing', 'Database Administration', 'Solution Architecture', 'Network Engineering', 'Product Management', 'Computer Vision', 'Cyber Threat Intelligence', 'Robotics Engineering', 'API Development', 'Site Reliability Engineering', 'Augmented Reality', 'Quantum Computing', 'Bioinformatics', 'Enterprise Software', 'Embedded Systems', 'Web Services Architecture', 'Accessibility Engineering', 'Performance Engineering', 'Natural Language Processing', 'Fintech Development', 'Environmental Computing', 'Healthcare IT', 'E-Commerce Development', 'Marketing Technology', 'Supply Chain Tech', 'Content Delivery Systems', 'Information Security', 'Voice Technology', 'Streaming Platforms', 'Software Testing', 'Container Orchestration', 'Graph Database Design', 'Search Engine Architecture', 'Analytics Engineering', 'Compliance Engineering', 'Edge Computing', 'Software Security', 'API Governance', 'Cloud Security', 'Low-Code Platforms', 'Incident Management', 'Data Privacy', 'Observability Engineering'] }, gpa: { bsonType: 'decimal', minimum: 0.0, maximum: 4.0 }, isInternational: { bsonType: 'bool' }, skills: { bsonType: 'array', minItems: 1, maxItems: 10, items: { bsonType: 'string' } }, courses: { bsonType: 'array', items: { bsonType: 'object', required: ['courseCode', 'credits', 'grade'], properties: { courseCode: { bsonType: 'string' }, credits: { bsonType: 'int', minimum: 1, maximum: 4 }, grade: { enum: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D', 'F'] } } } }, campusLocation: { bsonType: 'object', required: ['type', 'coordinates'], properties: { type: { enum: ['Point'] }, coordinates: { bsonType: 'array', minItems: 2, maxItems: 2, items: { bsonType: 'double' } } } }, scholarshipDetails: { oneOf: [{ bsonType: 'null' }, { bsonType: 'object', properties: { scholarshipName: { bsonType: 'string' }, amount: { bsonType: 'int', minimum: 5000 }, renewable: { bsonType: 'bool' } } }] }, libraryCardToken: { bsonType: 'object', required: ['$binary'], properties: { '$binary': { bsonType: 'object', properties: { base64: { bsonType: 'string' }, subType: { bsonType: 'string' } } } } } } } } })",
+          "explanation": "Creates students collection with comprehensive validation for all 60 student records",
+          "result": "Fully validated students collection matching data.json structure"
+        }
+      ]
+    },
+    {
+      "method": 4,
+      "title": "Collection with Collation - Multi-Language Student Names",
+      "description": "Create students collection with collation for proper name handling",
+      "examples": [
+        {
+          "name": "English Collation for Student Names",
+          "query": "db.createCollection('students', { collation: { locale: 'en_US', strength: 2 } })",
+          "explanation": "Creates students collection with English US collation for proper sorting of student names",
+          "result": "Students collection with English name sorting"
+        },
+        {
+          "name": "Case-Insensitive Student Queries",
+          "query": "db.createCollection('students', { collation: { locale: 'en', strength: 1 } })",
+          "explanation": "Enables case-insensitive queries on student names (Daksh = DAKSH = daksh)",
+          "result": "Case-insensitive students collection"
+        }
+      ]
+    },
+    {
+      "method": 5,
+      "title": "Time Series Collection - Student Enrollment Data",
+      "description": "Create optimized collection for student enrollment time series",
+      "examples": [
+        {
+          "name": "Enrollment Timeline Collection",
+          "query": "db.createCollection('enrollment_timeline', { timeseries: { timeField: 'enrollmentDate', metaField: 'student_metadata' } })",
+          "explanation": "Creates time series collection for tracking student enrollments over time",
+          "result": "Time series collection for enrollment analytics"
+        },
+        {
+          "name": "GPA Tracking Over Time",
+          "query": "db.createCollection('student_gpa_history', { timeseries: { timeField: 'recordDate', metaField: 'studentInfo', granularity: 'months' } })",
+          "explanation": "Creates monthly granularity time series for student GPA progression",
+          "result": "Monthly GPA tracking collection"
+        }
+      ]
+    },
+    {
+      "method": 6,
+      "title": "Collection with Indexes - Optimize Student Queries",
+      "description": "Create students collection with optimized indexes",
+      "examples": [
+        {
+          "name": "Index on Student ID",
+          "query": "db.students.createIndex({ 'studentId': 1 })",
+          "explanation": "Creates index on studentId for fast lookups",
+          "result": "Indexed studentId field for quick retrieval"
+        },
+        {
+          "name": "Index on Major (Group by Major)",
+          "query": "db.students.createIndex({ 'major': 1 })",
+          "explanation": "Creates index on major field to quickly find all students by major",
+          "result": "Major field indexed"
+        },
+        {
+          "name": "Index on Age Range Queries",
+          "query": "db.students.createIndex({ 'age': 1 })",
+          "explanation": "Creates index for efficient age range queries",
+          "result": "Age field indexed for range queries"
+        },
+        {
+          "name": "Compound Index - Major and GPA",
+          "query": "db.students.createIndex({ 'major': 1, 'gpa': -1 })",
+          "explanation": "Creates index for finding top GPA students by major",
+          "result": "Compound index for major and GPA sorting"
+        },
+        {
+          "name": "Text Index on Skills",
+          "query": "db.students.createIndex({ 'skills': 'text' })",
+          "explanation": "Creates text search index for skill-based queries",
+          "result": "Full-text search enabled on skills"
+        },
+        {
+          "name": "Geospatial Index on Campus Location",
+          "query": "db.students.createIndex({ 'campusLocation': '2dsphere' })",
+          "explanation": "Creates geospatial index for location-based student queries",
+          "result": "Geo-queries enabled for campus locations"
+        },
+        {
+          "name": "Unique Index on Student Email (if added)",
+          "query": "db.students.createIndex({ 'email': 1 }, { unique: true, sparse: true })",
+          "explanation": "Ensures no duplicate student emails",
+          "result": "Email uniqueness enforced"
+        }
+      ]
+    },
+    {
+      "method": 7,
+      "title": "Collection with TTL - Student Session Cache",
+      "description": "Create collections that auto-expire student session data",
+      "examples": [
+        {
+          "name": "Student Login Session Cache (1 Hour Expiry)",
+          "query": "db.student_sessions.createIndex({ 'createdAt': 1 }, { expireAfterSeconds: 3600 }); db.student_sessions.insertOne({ studentId: 20260001, name: 'Daksh Chauhan', loginTime: new Date(), createdAt: new Date() })",
+          "explanation": "Creates session collection that auto-deletes old login sessions after 1 hour",
+          "result": "Auto-expiring session collection"
+        },
+        {
+          "name": "Student Temporary Data (24 Hour Expiry)",
+          "query": "db.temp_student_data.createIndex({ 'createdAt': 1 }, { expireAfterSeconds: 86400 })",
+          "explanation": "Creates temporary collection for student uploads/processing with 24-hour auto-cleanup",
+          "result": "Auto-cleaning temporary data collection"
+        },
+        {
+          "name": "Student Activity Log (7 Day Retention)",
+          "query": "db.student_activity_logs.createIndex({ 'timestamp': 1 }, { expireAfterSeconds: 604800 })",
+          "explanation": "Creates activity log that keeps student actions for 7 days then auto-deletes",
+          "result": "7-day rolling activity log"
+        }
+      ]
+    },
+    {
+      "method": 8,
+      "title": "Collection with Change Streams - Real-Time Student Updates",
+      "description": "Monitor real-time changes to student data",
+      "examples": [
+        {
+          "name": "Watch All Student Changes",
+          "query": "const changeStream = db.students.watch(); changeStream.on('change', (change) => { console.log('Student data changed:', change) })",
+          "explanation": "Opens change stream to monitor all student record modifications",
+          "result": "Real-time notification system for student updates"
+        },
+        {
+          "name": "Watch High GPA Students",
+          "query": "const changeStream = db.students.watch([ { $match: { 'operationType': 'insert', 'fullDocument.gpa': { $gte: 3.9 } } } ]); changeStream.on('change', (change) => { console.log('High GPA student added:', change.fullDocument) })",
+          "explanation": "Monitors only new high-performing students (GPA >= 3.9)",
+          "result": "Real-time alerts for excellent students"
+        },
+        {
+          "name": "Watch Student GPA Updates",
+          "query": "const changeStream = db.students.watch([ { $match: { 'operationType': 'update', 'updateDescription.updatedFields.gpa': { $exists: true } } } ])",
+          "explanation": "Monitors only GPA field updates for any student",
+          "result": "Real-time GPA change tracking"
+        }
+      ]
+    },
+    {
+      "method": 9,
+      "title": "Copy/Filter Students to New Collections",
+      "description": "Create new collections by copying or filtering student data",
+      "examples": [
+        {
+          "name": "Copy All 60 Students to Backup",
+          "query": "db.students_backup.insertMany(db.students.find().toArray())",
+          "explanation": "Creates backup collection with all 60 student records",
+          "result": "Complete backup of student data"
+        },
+        {
+          "name": "High Performers (GPA >= 3.8)",
+          "query": "db.honor_students.insertMany(db.students.find({ 'gpa': { $gte: { $numberDecimal: '3.8' } } }).toArray())",
+          "explanation": "Creates honor roll collection with 17 students (those with GPA >= 3.8)",
+          "result": "Honor students collection: Anaya Sharma, Kavya Mishra, Neha Gupta, Harleen Kaur, Prisha Yadav, Yara Hassan, Maya Kapoor, Esha Chatterjee, Shreya Prabhu, Simran Kaur, Ishaan Mittal, Ishita Nair, Sudha Lakshmi, Sana Khan, Anita Malhotra, and others"
+        },
+        {
+          "name": "International Students Only",
+          "query": "db.international_students.insertMany(db.students.find({ 'isInternational': true }).toArray())",
+          "explanation": "Creates collection with only international students (30 out of 60)",
+          "result": "International students collection created"
+        },
+        {
+          "name": "Students by Major - Data Science",
+          "query": "db.data_science_majors.insertMany(db.students.find({ 'major': 'Data Science' }).toArray())",
+          "explanation": "Creates collection with only Data Science major students",
+          "result": "Data Science major collection: Daksh Chauhan"
+        },
+        {
+          "name": "Students with Scholarship",
+          "query": "db.scholarship_students.insertMany(db.students.find({ 'scholarshipDetails': { $ne: null } }).toArray())",
+          "explanation": "Creates collection of students with active scholarships (30 out of 60)",
+          "result": "Scholarship recipients collection"
+        },
+        {
+          "name": "Young Students (Age 20-25)",
+          "query": "db.young_students.insertMany(db.students.find({ 'age': { $lte: 25 } }).toArray())",
+          "explanation": "Creates collection of students aged 20-25 (12 students from data.json)",
+          "result": "Young cohort: Daksh, Anaya, Priya, Neha, Sana, Kavya, Maya, Pooja, Ishita, Zara, Anita, Prisha"
+        },
+        {
+          "name": "Mature Students (Age 40+)",
+          "query": "db.mature_students.insertMany(db.students.find({ 'age': { $gte: 40 } }).toArray())",
+          "explanation": "Creates collection of older/mature students (12 students aged 40-53)",
+          "result": "Mature student cohort collection"
+        }
+      ]
+    },
+    {
+      "method": 10,
+      "title": "Create Student Summary Collections via Aggregation",
+      "description": "Generate aggregate student statistics collections",
+      "examples": [
+        {
+          "name": "Major Distribution Summary",
+          "query": "db.major_summary.insertMany(db.students.aggregate([ { $group: { _id: '$major', count: { $sum: 1 }, avgGPA: { $avg: '$gpa' }, totalScholarship: { $sum: { $cond: [ { $ne: ['$scholarshipDetails', null] }, '$scholarshipDetails.amount', 0 ] } } } }, { $sort: { count: -1 } } ]).toArray())",
+          "explanation": "Creates summary collection with student counts, avg GPA, and scholarship totals by major",
+          "result": "60 unique majors with statistics"
+        },
+        {
+          "name": "Age Group Statistics",
+          "query": "db.age_statistics.insertMany(db.students.aggregate([ { $group: { _id: '$age', studentCount: { $sum: 1 }, avgGPA: { $avg: '$gpa' }, internationalCount: { $sum: { $cond: ['$isInternational', 1, 0] } } } }, { $sort: { _id: 1 } } ]).toArray())",
+          "explanation": "Creates age group statistics from ages 20 to 53",
+          "result": "Age cohort analysis collection"
+        },
+        {
+          "name": "Skills Frequency Analysis",
+          "query": "db.skill_frequency.insertMany(db.students.aggregate([ { $unwind: '$skills' }, { $group: { _id: '$skills', count: { $sum: 1 } } }, { $sort: { count: -1 } } ]).toArray())",
+          "explanation": "Creates collection showing which skills are most common among all 60 students",
+          "result": "Top skills frequency ranking"
+        },
+        {
+          "name": "GPA Distribution Brackets",
+          "query": "db.gpa_brackets.insertMany(db.students.aggregate([ { $bucket: { groupBy: '$gpa', boundaries: [3.0, 3.25, 3.5, 3.75, 4.0], default: 'below3.0', output: { studentIds: { $push: '$studentId' }, count: { $sum: 1 } } } } ]).toArray())",
+          "explanation": "Creates GPA bracket distribution (how many students in each GPA range)",
+          "result": "GPA distribution buckets"
+        },
+        {
+          "name": "Scholarship Statistics by Major",
+          "query": "db.scholarship_by_major.insertMany(db.students.aggregate([ { $match: { 'scholarshipDetails': { $ne: null } } }, { $group: { _id: '$major', recipients: { $sum: 1 }, totalAmount: { $sum: '$scholarshipDetails.amount' }, avgAmount: { $avg: '$scholarshipDetails.amount' } } }, { $sort: { recipients: -1 } } ]).toArray())",
+          "explanation": "Creates scholarship distribution by major",
+          "result": "Scholarship analysis by major"
+        }
+      ]
+    },
+    {
+      "method": 11,
+      "title": "Drop and Recreate Student Collection",
+      "description": "Reset or refresh student collection",
+      "examples": [
+        {
+          "name": "Fresh Student Collection",
+          "query": "db.students.drop(); db.createCollection('students'); db.students.insertMany([...60 student records...])",
+          "explanation": "Removes old student collection and creates fresh one with clean data",
+          "result": "Fresh student collection with all 60 records"
+        },
+        {
+          "name": "Safe Drop (Even if Not Exists)",
+          "query": "db.students.drop() || true; db.createCollection('students')",
+          "explanation": "Safely drops collection if exists, then creates new empty one",
+          "result": "Fresh empty collection"
+        }
+      ]
+    },
+    {
+      "method": 12,
+      "title": "Collection with Complex Student Schema Validation",
+      "description": "Advanced validation matching exact data.json structure",
+      "examples": [
+        {
+          "name": "Complete Student Schema with All Validations",
+          "query": "db.createCollection('students', { validator: { $jsonSchema: { bsonType: 'object', required: ['studentId', 'name', 'age', 'enrollmentDate', 'major', 'gpa', 'isInternational', 'skills', 'courses', 'campusLocation', 'scholarshipDetails', 'libraryCardToken'], properties: { studentId: { bsonType: 'long', description: 'Unique student ID like 20260001' }, name: { bsonType: 'object', required: ['first', 'last'], properties: { first: { bsonType: 'string', minLength: 1, maxLength: 100, description: 'First name (Daksh, Anaya, etc)' }, last: { bsonType: 'string', minLength: 1, maxLength: 100, description: 'Last name (Chauhan, Sharma, etc)' } } }, age: { bsonType: 'int', minimum: 18, maximum: 65, description: 'Student age (20-53 in current data)' }, enrollmentDate: { bsonType: 'date', description: 'Date student enrolled' }, major: { enum: ['Data Science', 'Frontend Engineering', 'Machine Learning', 'Cloud Computing', 'Cybersecurity', 'Mobile Development', 'Backend Engineering', 'Artificial Intelligence', 'DevOps Engineering', 'Game Development', 'Full Stack Development', 'Blockchain Development', 'Software Architecture', 'QA Automation', 'Data Engineering', 'UI/UX Design', 'IoT Solutions', 'Technical Writing', 'Database Administration', 'Solution Architecture', 'Network Engineering', 'Product Management', 'Computer Vision', 'Cyber Threat Intelligence', 'Robotics Engineering', 'API Development', 'Site Reliability Engineering', 'Augmented Reality', 'Quantum Computing', 'Bioinformatics', 'Enterprise Software', 'Embedded Systems', 'Web Services Architecture', 'Accessibility Engineering', 'Performance Engineering', 'Natural Language Processing', 'Fintech Development', 'Environmental Computing', 'Healthcare IT', 'E-Commerce Development', 'Marketing Technology', 'Supply Chain Tech', 'Content Delivery Systems', 'Information Security', 'Voice Technology', 'Streaming Platforms', 'Software Testing', 'Container Orchestration', 'Graph Database Design', 'Search Engine Architecture', 'Analytics Engineering', 'Compliance Engineering', 'Edge Computing', 'Software Security', 'API Governance', 'Cloud Security', 'Low-Code Platforms', 'Incident Management', 'Data Privacy', 'Observability Engineering'], description: '60 different majors in current dataset' }, gpa: { bsonType: 'decimal', minimum: 0.0, maximum: 4.0, description: 'GPA between 3.21 and 3.98 in current data' }, isInternational: { bsonType: 'bool', description: 'Whether student is international (true/false)' }, skills: { bsonType: 'array', minItems: 3, maxItems: 10, items: { bsonType: 'string' }, description: 'List of technical skills like Python, Java, React, etc' }, courses: { bsonType: 'array', minItems: 1, items: { bsonType: 'object', required: ['courseCode', 'credits', 'grade'], properties: { courseCode: { bsonType: 'string', pattern: '^[A-Z]{1,20}-[0-9]{3}$' }, credits: { bsonType: 'int', minimum: 1, maximum: 4 }, grade: { enum: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D', 'F'] } } } }, campusLocation: { bsonType: 'object', required: ['type', 'coordinates'], properties: { type: { enum: ['Point'] }, coordinates: { bsonType: 'array', minItems: 2, maxItems: 2, items: { bsonType: 'double' }, description: 'Longitude and latitude coordinates' } } }, scholarshipDetails: { oneOf: [{ bsonType: 'null' }, { bsonType: 'object', required: ['scholarshipName', 'amount', 'renewable'], properties: { scholarshipName: { bsonType: 'string' }, amount: { bsonType: 'int', minimum: 5000, maximum: 50000 }, renewable: { bsonType: 'bool' } } }] }, libraryCardToken: { bsonType: 'object', required: ['$binary'], properties: { '$binary': { bsonType: 'object', properties: { base64: { bsonType: 'string' }, subType: { enum: ['00'] } } } } } }, additionalProperties: false } } })",
+          "explanation": "Validates all 60 student records matching exact data.json structure",
+          "result": "Fully validated students collection"
+        }
+      ]
+    },
+    {
+      "method": 13,
+      "title": "Bulk Student Collection Operations",
+      "description": "Create multiple student-related collections efficiently",
+      "examples": [
+        {
+          "name": "Create All Student Collections at Once",
+          "query": "['students', 'honor_students', 'international_students', 'scholarship_students', 'student_analytics'].forEach(name => { db.createCollection(name) })",
+          "explanation": "Creates 5 student-related collections in one operation",
+          "result": "Multiple student collections created"
+        },
+        {
+          "name": "Create Collections with Specific Purposes",
+          "query": "db.createCollection('active_students'); db.createCollection('graduated_students', { capped: true, size: 10485760 }); db.createCollection('student_archive', { size: 52428800 }); db.createCollection('student_temp_data', { expireAfterSeconds: 3600 })",
+          "explanation": "Creates multiple student collections for different purposes",
+          "result": "Purpose-specific student collections"
+        }
+      ]
+    },
+    {
+      "method": 14,
+      "title": "Create Student Collections with Campus Location Optimization",
+      "description": "Optimize for geospatial queries on campus locations",
+      "examples": [
+        {
+          "name": "Students by Campus Location",
+          "query": "db.students.createIndex({ 'campusLocation': '2dsphere' }); db.students.find({ campusLocation: { $near: { $geometry: { type: 'Point', coordinates: [-73.9352, 40.7306] }, $maxDistance: 5000 } } })",
+          "explanation": "Creates geospatial index and finds students within 5km of NYC campus (40.7306, -73.9352)",
+          "result": "Location-based student queries enabled"
+        },
+        {
+          "name": "Students in Geographic Region",
+          "query": "db.students.createIndex({ 'campusLocation': '2dsphere' }); db.students.find({ campusLocation: { $geoWithin: { $box: [[-75, 40], [-73, 41]] } } })",
+          "explanation": "Finds all students within a geographic bounding box",
+          "result": "Region-based student query collection"
+        }
+      ]
+    },
+    {
+      "method": 15,
+      "title": "Complete Production-Grade Student Collection Setup",
+      "description": "Enterprise-ready student collection with all features",
+      "examples": [
+        {
+          "name": "Production Student System Collection",
+          "query": "db.createCollection('students', { capped: false, size: 209715200, max: 100000, validator: { $jsonSchema: { [Full schema from method 12] } }, validationLevel: 'strict', validationAction: 'error', collation: { locale: 'en_US', strength: 2 }, comment: 'Primary production collection for 60 students with comprehensive validation' }); db.students.createIndex({ 'studentId': 1 }, { unique: true }); db.students.createIndex({ 'major': 1 }); db.students.createIndex({ 'gpa': -1 }); db.students.createIndex({ 'age': 1 }); db.students.createIndex({ 'campusLocation': '2dsphere' }); db.students.createIndex({ 'skills': 'text' }); db.students.createIndex({ 'isInternational': 1 })",
+          "explanation": "Creates fully optimized production student collection with all validations, collation, and indexes",
+          "result": "Enterprise-grade student system ready for 60+ student records"
+        }
+      ]
+    }
+  ],
+  "sample_queries_using_student_data": {
+    "find_students_by_major": "db.students.find({ major: 'Data Science' })",
+    "find_honor_students": "db.students.find({ gpa: { $gte: { $numberDecimal: '3.9' } } })",
+    "find_international_students": "db.students.find({ isInternational: true })",
+    "find_students_with_scholarship": "db.students.find({ scholarshipDetails: { $ne: null } })",
+    "find_students_by_age_group": "db.students.find({ age: { $gte: 20, $lte: 25 } })",
+    "find_students_with_specific_skill": "db.students.find({ skills: 'Python' })",
+    "find_students_by_location": "db.students.find({ campusLocation: { $near: { $geometry: { type: 'Point', coordinates: [-73.9352, 40.7306] } } } })",
+    "count_students_by_major": "db.students.aggregate([ { $group: { _id: '$major', count: { $sum: 1 } } } ])",
+    "average_gpa_by_major": "db.students.aggregate([ { $group: { _id: '$major', avgGPA: { $avg: '$gpa' } } } ])",
+    "students_with_most_skills": "db.students.aggregate([ { $addFields: { skillCount: { $size: '$skills' } } }, { $sort: { skillCount: -1 } }, { $limit: 10 } ])"
+  },
+  "student_data_statistics": {
+    "totalRecords": 60,
+    "ageRange": "20 to 53",
+    "agePattern": "Pairs: 20,20 | 25,25 | 26,26 | 27,27... | 53,53",
+    "internationalStudents": 30,
+    "domesticStudents": 30,
+    "studentsWithScholarship": 30,
+    "studentsWithoutScholarship": 30,
+    "gpaRange": "3.21 to 3.98",
+    "totalMajors": 60,
+    "totalSkills": 240,
+    "uniqueLocations": 40,
+    "coursesPerStudent": 2
+  }
+}

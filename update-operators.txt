@@ -1,0 +1,571 @@
+================================================================================
+     MONGODB ADVANCED UPDATE OPERATORS - COMPLETE GUIDE
+    (Beginner to Advanced Level - $inc, $min, $max, $mul, $unset, $rename, Upsert)
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Advanced update operators for efficient field modifications
+EXAMPLES: Using 60 Student Records from data.json
+LEVEL: Beginner → Intermediate → Advanced
+
+ADVANCED UPDATE OPERATORS = Modify specific fields without replacing documents
+
+
+================================================================================
+PART 1: BEGINNER LEVEL
+================================================================================
+
+SECTION 1.1: WHAT ARE ADVANCED UPDATE OPERATORS?
+================================================================================
+
+DEFINITION:
+  Operators that modify specific fields in documents without full replacement
+
+PURPOSE:
+  ✓ Increment counters atomically
+  ✓ Remove unwanted fields
+  ✓ Rename fields during migration
+  ✓ Set minimum/maximum values
+  ✓ Scale numeric amounts
+  ✓ Insert or update (upsert)
+
+SYNTAX PATTERN:
+  db.collection.updateOne/updateMany(filter, { $operator: {...} })
+
+AVAILABLE OPERATORS:
+  $inc - Increment numeric
+  $unset - Remove field
+  $rename - Rename field
+  $min - Set to minimum
+  $max - Set to maximum
+  $mul - Multiply value
+  (Plus upsert option)
+
+
+================================================================================
+SECTION 1.2: BEGINNER - $INC OPERATOR
+================================================================================
+
+DEFINITION:
+  Increments numeric field by specified value
+
+SYNTAX:
+  { $inc: { field: value } }
+
+BEHAVIOR:
+  field += value (positive or negative)
+  If field doesn't exist, initialized to 0 first
+
+BEGINNER EXAMPLE #1: Increment scholarship amount
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $inc: { 'scholarshipDetails.amount': 5000 } }
+  )
+
+Before: scholarshipDetails.amount: 15000
+After:  scholarshipDetails.amount: 20000
+Result: +5000
+
+Use Case:
+  Award additional scholarship
+
+
+BEGINNER EXAMPLE #2: Decrement with negative value
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $inc: { 'scholarshipDetails.amount': -2000 } }
+  )
+
+Before: 20000
+After:  18000
+Result: -2000
+
+Use Case:
+  Reduce scholarship
+
+
+BEGINNER EXAMPLE #3: Increment login counter
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $inc: { loginCount: 1 } }
+  )
+
+Before: loginCount: 10
+After:  loginCount: 11
+Result: Tracked user activity
+
+Use Case:
+  Activity metrics
+
+
+BEGINNER EXAMPLE #4: Multiple increments in one update
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $inc: { loginCount: 1, coursesCompleted: 1 } }
+  )
+
+Before: loginCount: 10, coursesCompleted: 8
+After:  loginCount: 11, coursesCompleted: 9
+Result: Both incremented atomically
+
+Use Case:
+  Multiple counters at once
+
+
+$INC BENEFITS:
+  ✓ Atomic operation (no read needed)
+  ✓ Efficient and fast
+  ✓ Prevents race conditions
+  ✓ Creates field if doesn't exist
+
+
+================================================================================
+SECTION 1.3: BEGINNER - $UNSET OPERATOR
+================================================================================
+
+DEFINITION:
+  Removes field completely from document
+
+SYNTAX:
+  { $unset: { field: '' or 1 } }
+
+NOTE:
+  Value doesn't matter ('' or 1 or true all work)
+  Field is simply deleted
+
+BEGINNER EXAMPLE #1: Remove optional field
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $unset: { 'scholarshipDetails.notes': '' } }
+  )
+
+Before: { amount: 15000, notes: 'Merit-based' }
+After:  { amount: 15000 }
+Result: notes field completely removed
+
+Use Case:
+  Remove unwanted field
+
+
+BEGINNER EXAMPLE #2: Delete middle name
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $unset: { 'name.middle': '' } }
+  )
+
+Before: { first: 'Daksh', middle: 'Kumar', last: 'Chauhan' }
+After:  { first: 'Daksh', last: 'Chauhan' }
+Result: Middle name removed
+
+Use Case:
+  Clean data
+
+
+$UNSET BENEFITS:
+  ✓ Completely removes field
+  ✓ Clean document structure
+  ✓ Reduces storage
+  ✓ Field won't appear in queries
+
+
+================================================================================
+SECTION 1.4: BEGINNER - $RENAME OPERATOR
+================================================================================
+
+DEFINITION:
+  Renames field while preserving data
+
+SYNTAX:
+  { $rename: { oldName: newName } }
+
+BEHAVIOR:
+  Data copied to new field name
+  Old field deleted
+  Data itself unchanged
+
+BEGINNER EXAMPLE #1: Rename field during migration
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $rename: { phone: 'contact.phone' } }
+  )
+
+Before: { phone: '555-1234' }
+After:  { contact: { phone: '555-1234' } }
+Result: Field moved to nested structure
+
+Use Case:
+  Schema migration
+
+
+BEGINNER EXAMPLE #2: Clearer naming
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $rename: { gpa: 'gradePointAverage' } }
+  )
+
+Before: { gpa: 3.85 }
+After:  { gradePointAverage: 3.85 }
+Result: More explicit field name
+
+Use Case:
+  Improve clarity
+
+
+$RENAME BENEFITS:
+  ✓ Preserves data
+  ✓ Schema evolution
+  ✓ Better naming
+  ✓ Migration support
+
+
+================================================================================
+PART 2: INTERMEDIATE LEVEL
+================================================================================
+
+SECTION 2.1: INTERMEDIATE - $MIN AND $MAX OPERATORS
+================================================================================
+
+DEFINITION:
+  $min sets field to minimum of current and new value
+  $max sets field to maximum of current and new value
+
+SYNTAX:
+  { $min: { field: value } }
+  { $max: { field: value } }
+
+BEHAVIOR:
+  $min: field = Math.min(current, value)
+  $max: field = Math.max(current, value)
+  Creates field if doesn't exist
+
+INTERMEDIATE EXAMPLE #1: Track highest GPA achieved
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $max: { maxGpaAchieved: 3.85 } }
+  )
+
+Before: maxGpaAchieved: 3.80
+After:  maxGpaAchieved: 3.85 (3.85 > 3.80, updated)
+Result: Records best GPA
+
+Use Case:
+  Track performance records
+
+
+INTERMEDIATE EXAMPLE #2: Track lowest GPA
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $min: { minGpaAchieved: 3.85 } }
+  )
+
+Before: minGpaAchieved: 3.50
+After:  minGpaAchieved: 3.50 (3.85 > 3.50, not updated)
+Result: Records worst GPA
+
+
+$MIN/$MAX BENEFITS:
+  ✓ Auto-maintain extremes
+  ✓ No comparison logic needed
+  ✓ Atomic operation
+  ✓ Performance tracking
+
+
+================================================================================
+SECTION 2.2: INTERMEDIATE - $MUL OPERATOR
+================================================================================
+
+DEFINITION:
+  Multiplies numeric field by value
+
+SYNTAX:
+  { $mul: { field: multiplier } }
+
+BEHAVIOR:
+  field *= multiplier
+  Works with any numeric multiplier
+
+INTERMEDIATE EXAMPLE #1: Scale scholarship by 10%
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $mul: { 'scholarshipDetails.amount': 1.1 } }
+  )
+
+Before: 10000
+After:  11000 (10000 × 1.1)
+Result: 10% increase
+
+Use Case:
+  Annual increase
+
+
+INTERMEDIATE EXAMPLE #2: Reduce by 10%
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $mul: { 'scholarshipDetails.amount': 0.9 } }
+  )
+
+Before: 10000
+After:  9000 (10000 × 0.9)
+Result: 10% decrease
+
+Use Case:
+  Budget reduction
+
+
+$MUL BENEFITS:
+  ✓ Percentage calculations
+  ✓ Scaling amounts
+  ✓ No read needed (atomic)
+  ✓ Mathematical operations
+
+
+================================================================================
+PART 3: ADVANCED LEVEL
+================================================================================
+
+SECTION 3.1: ADVANCED - UPSERT
+================================================================================
+
+DEFINITION:
+  Update if document exists, Insert if not found
+
+SYNTAX:
+  db.collection.updateOne(filter, update, { upsert: true })
+
+BEHAVIOR:
+  Filter matches: Update those documents
+  Filter matches 0: Insert new document
+
+ADVANCED EXAMPLE #1: Track visits (create if first)
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.studentVisits.updateOne(
+    { studentId: '20260001', date: '2024-06-23' },
+    { $inc: { visits: 1 } },
+    { upsert: true }
+  )
+
+First visit:    Creates { studentId: '20260001', date: '2024-06-23', visits: 1 }
+Second visit:   { visits: 2 }
+Result:         Auto-tracks visits
+
+Use Case:
+  Activity tracking
+
+
+ADVANCED EXAMPLE #2: Upsert with initialization
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260099' },
+    { $set: { name: 'New Student', gpa: 0 }, $inc: { loginCount: 1 } },
+    { upsert: true }
+  )
+
+If exists:  Increment loginCount
+If new:     Insert with name='New Student', gpa=0, loginCount=1
+
+Use Case:
+  Auto-create student on first login
+
+
+ADVANCED EXAMPLE #3: Bulk upsert
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateMany(
+    { major: 'Data Science' },
+    { $set: { department: 'Engineering' } },
+    { upsert: true }
+  )
+
+All DS students get updated
+If none exist, inserts one document
+
+Use Case:
+  Ensure field exists
+
+
+UPSERT PATTERN:
+  ✓ "Insert or update" workflow
+  ✓ No check needed before insert
+  ✓ Atomic operation
+  ✓ Common for counters, tracking
+
+
+================================================================================
+SECTION 3.2: ADVANCED - COMPLEX COMBINED UPDATES
+================================================================================
+
+ADVANCED EXAMPLE #1: Multiple operators
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    {
+      $set: { lastUpdated: new Date() },
+      $inc: { updateCount: 1 },
+      $unset: { deprecatedField: '' }
+    }
+  )
+
+Multiple operators in single atomic update:
+- Set timestamp
+- Increment counter
+- Remove old field
+
+Use Case:
+  Atomic multi-step update
+
+
+ADVANCED EXAMPLE #2: Bulk update with filter
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateMany(
+    { major: 'Data Science' },
+    { $inc: { 'scholarshipDetails.amount': 5000 } }
+  )
+
+All Data Science students get $5000 increase
+
+Use Case:
+  Bulk scholarship increase
+
+
+ADVANCED EXAMPLE #3: Schema migration
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateMany(
+    {},
+    {
+      $rename: { phone: 'contact.phone', email: 'contact.email' },
+      $unset: { legacyField: 1 }
+    }
+  )
+
+Migrates all documents to new schema
+
+
+================================================================================
+SECTION 3.3: BEST PRACTICES & PERFORMANCE
+================================================================================
+
+BEST PRACTICES:
+
+1. USE $INC FOR COUNTERS
+   ✓ { $inc: { loginCount: 1 } }
+   Why: Atomic, no read needed, prevents races
+
+2. COMBINE OPERATORS ATOMICALLY
+   ✓ Single update with multiple operators
+   Why: Consistent state, all-or-nothing
+
+3. UPSERT WITH $SET FOR REQUIRED FIELDS
+   ✓ { $set: { name: 'X' }, $inc: { counter: 1 } }
+   Why: Ensures complete document on insert
+
+4. INDEX UPSERT FILTER FIELDS
+   ✓ createIndex({ studentId: 1 })
+   Why: Fast upsert (no full scan on not found)
+
+5. USE BULK OPERATIONS
+   ✓ updateMany instead of loop
+   Why: Single operation vs many round-trips
+
+
+PERFORMANCE TIPS:
+
+$inc:     Very fast (atomic, no read)
+$unset:   Fast (just field deletion)
+$rename:  Moderate (rewrites keys)
+$mul:     Very fast (single operation)
+$min/$max:Fast (simple comparison)
+Upsert:   Slower if filter unindexed (full scan)
+
+
+COMMON MISTAKES:
+
+❌ $unset with wrong syntax
+   Wrong: { $unset: { field: true } }
+   Right: { $unset: { field: '' } }
+
+❌ Upsert without $set initialization
+   Problem: Inserted document incomplete
+   Fix: Use $set for required fields
+
+❌ Upsert on unindexed field
+   Problem: Full collection scan on not found
+   Fix: createIndex on filter field
+
+❌ $inc on string field
+   Problem: Type error
+   Fix: Ensure field is numeric
+
+❌ $rename to existing field
+   Problem: Overwrites target
+   Fix: Verify target doesn't exist
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Operator       Syntax                           Use
+────────────────────────────────────────────────────────────────────────────
+$inc           { $inc: { field: 1 } }          Increment counter
+$unset         { $unset: { field: '' } }       Remove field
+$rename        { $rename: { old: 'new' } }     Rename field
+$min           { $min: { field: 5 } }          Set to minimum
+$max           { $max: { field: 5 } }          Set to maximum
+$mul           { $mul: { field: 1.1 } }        Scale amount
+Upsert         updateOne({...}, {...}, {u:t}) Insert or update
+
+Remember progression:
+  Beginner: $inc, $unset, $rename
+  Intermediate: $min/$max, $mul
+  Advanced: Upsert, combined operators
+
+================================================================================

@@ -1,0 +1,401 @@
+{
+  "title": "MongoDB Evaluation Operators - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on evaluation operators for pattern matching, expressions, and custom logic",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "operators_overview": {
+    "definition": "Evaluation operators perform pattern matching, expression evaluation, and custom logic on documents",
+    "purpose": [
+      "Pattern matching with regular expressions",
+      "Full-text search on text fields",
+      "Custom JavaScript evaluation",
+      "Complex expression evaluation",
+      "Modulo arithmetic operations",
+      "JSON schema validation"
+    ],
+    "operators_count": 6,
+    "syntax_pattern": "{ field: { $operator: value } }"
+  },
+  "section_1_beginner_regex": {
+    "title": "BEGINNER: $REGEX Operator",
+    "definition": "$regex performs pattern matching using regular expressions",
+    "syntax": "{ field: { $regex: 'pattern', $options: 'flags' } } or { field: /pattern/flags }",
+    "options": [
+      "i - case insensitive",
+      "m - multiline",
+      "x - ignore whitespace",
+      "s - dot matches newline"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Find students with first name starting with D",
+        "query": "db.students.find({ 'name.first': { $regex: '^D' } })",
+        "result": "Students: Daksh, Deepak, Divya, etc.",
+        "use_case": "Search by name prefix"
+      },
+      {
+        "title": "Find students ending with 'Singh'",
+        "query": "db.students.find({ 'name.last': { $regex: 'Singh$' } })",
+        "result": "Students with last name Singh",
+        "use_case": "Search by name suffix"
+      },
+      {
+        "title": "Case-insensitive search",
+        "query": "db.students.find({ major: { $regex: 'data', $options: 'i' } })",
+        "result": "Data Science (case-insensitive match)",
+        "use_case": "Flexible search ignoring case"
+      },
+      {
+        "title": "Find majors containing 'engineer'",
+        "query": "db.students.find({ major: { $regex: 'engineer', $options: 'i' } })",
+        "result": "Engineering, Software Engineering, etc.",
+        "use_case": "Substring matching"
+      }
+    ],
+    "common_patterns": [
+      "^pattern - Starts with",
+      "pattern$ - Ends with",
+      ".*pattern.* - Contains",
+      "[0-9]+ - Contains numbers"
+    ]
+  },
+  "section_2_beginner_mod": {
+    "title": "BEGINNER: $MOD Operator",
+    "definition": "$mod performs modulo operation (remainder after division)",
+    "syntax": "{ field: { $mod: [divisor, remainder] } }",
+    "meaning": "field % divisor == remainder",
+    "beginner_examples": [
+      {
+        "title": "Find students with even student ID (last digit)",
+        "query": "db.students.find({ studentId: { $mod: [2, 0] } })",
+        "result": "Student IDs ending in 0,2,4,6,8",
+        "use_case": "Find by number parity"
+      },
+      {
+        "title": "Find students with age divisible by 5",
+        "query": "db.students.find({ age: { $mod: [5, 0] } })",
+        "result": "Ages: 20, 25, 30, 35, etc.",
+        "use_case": "Age groups by 5-year intervals"
+      },
+      {
+        "title": "Find students in every 3rd ID",
+        "query": "db.students.find({ studentId: { $mod: [3, 0] } })",
+        "result": "Every 3rd student from sorted IDs",
+        "use_case": "Systematic sampling"
+      }
+    ]
+  },
+  "section_3_intermediate_expr": {
+    "title": "INTERMEDIATE: $EXPR Operator",
+    "definition": "$expr allows using aggregation expressions in queries",
+    "syntax": "{ $expr: { expression } }",
+    "enables": [
+      "Compare two fields",
+      "Complex calculations",
+      "Aggregation operators in queries",
+      "Field-to-field comparisons"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Find students where GPA equals a calculated threshold",
+        "query": "db.students.find({ $expr: { $gte: ['$gpa', { $avg: [3.5, 3.9] }] } })",
+        "result": "Students with GPA >= 3.7",
+        "use_case": "Dynamic threshold calculations"
+      },
+      {
+        "title": "Complex calculation - multi-factor evaluation",
+        "query": "db.students.find({ $expr: { $gt: [{ $add: ['$gpa', { $divide: ['$age', 100] }] }, 4.0] } })",
+        "result": "Complex scoring formula",
+        "use_case": "Composite scoring"
+      },
+      {
+        "title": "Find students with scholarships matching business logic",
+        "query": "db.students.find({ $expr: { $and: [{ $gte: ['$gpa', 3.9] }, { $eq: ['$isInternational', true] }] } })",
+        "result": "International honor students",
+        "use_case": "Complex eligibility rules"
+      }
+    ]
+  },
+  "section_4_intermediate_text": {
+    "title": "INTERMEDIATE: $TEXT Operator",
+    "definition": "$text performs full-text search on indexed text fields",
+    "requirement": "Text index must exist: db.collection.createIndex({ field: 'text' })",
+    "syntax": "{ $text: { $search: 'search string', $caseSensitive: false, $diacriticSensitive: false } }",
+    "intermediate_examples": [
+      {
+        "title": "Search scholarship notes for 'merit'",
+        "query": "db.students.find({ $text: { $search: 'merit' } })",
+        "requirement": "Text index on scholarshipDetails.notes",
+        "result": "Documents mentioning 'merit'",
+        "use_case": "Full-text search on text fields"
+      },
+      {
+        "title": "Search for multiple terms",
+        "query": "db.students.find({ $text: { $search: 'international OR scholarship' } })",
+        "result": "Matching 'international' OR 'scholarship'",
+        "use_case": "Multi-term search"
+      },
+      {
+        "title": "Exclude terms with negation",
+        "query": "db.students.find({ $text: { $search: 'scholarship -denied' } })",
+        "result": "'scholarship' but NOT 'denied'",
+        "use_case": "Refined search"
+      }
+    ]
+  },
+  "section_5_advanced_where": {
+    "title": "ADVANCED: $WHERE Operator",
+    "definition": "$where evaluates custom JavaScript function",
+    "syntax": "{ $where: function() { return condition; } }",
+    "warning": "⚠️ SECURITY RISK: Never use with user input",
+    "performance": "Very slow, scans entire collection",
+    "advanced_examples": [
+      {
+        "title": "Complex multi-field calculation",
+        "query": "db.students.find({ $where: function() { return this.gpa > 3.5 && this.age < 25; } })",
+        "use_case": "Complex logic (avoid if possible)",
+        "performance": "Slow - use $expr instead"
+      },
+      {
+        "title": "String manipulation",
+        "query": "db.students.find({ $where: 'this.name.first.length > 5' })",
+        "use_case": "Validate string properties",
+        "performance": "Very slow"
+      },
+      {
+        "title": "Array operations",
+        "query": "db.students.find({ $where: 'this.skills.length >= 3' })",
+        "use_case": "Array length checking",
+        "note": "$size is faster than $where"
+      }
+    ],
+    "when_to_avoid": [
+      "User input (security risk)",
+      "Performance critical queries",
+      "Can be expressed with other operators",
+      "Large collections"
+    ],
+    "when_to_use": [
+      "Rare legacy code",
+      "Very complex custom logic",
+      "No aggregation equivalent"
+    ]
+  },
+  "section_6_advanced_jsonschema": {
+    "title": "ADVANCED: $JSONSCHEMA Operator",
+    "definition": "$jsonSchema validates document against JSON Schema in queries",
+    "syntax": "{ $jsonSchema: { schema definition } }",
+    "use_case": "Validate document structure in queries",
+    "advanced_examples": [
+      {
+        "title": "Find documents matching schema",
+        "query": "db.students.find({ $jsonSchema: { bsonType: 'object', required: ['studentId', 'gpa'], properties: { studentId: { bsonType: 'string' }, gpa: { bsonType: 'double', minimum: 0, maximum: 4.0 } } } })",
+        "result": "Valid documents matching schema",
+        "use_case": "Data quality validation in queries"
+      },
+      {
+        "title": "Find documents NOT matching schema",
+        "query": "db.students.find({ $nor: [{ $jsonSchema: { bsonType: 'object', properties: { gpa: { bsonType: 'double' } } } }] })",
+        "result": "Documents with invalid gpa type",
+        "use_case": "Find schema violations"
+      }
+    ]
+  },
+  "section_7_advanced_complex": {
+    "title": "ADVANCED: Combining Evaluation Operators",
+    "example_1_regex_with_expr": {
+      "title": "Regex pattern with expression",
+      "query": "db.students.find({ 'name.first': { $regex: '^[A-D]' }, $expr: { $gte: ['$gpa', 3.8] } })",
+      "logic": "First name A-D AND GPA >= 3.8",
+      "result": "Selective filtering with multiple conditions"
+    },
+    "example_2_text_with_range": {
+      "title": "Full-text search with range",
+      "query": "db.students.find({ $text: { $search: 'scholarship' }, age: { $gte: 20, $lte: 25 } })",
+      "logic": "Scholarship mentions in age range 20-25",
+      "result": "Refined search results"
+    },
+    "example_3_complex_scoring": {
+      "title": "Multi-factor evaluation system",
+      "query": "db.students.find({ $expr: { $or: [ { $and: [{ $gte: ['$gpa', 3.9] }, { $eq: ['$isInternational', true] }] }, { $and: [{ $gte: ['$gpa', 3.5] }, { $gte: [{ $size: ['$skills'] }, 5] }] } ] } })",
+      "logic": "(Honor + International) OR (Good GPA + Many Skills)",
+      "result": "Complex eligibility matrix"
+    }
+  },
+  "section_8_use_cases_by_level": {
+    "beginner_use_cases": [
+      {
+        "use_case": "Find students by name pattern",
+        "operator": "$regex",
+        "example": "Start with D, contain 'sin', etc."
+      },
+      {
+        "use_case": "Find even/odd IDs",
+        "operator": "$mod",
+        "example": "Sampling every Nth student"
+      },
+      {
+        "use_case": "Age group analysis",
+        "operator": "$mod",
+        "example": "Ages divisible by 5"
+      }
+    ],
+    "intermediate_use_cases": [
+      {
+        "use_case": "Dynamic thresholds",
+        "operator": "$expr",
+        "example": "Compare with calculated values"
+      },
+      {
+        "use_case": "Full-text search",
+        "operator": "$text",
+        "example": "Search scholarship notes"
+      },
+      {
+        "use_case": "Regex with ranges",
+        "operator": "$regex + comparison",
+        "example": "Pattern + range combined"
+      }
+    ],
+    "advanced_use_cases": [
+      {
+        "use_case": "Complex scoring systems",
+        "operator": "$expr with multiple conditions",
+        "example": "Multi-factor evaluation"
+      },
+      {
+        "use_case": "Schema validation",
+        "operator": "$jsonSchema",
+        "example": "Find schema violations"
+      },
+      {
+        "use_case": "Legacy systems",
+        "operator": "$where (avoid)",
+        "example": "Complex JavaScript logic"
+      }
+    ]
+  },
+  "section_9_performance": {
+    "title": "Performance Considerations",
+    "regex": {
+      "performance": "Can use index if anchored",
+      "note": "^pattern uses index, .*pattern.* doesn't",
+      "optimization": "Index on text fields"
+    },
+    "mod": {
+      "performance": "Fast, no index needed",
+      "use": "Efficient for sampling"
+    },
+    "expr": {
+      "performance": "Can be slow with complex expressions",
+      "optimization": "Combine with indexed comparison first"
+    },
+    "text": {
+      "performance": "Fast with text index",
+      "requirement": "Text index must exist",
+      "optimization": "Create text index on frequently searched fields"
+    },
+    "where": {
+      "performance": "Very slow - full collection scan",
+      "warning": "Avoid in production",
+      "alternative": "Use $expr or other operators"
+    },
+    "jsonschema": {
+      "performance": "Slower, validates structure",
+      "use": "Validation queries, not filtering"
+    }
+  },
+  "section_10_best_practices": {
+    "practice_1_prefer_anchored_regex": {
+      "rule": "Use ^pattern or pattern$ for index usage",
+      "good": "{ field: { $regex: '^D' } }",
+      "bad": "{ field: { $regex: 'D' } }",
+      "reason": "Index optimization"
+    },
+    "practice_2_use_expr_over_where": {
+      "rule": "Prefer $expr to $where",
+      "good": "{ $expr: { $gt: ['$field1', '$field2'] } }",
+      "bad": "{ $where: 'this.field1 > this.field2' }",
+      "reason": "Better performance, security"
+    },
+    "practice_3_create_text_indexes": {
+      "rule": "Create text index for $text searches",
+      "command": "db.collection.createIndex({ field: 'text' })",
+      "benefit": "Fast full-text search"
+    },
+    "practice_4_combine_indexed_first": {
+      "rule": "Use indexed fields before expensive operators",
+      "pattern": "{ indexedField: value, expensiveOperator: ... }",
+      "reason": "Filter with index first, then evaluate"
+    },
+    "practice_5_avoid_where_with_user_input": {
+      "rule": "Never use $where with untrusted user input",
+      "why": "Code injection security risk",
+      "use": "Parameterized queries or pre-validated input"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_regex_without_anchor": {
+      "mistake": "Using $regex without ^ or $",
+      "problem": "Can't use index effectively",
+      "solution": "Anchor pattern: { $regex: '^pattern' }"
+    },
+    "mistake_2_text_without_index": {
+      "mistake": "Using $text without creating text index",
+      "problem": "Error: text index required",
+      "solution": "db.collection.createIndex({ field: 'text' })"
+    },
+    "mistake_3_where_in_production": {
+      "mistake": "Using $where for filtering",
+      "problem": "Performance disaster, security risk",
+      "solution": "Use $expr or other operators"
+    },
+    "mistake_4_mod_with_strings": {
+      "mistake": "Using $mod on string fields",
+      "problem": "Type mismatch error",
+      "solution": "Use only on numeric fields"
+    },
+    "mistake_5_expr_overcomplexity": {
+      "mistake": "Over-complex $expr expressions",
+      "problem": "Hard to maintain, slow",
+      "solution": "Keep expressions simple, use multiple operators"
+    }
+  },
+  "section_12_progression": {
+    "beginner": [
+      "Basic $regex with anchors",
+      "Simple $mod operations",
+      "Pattern matching for names"
+    ],
+    "intermediate": [
+      "$expr for field comparisons",
+      "$text for full-text search",
+      "Combining operators"
+    ],
+    "advanced": [
+      "Complex $expr scoring",
+      "$jsonSchema validation",
+      "Multi-operator queries",
+      "Performance optimization"
+    ]
+  },
+  "summary": {
+    "operators": [
+      "$regex - Pattern matching",
+      "$mod - Modulo operation",
+      "$expr - Expression evaluation",
+      "$text - Full-text search",
+      "$where - JavaScript evaluation (avoid)",
+      "$jsonSchema - Schema validation"
+    ],
+    "key_concepts": [
+      "Anchor regex for index usage",
+      "Create text index for $text",
+      "Use $expr instead of $where",
+      "Combine operators for complex logic",
+      "Performance varies by operator"
+    ],
+    "best_practice": "Use anchored $regex, $expr for expressions, $text for search, avoid $where",
+    "progression": "Beginner: $regex/$mod → Intermediate: $expr/$text → Advanced: Complex combinations"
+  }
+}

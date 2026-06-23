@@ -1,0 +1,492 @@
+{
+  "title": "MongoDB Sharding - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on horizontal scaling through sharding, shard keys, and distributed data",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "sharding_overview": {
+    "definition": "Sharding distributes data across multiple MongoDB servers (shards) to handle large datasets and high throughput",
+    "concept": "Horizontal scaling - add more servers to scale, vs vertical scaling (bigger server)",
+    "purpose": [
+      "Handle datasets larger than single server memory",
+      "Distribute write load across multiple servers",
+      "Improve query performance through parallel execution",
+      "Enable geographic distribution",
+      "Support multi-tenant systems",
+      "Increase throughput and capacity"
+    ],
+    "key_components": [
+      "Shard: Individual MongoDB instance holding subset of data",
+      "Shard key: Field used to distribute data across shards",
+      "Chunk: Range of shard key values on single shard",
+      "Mongos: Query router directing queries to correct shard",
+      "Config servers: Metadata about shard distribution (replica set)",
+      "Balancer: Automatically moves chunks between shards"
+    ],
+    "minimum_setup": "2 shards + 3 config servers + mongos router(s)",
+    "when_to_use": "Dataset > 100GB or write throughput > 100K ops/sec"
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Sharding Concepts",
+    "definitions": [
+      {
+        "term": "Shard",
+        "definition": "Individual MongoDB instance holding subset of data",
+        "examples": ["Shard 1: Students A-M", "Shard 2: Students N-Z"]
+      },
+      {
+        "term": "Shard Key",
+        "definition": "Field used to determine which shard holds document",
+        "requirement": "Must exist on every document",
+        "immutable": "Cannot change shard key value after insert"
+      },
+      {
+        "term": "Chunk",
+        "definition": "Range of shard key values on single shard",
+        "example": "Chunk: {studentId: 10000-19999} on Shard1"
+      },
+      {
+        "term": "Mongos",
+        "definition": "Query router that directs operations to correct shard",
+        "behavior": "Looks up shard key, routes to appropriate shard"
+      },
+      {
+        "term": "Config Server",
+        "definition": "Stores metadata about shard topology",
+        "data": "Which chunk on which shard, shard key info"
+      },
+      {
+        "term": "Balancer",
+        "definition": "Automatically moves chunks between shards",
+        "goal": "Keep data evenly distributed"
+      }
+    ]
+  },
+  "section_2_beginner_sharding_setup": {
+    "title": "BEGINNER: Sharding Setup",
+    "definition": "Initialize sharding cluster with shards, config servers, and mongos",
+    "components_needed": [
+      "2+ shards (MongoDB instances or replica sets)",
+      "3 config servers (replica set for production)",
+      "1+ mongos routers (can be multiple for load distribution)"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Start shard 1",
+        "command": "mongod --shardsvr --replSet shard1rs --port 27017"
+      },
+      {
+        "title": "Start shard 2",
+        "command": "mongod --shardsvr --replSet shard2rs --port 27018"
+      },
+      {
+        "title": "Start config server",
+        "command": "mongod --configsvr --replSet configrs --port 27019"
+      },
+      {
+        "title": "Start mongos router",
+        "command": "mongos --configdb configrs/localhost:27019 --port 27017"
+      },
+      {
+        "title": "Connect to mongos and add shards",
+        "query": "sh.addShard('shard1rs/localhost:27017')\nsh.addShard('shard2rs/localhost:27018')"
+      }
+    ]
+  },
+  "section_3_beginner_shard_key": {
+    "title": "BEGINNER: Choosing Shard Key",
+    "definition": "Shard key is field used to distribute data across shards",
+    "characteristics": [
+      "Immutable: Cannot change after insert",
+      "Indexed: Automatically indexed",
+      "Cardinality: Should have many unique values",
+      "Write distribution: Should distribute writes evenly"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Shard by studentId",
+        "query": "sh.shardCollection('student_db.students', { studentId: 1 })",
+        "distribution": "Each student's data on one shard",
+        "pros": "Even distribution, immutable"
+      },
+      {
+        "title": "Shard by major",
+        "query": "sh.shardCollection('student_db.students', { major: 1 })",
+        "distribution": "CS students on Shard1, Math on Shard2, etc.",
+        "cons": "Uneven distribution if majors not balanced"
+      },
+      {
+        "title": "Compound shard key",
+        "query": "sh.shardCollection('student_db.students', { major: 1, gpa: 1 })",
+        "distribution": "Combination of major and GPA for distribution"
+      }
+    ],
+    "shard_key_properties": [
+      "Good: High cardinality (many unique values)",
+      "Good: Evenly distributed values",
+      "Good: Monotonically increasing (ObjectId)",
+      "Bad: Low cardinality (few unique values)",
+      "Bad: Skewed distribution (uneven)",
+      "Bad: Monotonically decreasing values"
+    ]
+  },
+  "section_4_beginner_querying": {
+    "title": "BEGINNER: Querying Sharded Collections",
+    "definition": "Queries routed through mongos to appropriate shard(s)",
+    "query_types": [
+      {
+        "type": "Targeted query",
+        "example": "db.students.find({ studentId: '20260001' })",
+        "routing": "Mongos uses shard key to route to single shard",
+        "performance": "Fast (single shard)"
+      },
+      {
+        "type": "Broadcast query",
+        "example": "db.students.find({ gpa: { $gt: 3.8 } })",
+        "routing": "Mongos broadcasts to all shards",
+        "performance": "Slower (hits all shards)"
+      },
+      {
+        "type": "Sorted query",
+        "example": "db.students.find().sort({ gpa: -1 })",
+        "routing": "Mongos gathers from all shards, merges",
+        "performance": "Moderate (all shards involved)"
+      }
+    ],
+    "beginner_examples": [
+      {
+        "title": "Targeted query (fast)",
+        "query": "db.students.find({ studentId: '20260001' })",
+        "execution": "Mongos routes to correct shard immediately"
+      },
+      {
+        "title": "Scatter-gather query (slower)",
+        "query": "db.students.find({ gpa: { $gt: 3.8 } })",
+        "execution": "Mongos sends to all shards, merges results"
+      }
+    ]
+  },
+  "section_5_intermediate_chunk_management": {
+    "title": "INTERMEDIATE: Chunk Management",
+    "definition": "Chunks are ranges of shard key values distributed across shards",
+    "chunk_splitting": [
+      "MongoDB automatically splits chunks when they exceed 64MB",
+      "Balancer moves chunks between shards",
+      "Chunks prevent uneven data distribution"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Check shard distribution",
+        "query": "db.adminCommand( { printShardingStatus: 1 } )"
+      },
+      {
+        "title": "Monitor chunk distribution",
+        "query": "config.chunks.find()"
+      },
+      {
+        "title": "Check balancer status",
+        "query": "sh.getBalancerState()"
+      }
+    ]
+  },
+  "section_6_intermediate_balancing": {
+    "title": "INTERMEDIATE: Balancer & Data Distribution",
+    "definition": "Balancer automatically moves chunks to keep shards balanced",
+    "balancer_behavior": [
+      "Checks if chunks distributed evenly",
+      "If imbalance detected, moves chunks",
+      "Runs on config server (replica set member)"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Enable balancer (default)",
+        "query": "sh.enableBalancer()"
+      },
+      {
+        "title": "Disable balancer",
+        "query": "sh.disableBalancer()"
+      },
+      {
+        "title": "Check balancer status",
+        "query": "sh.getBalancerState()"
+      },
+      {
+        "title": "Set balancer window",
+        "query": "use config\ndb.settings.update(\n  { _id: 'balancer' },\n  { $set: { activeWindow: { start: '00:00', stop: '06:00' } } }\n)",
+        "effect": "Only balance during specified hours"
+      }
+    ]
+  },
+  "section_7_intermediate_shard_key_strategies": {
+    "title": "INTERMEDIATE: Shard Key Selection Strategies",
+    "good_shard_keys": [
+      {
+        "key": "Unique identifier",
+        "example": "studentId",
+        "pros": "High cardinality, even distribution",
+        "cons": "Query by other fields requires scatter-gather"
+      },
+      {
+        "key": "Timestamp with ID",
+        "example": "{ enrollmentDate: 1, studentId: 1 }",
+        "pros": "Chronological, prevents hotspot",
+        "cons": "Compound key complexity"
+      },
+      {
+        "key": "Random prefix",
+        "example": "{ random: 1, studentId: 1 }",
+        "pros": "Distributes writes evenly",
+        "cons": "Application complexity for random value"
+      }
+    ],
+    "bad_shard_keys": [
+      {
+        "key": "Boolean field",
+        "example": "isInternational",
+        "problem": "Only 2 values, extreme imbalance"
+      },
+      {
+        "key": "Gender",
+        "example": "gender",
+        "problem": "Few unique values, poor distribution"
+      },
+      {
+        "key": "Monotonically increasing",
+        "example": "Sequence number always increasing",
+        "problem": "All writes go to last shard (hotspot)"
+      }
+    ]
+  },
+  "section_8_advanced_hotspots": {
+    "title": "ADVANCED: Avoiding Hotspots",
+    "definition": "Hotspot: Single shard receiving disproportionate traffic",
+    "causes": [
+      "Shard key with poor cardinality",
+      "Shard key monotonically increasing",
+      "Skewed data distribution"
+    ],
+    "advanced_examples": [
+      {
+        "title": "Detect hotspot",
+        "query": "db.adminCommand( { printShardingStatus: 1 } )",
+        "check": "Compare document counts and chunk counts per shard"
+      },
+      {
+        "title": "Fix with compound key",
+        "problem": "Shard by major = CS gets 30% of writes",
+        "solution": "Shard by { major: 1, studentId: 1 } distributes within major"
+      },
+      {
+        "title": "Hash shard key",
+        "query": "sh.shardCollection('db.students', { studentId: 'hashed' })",
+        "effect": "Hash distributes evenly even with sequential IDs"
+      }
+    ]
+  },
+  "section_9_advanced_migration": {
+    "title": "ADVANCED: Adding Shards & Migration",
+    "definition": "Adding shards and rebalancing existing data",
+    "advanced_examples": [
+      {
+        "title": "Add new shard",
+        "query": "sh.addShard('shard3rs/localhost:27020')"
+      },
+      {
+        "title": "Balancer automatically migrates data",
+        "behavior": "New shard is empty, balancer moves chunks to it",
+        "time": "Migration happens automatically over time"
+      },
+      {
+        "title": "Remove shard",
+        "query": "use admin\ndb.adminCommand( { removeShard: 'shard3rs' } )"
+      },
+      {
+        "title": "Monitor migration",
+        "query": "db.adminCommand( { printShardingStatus: 1 } )"
+      }
+    ]
+  },
+  "section_10_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Growing dataset",
+        "example": "Student database grows from 100K to 1M documents",
+        "solution": "Shard by studentId to distribute"
+      },
+      {
+        "use_case": "High write throughput",
+        "example": "Millions of enrollments per day",
+        "solution": "Shard to distribute write load"
+      },
+      {
+        "use_case": "Multi-tenant",
+        "example": "Multiple universities in single cluster",
+        "solution": "Shard by university ID"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Geographic distribution",
+        "example": "Students worldwide need local performance",
+        "solution": "Shard by region, read from local shard"
+      },
+      {
+        "use_case": "Time-series data",
+        "example": "Daily activity logs for 1M students",
+        "solution": "Shard by { date: 1, studentId: 1 } for range queries"
+      },
+      {
+        "use_case": "Department separation",
+        "example": "Each department needs own data subset",
+        "solution": "Shard by major, then query major subset"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Global platform",
+        "example": "MongoDB sharded cluster across continents",
+        "solution": "Shard key + geographic awareness"
+      },
+      {
+        "use_case": "SaaS multi-tenant",
+        "example": "100,000 tenants in single cluster",
+        "solution": "Compound shard key with tenant ID"
+      },
+      {
+        "use_case": "Real-time analytics",
+        "example": "Ingest TB+ per day from 1000+ sources",
+        "solution": "Sharding + balancer for continuous scaling"
+      }
+    ]
+  },
+  "section_11_best_practices": {
+    "practice_1_shard_key_planning": {
+      "rule": "Plan shard key carefully (immutable)",
+      "consider": "Cardinality, distribution, immutability",
+      "test": "Test shard key on sample data before production"
+    },
+    "practice_2_avoid_low_cardinality": {
+      "rule": "Shard key should have many unique values",
+      "good": "studentId (60+ unique values)",
+      "bad": "gender or isInternational (few unique)"
+    },
+    "practice_3_even_distribution": {
+      "rule": "Data should distribute evenly across shards",
+      "monitor": "Check chunk distribution with printShardingStatus",
+      "fix": "Use hash sharding or compound key if skewed"
+    },
+    "practice_4_use_hash_for_monotonic": {
+      "rule": "Use hashed shard key for monotonically increasing values",
+      "example": "sh.shardCollection('db.students', { studentId: 'hashed' })",
+      "benefit": "Prevents hotspot from sequential IDs"
+    },
+    "practice_5_compound_keys_for_queries": {
+      "rule": "Compound key enables range queries",
+      "example": "{ major: 1, gpa: 1 } for major range queries",
+      "benefit": "First field used for routing, second for range"
+    },
+    "practice_6_monitor_balancing": {
+      "rule": "Monitor balancer to ensure even distribution",
+      "check": "printShardingStatus shows chunks per shard",
+      "action": "Adjust if imbalance detected"
+    }
+  },
+  "section_12_common_mistakes": {
+    "mistake_1_poor_cardinality": {
+      "mistake": "Shard by field with few unique values",
+      "example": "Shard by gender (only 2 values)",
+      "problem": "One shard gets 50% of data, other 50%",
+      "solution": "Use high-cardinality field or compound key"
+    },
+    "mistake_2_monotonic_key": {
+      "mistake": "Shard by always-increasing field",
+      "example": "Sequential studentId (1, 2, 3, ...)",
+      "problem": "All writes go to last shard (hotspot)",
+      "solution": "Use hashed shard key"
+    },
+    "mistake_3_changing_shard_key": {
+      "mistake": "Try to change shard key after sharding",
+      "problem": "Would require resharding all data",
+      "solution": "Plan shard key carefully before sharding"
+    },
+    "mistake_4_ignoring_balancer": {
+      "mistake": "Disable balancer permanently",
+      "problem": "Chunks not redistributed when adding shards",
+      "solution": "Enable balancer for production"
+    },
+    "mistake_5_broadcasting_queries": {
+      "mistake": "Query without shard key, hits all shards",
+      "example": "db.students.find({ gpa: { $gt: 3.8 } })",
+      "problem": "Slow, high resource usage",
+      "solution": "Design queries to include shard key when possible"
+    },
+    "mistake_6_no_monitoring": {
+      "mistake": "Don't monitor shard distribution",
+      "problem": "Don't know if data is balanced",
+      "solution": "Regular checks with printShardingStatus"
+    }
+  },
+  "section_13_vs_replication": {
+    "title": "Sharding vs Replication",
+    "comparison": [
+      {
+        "aspect": "Purpose",
+        "sharding": "Horizontal scaling, handle large data",
+        "replication": "High availability, data redundancy"
+      },
+      {
+        "aspect": "Data distribution",
+        "sharding": "Different data on each shard",
+        "replication": "Same data on each replica"
+      },
+      {
+        "aspect": "Write capacity",
+        "sharding": "Increased (distributed writes)",
+        "replication": "Same (all writes to primary)"
+      },
+      {
+        "aspect": "Failure impact",
+        "sharding": "Partial outage (one shard fails)",
+        "replication": "No outage (automatic failover)"
+      },
+      {
+        "aspect": "Use together",
+        "combined": "Shard + Replicate: Each shard is replica set"
+      }
+    ]
+  },
+  "section_14_progression": {
+    "beginner": [
+      "Understand sharding concept",
+      "Shard key basics",
+      "Setup basic sharded cluster",
+      "Targeted vs broadcast queries"
+    ],
+    "intermediate": [
+      "Chunk management and balancing",
+      "Shard key strategies",
+      "Data distribution monitoring",
+      "Query optimization"
+    ],
+    "advanced": [
+      "Avoiding hotspots",
+      "Adding shards and migration",
+      "Compound shard keys",
+      "Hashed shard keys",
+      "Performance optimization"
+    ]
+  },
+  "summary": {
+    "core_concept": "Sharding distributes data across multiple servers for horizontal scaling",
+    "minimum_setup": "2+ shards, config servers (replica set), mongos router",
+    "key_decision": "Choosing shard key (immutable, must have high cardinality)",
+    "key_features": [
+      "Automatic balancing of data chunks",
+      "Targeted queries hit single shard (fast)",
+      "Broadcast queries hit all shards (slower)",
+      "Transparent to application (mongos handles routing)"
+    ],
+    "when_to_shard": "Dataset > 100GB or write throughput > 100K ops/sec",
+    "best_practice": "Plan shard key carefully, use hash for monotonic values, monitor balancing",
+    "progression": "Beginner: Concepts and basic setup → Intermediate: Balancing and strategies → Advanced: Optimization and hotspots"
+  }
+}

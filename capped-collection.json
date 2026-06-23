@@ -1,0 +1,484 @@
+{
+  "title": "MongoDB Capped Collections - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on capped collections for fixed-size, circular buffer collections",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "capped_collection_overview": {
+    "definition": "Capped collection is a fixed-size collection that automatically removes oldest documents when size limit exceeded",
+    "concept": "Circular buffer - when full, oldest documents deleted to make room for new ones",
+    "purpose": [
+      "Logging and event tracking",
+      "Activity feeds",
+      "Session management",
+      "Time-series data",
+      "Chat message history",
+      "Audit trails",
+      "Fixed-size circular buffers"
+    ],
+    "key_characteristics": [
+      "Fixed size (cannot grow beyond limit)",
+      "Fixed document count (optional)",
+      "FIFO deletion (oldest documents first)",
+      "Automatic insertion order preservation",
+      "Cannot be modified (documents cannot be updated)",
+      "Cannot have indexes deleted",
+      "Cannot be sharded"
+    ],
+    "creation_required": true,
+    "note": "Must be created with capped option; cannot convert regular collection to capped"
+  },
+  "section_1_beginner_concept": {
+    "title": "BEGINNER: Understanding Capped Collections",
+    "definition": "Fixed-size collection with automatic oldest-document removal when limit reached",
+    "characteristics": [
+      "Size limit: Collection won't exceed specified size",
+      "Count limit: Optional maximum document count",
+      "Automatic deletion: Oldest documents deleted when limit exceeded",
+      "FIFO order: First-in-first-out (insertion order)",
+      "No updates: Cannot modify documents (can only insert/delete)",
+      "No indexes: Cannot create or delete indexes after creation",
+      "No sharding: Cannot be sharded across servers"
+    ],
+    "when_to_use": [
+      "Logging (application logs, errors)",
+      "Activity tracking (user actions, clicks)",
+      "Real-time feeds (news, notifications)",
+      "Chat messages (keep recent only)",
+      "Session data (temporary storage)",
+      "Time-series data (metrics, analytics)"
+    ],
+    "when_not_to_use": [
+      "Need to update documents",
+      "Need flexible indexing",
+      "Need document count to grow unbounded",
+      "Data should be permanent"
+    ]
+  },
+  "section_2_beginner_creation": {
+    "title": "BEGINNER: Creating Capped Collections",
+    "definition": "Capped collections must be explicitly created with capped option",
+    "syntax": "db.createCollection('name', { capped: true, size: bytes, max: docCount })",
+    "parameters": [
+      "capped: true (required, indicates capped)",
+      "size: Maximum size in bytes (required)",
+      "max: Maximum document count (optional)"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Create capped collection for activity log",
+        "query": "db.createCollection('studentActivity', {\n  capped: true,\n  size: 1048576,\n  max: 1000\n})",
+        "parameters": {
+          "size": "1048576 bytes = 1 MB",
+          "max": "1000 documents maximum"
+        },
+        "behavior": "When 1001st document inserted, oldest document deleted",
+        "use_case": "Keep last 1000 activities"
+      },
+      {
+        "title": "Create size-only capped collection",
+        "query": "db.createCollection('appLogs', {\n  capped: true,\n  size: 5242880\n})",
+        "size": "5242880 bytes = 5 MB",
+        "behavior": "When 5 MB exceeded, oldest documents deleted",
+        "use_case": "Keep last ~X documents (depends on size)"
+      },
+      {
+        "title": "Create count-only capped collection",
+        "query": "db.createCollection('recentEvents', {\n  capped: true,\n  max: 500\n})",
+        "note": "When max not specified, must specify size",
+        "issue": "Both size and max optional, but at least one required",
+        "use_case": "Keep exactly 500 events"
+      }
+    ],
+    "important_notes": [
+      "Must be created before use",
+      "Cannot convert regular → capped",
+      "Cannot convert capped → regular",
+      "Size in bytes, not MB (1MB = 1048576 bytes)",
+      "Both size and max optional, but at least one required",
+      "Actual storage may be slightly more than specified size"
+    ]
+  },
+  "section_3_beginner_behavior": {
+    "title": "BEGINNER: Capped Collection Behavior",
+    "beginner_examples": [
+      {
+        "title": "Automatic oldest deletion",
+        "query": "db.studentActivity.insertOne({ studentId: '1', action: 'login', time: new Date() })",
+        "scenario": "Collection max: 3 documents",
+        "step1": "Insert doc1: collection has [doc1]",
+        "step2": "Insert doc2: collection has [doc1, doc2]",
+        "step3": "Insert doc3: collection has [doc1, doc2, doc3]",
+        "step4": "Insert doc4: collection has [doc2, doc3, doc4] (doc1 auto-deleted)",
+        "use_case": "Automatic removal without cleanup code"
+      },
+      {
+        "title": "Size-based deletion",
+        "scenario": "Collection size: 1MB, each doc ~10KB",
+        "capacity": "~100 documents fit",
+        "insertion": "When 101st document inserted, oldest deleted automatically",
+        "use_case": "Keep collection under memory/disk limit"
+      },
+      {
+        "title": "Insertion order preserved",
+        "behavior": "Documents returned in insertion order by default",
+        "query": "db.studentActivity.find().sort({ $natural: 1 })",
+        "result": "Returns documents in insertion order (oldest first)",
+        "use_case": "Chronological ordering"
+      }
+    ]
+  },
+  "section_4_intermediate_operations": {
+    "title": "INTERMEDIATE: Operations on Capped Collections",
+    "limitations": [
+      "Cannot update documents",
+      "Cannot delete specific documents",
+      "Cannot create/drop indexes",
+      "Cannot shard collection",
+      "CAN insert and aggregate"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Bulk insert into capped collection",
+        "query": "db.studentActivity.insertMany([\n  { studentId: '1', action: 'login', timestamp: new Date() },\n  { studentId: '2', action: 'logout', timestamp: new Date() },\n  { studentId: '3', action: 'view', timestamp: new Date() }\n])",
+        "behavior": "All inserted; oldest removed if limit exceeded",
+        "use_case": "Batch insert activities"
+      },
+      {
+        "title": "Query recent documents",
+        "query": "db.studentActivity.find().limit(10)",
+        "result": "Last 10 documents inserted",
+        "use_case": "Get recent activity"
+      },
+      {
+        "title": "Aggregate from capped collection",
+        "query": "db.studentActivity.aggregate([\n  { $match: { action: 'login' } },\n  { $group: { _id: '$studentId', count: { $sum: 1 } } }\n])",
+        "behavior": "Can use all aggregation operators",
+        "use_case": "Analyze activity patterns"
+      },
+      {
+        "title": "Delete all documents (clear collection)",
+        "query": "db.studentActivity.deleteMany({})",
+        "note": "This is allowed; clears but doesn't delete collection",
+        "use_case": "Reset activity log"
+      }
+    ]
+  },
+  "section_5_intermediate_vs_ttl": {
+    "title": "INTERMEDIATE: Capped vs TTL Indexes",
+    "definition": "Two ways to automatically delete documents",
+    "comparison": [
+      {
+        "feature": "Automatic deletion",
+        "capped": "When size/count limit exceeded",
+        "ttl": "After specified time (expireAfterSeconds)"
+      },
+      {
+        "feature": "Ordering",
+        "capped": "FIFO (oldest first)",
+        "ttl": "By expiration time"
+      },
+      {
+        "feature": "Flexibility",
+        "capped": "Must specify at creation",
+        "ttl": "Can add to existing collection"
+      },
+      {
+        "feature": "Update allowed",
+        "capped": "NO",
+        "ttl": "YES"
+      },
+      {
+        "feature": "Use case",
+        "capped": "Activity logs (keep last N)",
+        "ttl": "Sessions (expire after time)"
+      }
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Capped: Activity log (last 100 activities)",
+        "query": "db.createCollection('activities', { capped: true, size: 10485760, max: 100 })",
+        "retention": "Keeps most recent 100",
+        "deletion": "Oldest deleted when 101st added",
+        "use_case": "Recent activity tracking"
+      },
+      {
+        "title": "TTL: Session expiration (1 hour)",
+        "query": "db.createCollection('sessions')\ndb.sessions.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 })",
+        "retention": "Keeps for 1 hour",
+        "deletion": "After 1 hour since createdAt",
+        "use_case": "Temporary session storage"
+      }
+    ]
+  },
+  "section_6_intermediate_storage": {
+    "title": "INTERMEDIATE: Storage Considerations",
+    "intermediate_examples": [
+      {
+        "title": "Calculate collection size",
+        "consideration": "Average document size: 200 bytes",
+        "query": "200 bytes × 1000 documents = 200KB minimum",
+        "allocation": "MongoDB allocates slightly more (padding, overhead)",
+        "use_case": "Plan size parameter"
+      },
+      {
+        "title": "Preallocated space",
+        "concept": "Capped collection preallocates space on disk",
+        "benefit": "Fast insertion (no growth/compaction)",
+        "cost": "Space used even if not full",
+        "use_case": "Trade storage for performance"
+      },
+      {
+        "title": "Conversion to capped (workaround)",
+        "limitation": "Cannot convert existing collection",
+        "workaround": "Create new capped, copy data, drop old, rename",
+        "query": "db.createCollection('newCapped', { capped: true, size: ... })\ndb.oldCollection.find().forEach(doc => db.newCapped.insertOne(doc))",
+        "use_case": "Convert if needed"
+      }
+    ]
+  },
+  "section_7_advanced_performance": {
+    "title": "ADVANCED: Performance & Optimization",
+    "advanced_examples": [
+      {
+        "title": "Optimize for insertion speed",
+        "strategy": "Preallocate sufficient size",
+        "benefit": "No reallocation, very fast inserts",
+        "parameter": "size: 100MB for millions of documents",
+        "use_case": "High-frequency logging"
+      },
+      {
+        "title": "Optimize for query performance",
+        "limitation": "No indexes except _id",
+        "workaround": "Use _id or $natural sort for ordering",
+        "note": "Cannot add indexes, so design carefully",
+        "use_case": "Plan query access before creation"
+      },
+      {
+        "title": "Replication with capped",
+        "concept": "Capped collections replicate automatically",
+        "caveat": "Each replica is separate capped collection",
+        "note": "Oplog uses capped collection internally",
+        "use_case": "Maintain activity logs across replicas"
+      }
+    ]
+  },
+  "section_8_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Application logs",
+        "example": "Keep last 10,000 error logs",
+        "setup": "max: 10000 or size: 50MB",
+        "benefit": "Auto-cleanup without code"
+      },
+      {
+        "use_case": "Activity feed",
+        "example": "Student activities (last 1000)",
+        "setup": "capped: true, max: 1000",
+        "benefit": "Always recent, bounded size"
+      },
+      {
+        "use_case": "Chat messages",
+        "example": "Keep last 100 messages per room",
+        "setup": "max: 100 per room collection",
+        "benefit": "Automatic old message removal"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Real-time metrics",
+        "example": "Application performance metrics",
+        "pattern": "Size-limited collection with aggregation",
+        "benefit": "Fast writes, recent data only"
+      },
+      {
+        "use_case": "Event stream",
+        "example": "System events (keep 1 hour worth)",
+        "pattern": "Size-based deletion for bounded stream",
+        "benefit": "Circular buffer pattern"
+      },
+      {
+        "use_case": "Session tracking",
+        "example": "Student login sessions",
+        "note": "Consider TTL index instead for time-based expiration",
+        "benefit": "Automatic session cleanup"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Oplog replacement (internal)",
+        "example": "MongoDB replication log",
+        "note": "Advanced internal use",
+        "benefit": "Bounded replication journal"
+      },
+      {
+        "use_case": "Time-series buffer",
+        "example": "High-frequency sensor data",
+        "pattern": "Very large capped collection",
+        "benefit": "Automatic retention policy"
+      },
+      {
+        "use_case": "Audit trail (limited)",
+        "example": "Keep recent audit events",
+        "caveat": "Cannot update, so full immutability",
+        "benefit": "Tamper-evident log"
+      }
+    ]
+  },
+  "section_9_performance": {
+    "title": "Performance Characteristics",
+    "insertion": {
+      "speed": "Very fast (O(1) with preallocated space)",
+      "note": "No indexing overhead",
+      "benefit": "Fastest collection type for inserts"
+    },
+    "queries": {
+      "speed": "Depends on document count",
+      "limitation": "No indexes except _id",
+      "optimization": "Full collection scan for non-_id queries"
+    },
+    "space": {
+      "usage": "Fixed and preallocated",
+      "benefit": "Predictable space consumption",
+      "cost": "May waste space if underutilized"
+    }
+  },
+  "section_10_best_practices": {
+    "practice_1_size_calculation": {
+      "rule": "Calculate average document size",
+      "formula": "size >= avgDocSize × expectedDocCount × 1.2",
+      "example": "200 bytes × 1000 docs × 1.2 = 240KB minimum",
+      "why": "Buffer for overhead, prevents unexpected deletions"
+    },
+    "practice_2_use_max_too": {
+      "rule": "Specify both size AND max when possible",
+      "good": "{ capped: true, size: 10MB, max: 5000 }",
+      "benefit": "Double safety - whichever limit hit first"
+    },
+    "practice_3_plan_before_creation": {
+      "rule": "Plan indexes and queries before creating",
+      "why": "Cannot add/remove indexes after creation",
+      "solution": "Use _id and $natural sort if needed"
+    },
+    "practice_4_monitor_space": {
+      "rule": "Monitor collection to ensure size sufficient",
+      "command": "db.capped.stats()",
+      "watch": "avgObjSize, count, size fields"
+    },
+    "practice_5_consider_ttl_alternative": {
+      "rule": "Use TTL if time-based expiration needed",
+      "when": "Want to keep X days of data",
+      "why": "TTL more flexible than capped"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_conversion": {
+      "mistake": "Try to convert regular → capped",
+      "problem": "MongoDB doesn't support direct conversion",
+      "solution": "Create new capped, copy data, rename"
+    },
+    "mistake_2_size_too_small": {
+      "mistake": "Size calculated too small",
+      "problem": "Documents deleted faster than expected",
+      "solution": "Use formula: docSize × count × 1.2"
+    },
+    "mistake_3_update_attempt": {
+      "mistake": "Try to update document",
+      "problem": "Error: cannot update in capped collection",
+      "solution": "Delete and re-insert if change needed"
+    },
+    "mistake_4_index_after_creation": {
+      "mistake": "Try to add index after creation",
+      "problem": "Cannot modify indexes",
+      "solution": "Plan before creating, recreate if needed"
+    },
+    "mistake_5_no_monitoring": {
+      "mistake": "Ignore collection stats",
+      "problem": "May not realize size exceeded",
+      "solution": "Regular monitoring with stats()"
+    },
+    "mistake_6_wrong_use_case": {
+      "mistake": "Use capped for permanent data",
+      "problem": "Data lost when limit exceeded",
+      "solution": "Use capped only for temporary/log data"
+    }
+  },
+  "section_12_vs_regular": {
+    "title": "Capped vs Regular Collections",
+    "comparison": [
+      {
+        "feature": "Size limit",
+        "capped": "Fixed, enforced",
+        "regular": "Unlimited"
+      },
+      {
+        "feature": "Deletion",
+        "capped": "Automatic (oldest first)",
+        "regular": "Manual only"
+      },
+      {
+        "feature": "Updates",
+        "capped": "NOT allowed",
+        "regular": "Allowed"
+      },
+      {
+        "feature": "Indexes",
+        "capped": "Limited (created at init only)",
+        "regular": "Flexible (add/remove anytime)"
+      },
+      {
+        "feature": "Performance",
+        "capped": "Insertion very fast",
+        "regular": "Standard performance"
+      },
+      {
+        "feature": "Data persistence",
+        "capped": "Limited (auto-deleted)",
+        "regular": "Permanent"
+      }
+    ]
+  },
+  "section_13_progression": {
+    "beginner": [
+      "Understand capped collection concept",
+      "Create simple capped collection",
+      "Insert documents",
+      "Query recent documents"
+    ],
+    "intermediate": [
+      "Understand FIFO deletion behavior",
+      "Size and max parameters",
+      "Capped vs TTL comparison",
+      "Bulk operations"
+    ],
+    "advanced": [
+      "Performance optimization",
+      "Large-scale capped collections",
+      "Monitoring and stats",
+      "Advanced use cases"
+    ]
+  },
+  "summary": {
+    "core_concept": "Fixed-size collection with automatic oldest-document removal",
+    "creation_syntax": "db.createCollection('name', { capped: true, size: bytes, max: count })",
+    "key_characteristics": [
+      "Fixed size (cannot grow beyond limit)",
+      "FIFO deletion (oldest documents first)",
+      "No updates allowed",
+      "No index changes after creation",
+      "Very fast inserts"
+    ],
+    "best_uses": [
+      "Application logging",
+      "Activity tracking",
+      "Real-time feeds",
+      "Temporary data"
+    ],
+    "avoid_for": [
+      "Permanent data",
+      "Data needing updates",
+      "Flexible indexing needs"
+    ],
+    "best_practice": "Calculate size carefully, specify both size and max, plan queries before creation",
+    "progression": "Beginner: Concepts and creation → Intermediate: Behavior and alternatives → Advanced: Optimization and monitoring"
+  }
+}

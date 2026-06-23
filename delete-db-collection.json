@@ -1,0 +1,689 @@
+{
+  "title": "MongoDB Delete Database & Collection - Complete Guide",
+  "description": "Comprehensive guide on deleting databases and collections with safety procedures",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "warning": "⚠️ DELETION IS IRREVERSIBLE AND PERMANENT - CRITICAL SAFETY GUIDE",
+  "overview": {
+    "definition": "Drop operations remove entire databases or collections with all data",
+    "danger_level": "CRITICAL - No undo button, permanent data loss",
+    "operations": [
+      "Drop Database: Delete entire database (all collections)",
+      "Drop Collection: Delete one collection (all documents)"
+    ],
+    "key_difference": {
+      "dropDatabase": "Removes ALL collections and data in database",
+      "dropCollection": "Removes single collection only"
+    }
+  },
+  "section_1_drop_database": {
+    "title": "Drop Database - Delete Entire Database",
+    "definition": "Removes the entire database including all collections",
+    "danger_level": "⚠️⚠️⚠️ MOST DANGEROUS - ALL DATA LOST",
+    "syntax": "db.dropDatabase()",
+    "requirements": [
+      "Connected to database to drop",
+      "Sufficient permissions (admin role typically)"
+    ],
+    "example_database": "school_db",
+    "example_collections_deleted": [
+      "students (60 records lost)",
+      "teachers",
+      "courses",
+      "grades",
+      "Any other collections in database"
+    ],
+    "code_example": {
+      "step1_show_databases": "show dbs",
+      "step2_use_database": "use school_db",
+      "step3_verify_database": "db.getName()",
+      "step4_verify_collections": "show collections",
+      "step5_execute_drop": "db.dropDatabase()",
+      "result": "Database completely removed with all data"
+    },
+    "return_value": {
+      "success": "{ 'ok': 1 }",
+      "database_name_after": "Database no longer exists"
+    },
+    "safety_procedure": [
+      {
+        "step": 1,
+        "action": "BACKUP FIRST",
+        "command": "mongodump --db school_db --out backup_school/",
+        "critical": "MANDATORY - No recovery without backup"
+      },
+      {
+        "step": 2,
+        "action": "Verify you are in correct database",
+        "command": "db.getName()",
+        "verify": "Must show 'school_db' or target database"
+      },
+      {
+        "step": 3,
+        "action": "List all collections first",
+        "command": "show collections",
+        "note": "See what will be deleted"
+      },
+      {
+        "step": 4,
+        "action": "Count total documents",
+        "command": "db.students.countDocuments()",
+        "note": "Verify scale of loss"
+      },
+      {
+        "step": 5,
+        "action": "Confirm with stakeholders",
+        "command": "Email/message team: 'Deleting school_db on 2024-06-23'",
+        "critical": "Get approval before proceeding"
+      },
+      {
+        "step": 6,
+        "action": "Execute drop",
+        "command": "db.dropDatabase()",
+        "warning": "Point of no return"
+      },
+      {
+        "step": 7,
+        "action": "Verify deletion",
+        "command": "show dbs",
+        "verify": "school_db should not appear"
+      }
+    ],
+    "scenario_example": {
+      "situation": "Development environment cleanup",
+      "database": "school_db_dev",
+      "reason": "End of testing cycle, need fresh database",
+      "process": [
+        "1. Confirm no production data",
+        "2. Backup (optional for dev, but good practice)",
+        "3. List collections: show collections",
+        "4. Execute: db.dropDatabase()",
+        "5. Verify: show dbs (school_db_dev should be gone)"
+      ],
+      "time_taken": "Milliseconds for entire database"
+    },
+    "recovery": "IMPOSSIBLE without backup - Use mongorestore if backup exists"
+  },
+  "section_2_drop_collection": {
+    "title": "Drop Collection - Delete Single Collection",
+    "definition": "Removes a single collection from the database",
+    "danger_level": "⚠️⚠️ VERY DANGEROUS - Collection data lost, database remains",
+    "syntax": "db.collection.drop()",
+    "requirements": [
+      "Connected to database",
+      "Collection name specified"
+    ],
+    "example_collection": "students",
+    "example_data_lost": "60 student records permanently deleted",
+    "code_example": {
+      "step1_use_database": "use school_db",
+      "step2_list_collections": "show collections",
+      "step3_count_documents": "db.students.countDocuments()",
+      "step4_execute_drop": "db.students.drop()",
+      "result": "students collection and all 60 records deleted"
+    },
+    "return_value": {
+      "success": "true (if collection exists)",
+      "not_exists": "false (if collection doesn't exist)"
+    },
+    "safety_procedure": [
+      {
+        "step": 1,
+        "action": "BACKUP FIRST",
+        "command": "mongodump --db school_db --collection students --out backup_students/",
+        "critical": "MANDATORY - No recovery without backup"
+      },
+      {
+        "step": 2,
+        "action": "Verify you are in correct database",
+        "command": "db.getName()",
+        "verify": "Must show 'school_db'"
+      },
+      {
+        "step": 3,
+        "action": "Verify correct collection",
+        "command": "db.students.findOne()",
+        "note": "Confirm this is the right collection"
+      },
+      {
+        "step": 4,
+        "action": "Count documents to be deleted",
+        "command": "db.students.countDocuments()",
+        "verify": "Expect 60 documents"
+      },
+      {
+        "step": 5,
+        "action": "Check for recent activity",
+        "command": "db.students.find().sort({ _id: -1 }).limit(1)",
+        "note": "Verify no recent inserts/updates"
+      },
+      {
+        "step": 6,
+        "action": "Confirm with team",
+        "command": "Get written approval before deletion",
+        "critical": "Document who authorized"
+      },
+      {
+        "step": 7,
+        "action": "Execute drop",
+        "command": "db.students.drop()",
+        "warning": "Point of no return"
+      },
+      {
+        "step": 8,
+        "action": "Verify deletion",
+        "command": "show collections",
+        "verify": "students should not appear"
+      }
+    ],
+    "scenario_examples": [
+      {
+        "scenario": "Delete old course records",
+        "collection": "courses_2020",
+        "reason": "Archive old data, reduce storage",
+        "process": [
+          "1. Backup: mongodump --collection courses_2020",
+          "2. Count: db.courses_2020.countDocuments() → 500 docs",
+          "3. Confirm archival location",
+          "4. Drop: db.courses_2020.drop()",
+          "5. Verify: show collections (courses_2020 gone)"
+        ],
+        "document_count": 500
+      },
+      {
+        "scenario": "Delete test/temp collection",
+        "collection": "temp_import",
+        "reason": "Cleanup after data migration test",
+        "process": [
+          "1. Verify temp data (not production)",
+          "2. Count: db.temp_import.countDocuments() → 2000 docs",
+          "3. Drop: db.temp_import.drop()",
+          "4. Verify gone"
+        ],
+        "document_count": 2000
+      }
+    ],
+    "recovery": "IMPOSSIBLE without backup - Use mongorestore if backup exists"
+  },
+  "section_3_comparison_database_vs_collection": {
+    "title": "Drop Database vs Drop Collection",
+    "comparison_table": [
+      {
+        "aspect": "What is deleted",
+        "dropDatabase": "Entire database + ALL collections",
+        "dropCollection": "Single collection only"
+      },
+      {
+        "aspect": "Database remains",
+        "dropDatabase": "NO - Database is gone",
+        "dropCollection": "YES - Database intact, other collections remain"
+      },
+      {
+        "aspect": "Other collections",
+        "dropDatabase": "ALL deleted",
+        "dropCollection": "Other collections unaffected"
+      },
+      {
+        "aspect": "Syntax",
+        "dropDatabase": "db.dropDatabase()",
+        "dropCollection": "db.collectionName.drop()"
+      },
+      {
+        "aspect": "Use case",
+        "dropDatabase": "Complete environment cleanup",
+        "dropCollection": "Remove specific old data"
+      },
+      {
+        "aspect": "Danger level",
+        "dropDatabase": "⚠️⚠️⚠️ MOST DANGEROUS",
+        "dropCollection": "⚠️⚠️ Very dangerous"
+      },
+      {
+        "aspect": "Frequency",
+        "dropDatabase": "Rarely (dev cleanup only)",
+        "dropCollection": "More common (archival, cleanup)"
+      }
+    ]
+  },
+  "section_4_alternatives_to_deletion": {
+    "title": "Safer Alternatives Instead of Deletion",
+    "why_consider": "Deletion is permanent - consider alternatives first",
+    "alternative_1_soft_delete": {
+      "name": "Soft Delete",
+      "description": "Mark records as deleted instead of removing",
+      "advantage": "Reversible, keeps audit trail",
+      "implementation": "Add 'deleted: true' field",
+      "code_example": {
+        "instead_of_drop": "db.students.drop()",
+        "use_soft_delete": "db.students.updateMany({}, { $set: { deleted: true } })",
+        "query_active": "db.students.find({ deleted: false })"
+      },
+      "recovery": "Set deleted: false to undelete",
+      "cost": "Slightly more storage, but reversible"
+    },
+    "alternative_2_archive": {
+      "name": "Archive to Different Collection",
+      "description": "Move data to archive collection before deletion",
+      "advantage": "Keep historical data accessible",
+      "implementation": "Copy to archive, then drop original",
+      "code_example": {
+        "step1_create_archive": "db.createCollection('students_archive_2024')",
+        "step2_copy_data": "db.students_archive_2024.insertMany(db.students.find().toArray())",
+        "step3_drop_original": "db.students.drop()",
+        "recovery": "db.students.insertMany(db.students_archive_2024.find().toArray())"
+      },
+      "recovery": "Restore from archive collection",
+      "cost": "Double storage temporarily, but data preserved"
+    },
+    "alternative_3_export_backup": {
+      "name": "Export to File Before Deletion",
+      "description": "Export collection/database to JSON or BSON file",
+      "advantage": "External backup, offline access",
+      "implementation": "Use mongodump or mongoexport",
+      "code_example": {
+        "export_json": "mongoexport --db school_db --collection students --out students_backup.json",
+        "export_bson": "mongodump --db school_db --collection students --out backup/",
+        "drop": "db.students.drop()",
+        "recovery": "mongorestore --db school_db --collection students backup/school_db/students.bson"
+      },
+      "recovery": "Restore from backup file",
+      "cost": "Minimal storage (compressed), portable"
+    },
+    "alternative_4_separate_database": {
+      "name": "Move to Separate Database",
+      "description": "Instead of drop, move active data to new database",
+      "advantage": "Keep old data accessible, clean production",
+      "implementation": "Copy to new DB, then drop old",
+      "code_example": {
+        "current": "school_db (has old data mixed in)",
+        "solution": "Create school_db_active (clean data) + school_db_archive (old data)",
+        "then_drop": "Drop old school_db"
+      },
+      "recovery": "Both databases still exist",
+      "cost": "More storage, but organized"
+    },
+    "recommendation": "Always use alternative if you might need data again"
+  },
+  "section_5_backup_recovery": {
+    "title": "Backup and Recovery Procedures",
+    "mongodump_backup": {
+      "description": "Backup entire database or collection",
+      "backup_database": "mongodump --db school_db --out backup_school_db/",
+      "backup_collection": "mongodump --db school_db --collection students --out backup_students/",
+      "backup_all": "mongodump --out backup_all/",
+      "timing": "Takes ~5-30 seconds for 60 documents",
+      "storage": "BSON format, compressed"
+    },
+    "mongorestore_recovery": {
+      "description": "Restore from mongodump backup",
+      "restore_database": "mongorestore --db school_db backup_school_db/school_db/",
+      "restore_collection": "mongorestore --db school_db --collection students backup_students/school_db/students.bson",
+      "restore_all": "mongorestore backup_all/",
+      "timing": "~5-30 seconds to restore"
+    },
+    "mongoexport_json": {
+      "description": "Export to JSON for manual inspection",
+      "export": "mongoexport --db school_db --collection students --out students.json",
+      "view": "Human-readable JSON format",
+      "import": "mongoimport --db school_db --collection students < students.json"
+    },
+    "backup_automation": {
+      "recommendation": "Automate daily backups",
+      "example_script": "0 2 * * * mongodump --db school_db --out /backups/school_db_$(date +%Y%m%d)/",
+      "retention": "Keep 30 days of backups",
+      "test_recovery": "Test restore monthly"
+    }
+  },
+  "section_6_real_world_scenarios": {
+    "scenario_1_development_cleanup": {
+      "title": "Development Environment Cleanup",
+      "situation": "End of sprint, need fresh dev database",
+      "collections": "students, teachers, courses, grades",
+      "reason": "Test data from previous sprint",
+      "process": [
+        "1. No backup needed (dev only, not production)",
+        "2. List collections: show collections",
+        "3. Count documents: db.students.countDocuments()",
+        "4. All data is test data - safe to delete",
+        "5. Execute: db.dropDatabase()",
+        "6. Verify: show dbs (should not show school_db)"
+      ],
+      "time": "Milliseconds",
+      "risk": "LOW (development only)"
+    },
+    "scenario_2_production_archival": {
+      "title": "Production: Archive Old Year and Delete",
+      "situation": "School year ended, archive 2023 data",
+      "collections": "students_2023 (500 docs), courses_2023 (100 docs)",
+      "reason": "Reduce production database size",
+      "process": [
+        "1. BACKUP FIRST: mongodump --db school_db --out backup_2024_06_23/",
+        "2. Verify backup success (check file sizes)",
+        "3. Create archive database: use school_db_archive",
+        "4. Copy data: db.students_2023_archive.insertMany(...)",
+        "5. Verify copy (count matches): 500 ✓",
+        "6. Get approval from team lead",
+        "7. Drop from production: use school_db; db.students_2023.drop()",
+        "8. Verify: students_2023 gone from production",
+        "9. Archive database has backup copy"
+      ],
+      "time": "Minutes (including backup + copy)",
+      "risk": "LOW (with backup + verification)"
+    },
+    "scenario_3_failed_migration": {
+      "title": "Failed Data Migration - Rollback",
+      "situation": "Migration to new schema failed",
+      "collections": "students_new (incomplete, corrupted)",
+      "reason": "Bad data in migration process",
+      "process": [
+        "1. Check data integrity: db.students_new.find().limit(5)",
+        "2. Data is corrupted/incomplete",
+        "3. Drop failed collection: db.students_new.drop()",
+        "4. Rollback from backup: mongorestore backup_students/",
+        "5. Verify restoration: db.students.countDocuments()",
+        "6. Verify data integrity: Random spot checks"
+      ],
+      "time": "Minutes (restore + verification)",
+      "risk": "MEDIUM (but backup prevents loss)"
+    },
+    "scenario_4_disaster_cleanup": {
+      "title": "Accidental Deletion - Recovery",
+      "situation": "Student deletes data accidentally",
+      "what_happened": "Ran: db.students.drop()",
+      "when_discovered": "5 minutes later",
+      "process": [
+        "1. DO NOT panic - backup should exist",
+        "2. Find latest backup: ls -la backup_students/",
+        "3. Restore: mongorestore --db school_db backup_students/school_db/",
+        "4. Verify: db.students.countDocuments() → 60 ✓",
+        "5. Check timestamp of recovered data",
+        "6. Review what changed since backup"
+      ],
+      "time": "Minutes (restore is fast)",
+      "risk": "HIGH (but recovery is possible with backup)"
+    }
+  },
+  "section_7_critical_safety_rules": {
+    "rule_1_always_backup": {
+      "rule": "ALWAYS BACKUP BEFORE DROP",
+      "why": "Only way to recover from permanent deletion",
+      "command": "mongodump --db school_db --out backup_$(date +%Y%m%d_%H%M%S)/",
+      "requirement": "MANDATORY for production"
+    },
+    "rule_2_verify_database": {
+      "rule": "VERIFY CORRECT DATABASE",
+      "why": "Can't delete from 2 databases simultaneously",
+      "command": "db.getName()",
+      "requirement": "Must match target exactly"
+    },
+    "rule_3_count_documents": {
+      "rule": "COUNT DOCUMENTS FIRST",
+      "why": "Verify scale of deletion",
+      "command": "db.students.countDocuments()",
+      "requirement": "Know what you're deleting"
+    },
+    "rule_4_get_approval": {
+      "rule": "GET WRITTEN APPROVAL",
+      "why": "Accountability, prevent mistakes",
+      "evidence": "Email/Slack from manager",
+      "requirement": "Especially for production"
+    },
+    "rule_5_document_deletion": {
+      "rule": "DOCUMENT THE DELETION",
+      "why": "Audit trail for compliance",
+      "record": "Who, when, why, what backup",
+      "requirement": "Required for production"
+    },
+    "rule_6_no_undo_button": {
+      "rule": "DELETION IS PERMANENT",
+      "why": "No second chances",
+      "point_of_no_return": "When db.drop() executes",
+      "requirement": "Proceed with extreme caution"
+    }
+  },
+  "section_8_common_mistakes": {
+    "mistake_1_forgetting_backup": {
+      "mistake": "Deleting without backup",
+      "scenario": "Need to free up space, drop old collection without backup",
+      "result": "❌ Data permanently lost, unrecoverable",
+      "fix": "Always mongodump before drop",
+      "lesson": "Backup is insurance policy"
+    },
+    "mistake_2_wrong_database": {
+      "mistake": "Wrong database context",
+      "scenario": "Meant to drop school_db_test but was in school_db",
+      "result": "❌ Deleted production data instead",
+      "prevention": "Always verify: db.getName()",
+      "lesson": "Double-check context before drop"
+    },
+    "mistake_3_no_verification": {
+      "mistake": "Not verifying after drop",
+      "scenario": "Drop command ran, but didn't check if actually deleted",
+      "result": "😕 May have failed silently",
+      "verification": "show collections / show dbs after drop",
+      "lesson": "Verify deletion completed"
+    },
+    "mistake_4_no_approval": {
+      "mistake": "Deleting without getting approval",
+      "scenario": "Team member deletes shared collection",
+      "result": "❌ Other team members lost access",
+      "solution": "Get written approval first",
+      "lesson": "Communication prevents disasters"
+    },
+    "mistake_5_wrong_syntax": {
+      "mistake": "Wrong method name",
+      "bad_syntax": "db.students.remove({}) instead of db.students.drop()",
+      "result": "May not drop collection entirely",
+      "correct_syntax": "db.students.drop()",
+      "lesson": "Use correct command"
+    }
+  },
+  "section_9_performance_implications": {
+    "drop_database_performance": {
+      "operation": "db.dropDatabase()",
+      "time_complexity": "O(number of collections)",
+      "execution_time": "50-500ms for typical database",
+      "factors": [
+        "Number of collections",
+        "Indexes to drop",
+        "Storage engine cleanup"
+      ],
+      "blocking": "Blocks write operations temporarily",
+      "note": "Very fast operation"
+    },
+    "drop_collection_performance": {
+      "operation": "db.collection.drop()",
+      "time_complexity": "O(number of indexes)",
+      "execution_time": "10-100ms for typical collection",
+      "factors": [
+        "Number of indexes to drop",
+        "Size of collection (not directly)"
+      ],
+      "blocking": "Blocks operations on that collection only",
+      "note": "Very fast operation"
+    },
+    "recovery_performance": {
+      "operation": "mongorestore",
+      "time_complexity": "O(number of documents)",
+      "execution_time": "1-10 seconds for 60 documents",
+      "for_large_collections": "Minutes or hours for millions of documents",
+      "network": "Network bandwidth important for large restores"
+    },
+    "note": "Drop is fast, but restore is slower"
+  },
+  "section_10_best_practices": {
+    "practice_1_automation": {
+      "practice": "Automate backups",
+      "why": "Never forget to backup",
+      "example": "Daily mongodump at 2 AM"
+    },
+    "practice_2_staging_environment": {
+      "practice": "Test drop in staging first",
+      "why": "Verify process before production",
+      "method": "Replicate production data to staging, test drop procedure"
+    },
+    "practice_3_retention_policy": {
+      "practice": "Keep multiple backup versions",
+      "why": "Can recover from older backups",
+      "example": "Daily (7 days), Weekly (4 weeks), Monthly (1 year)"
+    },
+    "practice_4_slow_mode": {
+      "practice": "Use soft delete first, hard delete later",
+      "why": "Catch mistakes before permanent deletion",
+      "timeline": "Soft delete immediately, hard delete after 30 days"
+    },
+    "practice_5_monitoring": {
+      "practice": "Monitor drop operations",
+      "why": "Know what's being deleted",
+      "method": "Log all drop commands, alert on drops"
+    },
+    "practice_6_access_control": {
+      "practice": "Restrict drop permissions",
+      "why": "Prevent accidental/unauthorized deletion",
+      "implementation": "Only admins can drop, require approval"
+    },
+    "practice_7_encryption": {
+      "practice": "Encrypt backups",
+      "why": "Protect sensitive student data",
+      "method": "Encrypt backup files at rest"
+    }
+  },
+  "section_11_example_procedures": {
+    "procedure_drop_collection": {
+      "title": "Safe Drop Collection Procedure",
+      "steps": [
+        {
+          "step": 1,
+          "action": "BACKUP",
+          "command": "mongodump --db school_db --collection students --out backup_students_$(date +%Y%m%d)/",
+          "verify": "Check backup directory created with files"
+        },
+        {
+          "step": 2,
+          "action": "VERIFY DATABASE",
+          "command": "db.getName()",
+          "check": "Output must be 'school_db'"
+        },
+        {
+          "step": 3,
+          "action": "VERIFY COLLECTION",
+          "command": "db.students.findOne()",
+          "check": "Get one document, verify it's correct collection"
+        },
+        {
+          "step": 4,
+          "action": "COUNT DOCUMENTS",
+          "command": "db.students.countDocuments()",
+          "verify": "Should be 60 for student collection"
+        },
+        {
+          "step": 5,
+          "action": "GET APPROVAL",
+          "evidence": "Email/Slack message from manager",
+          "required": "YES"
+        },
+        {
+          "step": 6,
+          "action": "DROP COLLECTION",
+          "command": "db.students.drop()",
+          "result": "Returns true if successful"
+        },
+        {
+          "step": 7,
+          "action": "VERIFY DELETION",
+          "command": "show collections",
+          "check": "students should NOT appear"
+        },
+        {
+          "step": 8,
+          "action": "DOCUMENT ACTION",
+          "log": "Who (name), when (timestamp), why (reason), backup location",
+          "required": "For audit trail"
+        }
+      ]
+    },
+    "procedure_drop_database": {
+      "title": "Safe Drop Database Procedure",
+      "steps": [
+        {
+          "step": 1,
+          "action": "BACKUP ENTIRE DATABASE",
+          "command": "mongodump --db school_db --out backup_school_db_$(date +%Y%m%d)/",
+          "verify": "All collections backed up with .bson files"
+        },
+        {
+          "step": 2,
+          "action": "LIST ALL COLLECTIONS",
+          "command": "show collections",
+          "document": "Write down all collection names"
+        },
+        {
+          "step": 3,
+          "action": "VERIFY CORRECT DATABASE",
+          "command": "use school_db; db.getName()",
+          "check": "Must be development/test, never production"
+        },
+        {
+          "step": 4,
+          "action": "COUNT TOTAL DOCUMENTS",
+          "command": "db.students.countDocuments() + (repeat for other collections)",
+          "document": "Know total data volume"
+        },
+        {
+          "step": 5,
+          "action": "GET TEAM APPROVAL",
+          "evidence": "Email to team: 'Dropping school_db on 2024-06-23 14:00 UTC'",
+          "required": "Even for development"
+        },
+        {
+          "step": 6,
+          "action": "PAUSE (30 MINUTES)",
+          "reason": "Allow time for objections",
+          "note": "Give team time to respond"
+        },
+        {
+          "step": 7,
+          "action": "EXECUTE DROP",
+          "command": "db.dropDatabase()",
+          "result": "Returns { ok: 1 }"
+        },
+        {
+          "step": 8,
+          "action": "VERIFY DELETION",
+          "command": "show dbs",
+          "check": "school_db should NOT appear"
+        },
+        {
+          "step": 9,
+          "action": "FINAL VERIFICATION",
+          "command": "use school_db",
+          "result": "Error: database not found (expected)"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "operations": [
+      "DROP DATABASE: db.dropDatabase() - removes entire database",
+      "DROP COLLECTION: db.collection.drop() - removes single collection"
+    ],
+    "danger": "⚠️ PERMANENT and IRREVERSIBLE - no undo",
+    "critical_steps": [
+      "BACKUP FIRST (mandatory)",
+      "Verify correct database/collection",
+      "Count documents to delete",
+      "Get written approval",
+      "Execute drop",
+      "Verify deletion",
+      "Document the action"
+    ],
+    "alternatives": [
+      "Soft delete (mark as deleted: true)",
+      "Archive to separate collection",
+      "Export backup files",
+      "Move to separate database"
+    ],
+    "recovery": "Use mongorestore if backup exists (only option)",
+    "best_practice": "Treat drops as rare events - use alternatives first"
+  }
+}

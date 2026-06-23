@@ -1,0 +1,763 @@
+================================================================================
+         MONGODB UPDATE OPERATIONS - updateOne vs updateMany
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Comparing update operations with use cases
+EXAMPLES: Using 60 Student Records from data.json
+
+TWO MAIN UPDATE METHODS:
+  updateOne()   → Update first matching document (1 document)
+  updateMany()  → Update all matching documents (2+ documents)
+
+
+================================================================================
+SECTION 1: QUICK OVERVIEW
+================================================================================
+
+┌──────────────────┬──────────────────┬──────────────────────────┐
+│ ASPECT           │ updateOne        │ updateMany               │
+├──────────────────┼──────────────────┼──────────────────────────┤
+│ Documents Update │ 1 (first match)  │ All matching             │
+│ Return Value     │ modifiedCount    │ modifiedCount            │
+│ Performance      │ ~1-5ms           │ ~20-50ms for 30 updates  │
+│ Use For          │ Single records   │ Bulk operations          │
+│ Other Matches    │ Untouched        │ All updated              │
+│ Best For         │ Individual       │ Batch/bulk updates       │
+│ Risk            │ Low              │ High (if filter wrong)    │
+│ Typical Count    │ 1 document       │ 10 to all 60             │
+└──────────────────┴──────────────────┴──────────────────────────┘
+
+
+================================================================================
+SECTION 2: updateOne() - SINGLE DOCUMENT UPDATE
+================================================================================
+
+WHAT IS updateOne()?
+  Updates first matching document only
+  Other matching documents are NOT touched
+  Returns modifiedCount (0 or 1)
+
+SYNTAX:
+  db.collection.updateOne(filter, update, options)
+
+RETURNS:
+  {
+    acknowledged: true,
+    matchedCount: 1,
+    modifiedCount: 1
+  }
+
+
+EXAMPLE #1: UPDATE STUDENT'S GPA
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { gpa: 3.95 } }
+  )
+
+Result:
+  {
+    acknowledged: true,
+    matchedCount: 1,
+    modifiedCount: 1
+  }
+
+Change:
+  Daksh Chauhan's GPA: 3.85 → 3.95
+
+Use Case:
+  Teacher updates one student's grade
+
+
+EXAMPLE #2: ADD SKILL TO STUDENT
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $push: { skills: 'Docker' } }
+  )
+
+Result:
+  Docker added to Daksh's skills array
+  Skills now: ["Python", "SQL", "TensorFlow", "Docker"]
+
+Use Case:
+  Student learns new technology
+
+
+EXAMPLE #3: UPDATE NESTED FIELD
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { 'scholarshipDetails.amount': 20000 } }
+  )
+
+Result:
+  Scholarship amount updated to 20000
+
+Use Case:
+  Change scholarship amount for one student
+
+
+EXAMPLE #4: MULTIPLE UPDATES IN ONE CALL
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    {
+      $set: { gpa: 3.95, age: 21 },
+      $push: { skills: 'Kubernetes' }
+    }
+  )
+
+Result:
+  Daksh's GPA updated, age updated, and Kubernetes added to skills
+  All in single database operation
+
+Use Case:
+  Multiple changes to same student at once
+
+
+REAL-WORLD SCENARIOS FOR updateOne:
+
+1. TEACHER UPDATES GRADE:
+   Teacher enters grade for student's course
+   Code:
+     db.students.updateOne(
+       { studentId: 20260001, 'courses.courseCode': 'DS-401' },
+       { $set: { 'courses.$.grade': 'A+' } }
+     )
+
+2. STUDENT BIRTHDAY:
+   Student has birthday, age increments
+   Code:
+     db.students.updateOne(
+       { studentId: 20260001 },
+       { $inc: { age: 1 } }
+     )
+
+3. STUDENT CHANGES MAJOR:
+   Student switches degree program
+   Code:
+     db.students.updateOne(
+       { studentId: 20260001 },
+       { $set: { major: 'Cloud Computing' } }
+     )
+
+4. ADD COURSE TO SCHEDULE:
+   Student enrolls in course
+   Code:
+     db.students.updateOne(
+       { studentId: 20260001 },
+       { $push: { courses: { courseCode: 'NEW-101', credits: 3, grade: 'In Progress' } } }
+     )
+
+5. UPDATE PROFILE PICTURE:
+   Student uploads new photo
+   Code:
+     db.students.updateOne(
+       { studentId: 20260001 },
+       { $set: { profilePhotoUrl: 'new-url.jpg', photoUpdatedAt: new Date() } }
+     )
+
+
+CHARACTERISTICS:
+  ✓ Updates exactly 1 document (first match)
+  ✓ Other matching documents untouched
+  ✓ Fast for single update (~1-5ms)
+  ✓ Good for real-time changes
+  ✓ Low risk of accidents
+  ✓ Clear intent
+
+✗ Slow for bulk updates (called repeatedly)
+✗ Multiple database round trips
+✗ Not ideal for batch operations
+
+
+OPERATORS COMMONLY USED WITH updateOne:
+
+$set:     db.students.updateOne({...}, { $set: { field: value } })
+$inc:     db.students.updateOne({...}, { $inc: { age: 1 } })
+$push:    db.students.updateOne({...}, { $push: { skills: 'Docker' } })
+$pull:    db.students.updateOne({...}, { $pull: { skills: 'Python' } })
+$unset:   db.students.updateOne({...}, { $unset: { tempField: '' } })
+
+
+================================================================================
+SECTION 3: updateMany() - MULTIPLE DOCUMENT UPDATE
+================================================================================
+
+WHAT IS updateMany()?
+  Updates ALL matching documents
+  Single database operation for all
+  Returns total modifiedCount
+
+SYNTAX:
+  db.collection.updateMany(filter, update, options)
+
+RETURNS:
+  {
+    acknowledged: true,
+    matchedCount: N,
+    modifiedCount: N
+  }
+
+
+EXAMPLE #1: UPDATE ALL INTERNATIONAL STUDENTS
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateMany(
+    { isInternational: true },
+    { $set: { visaStatus: 'F-1' } }
+  )
+
+Result:
+  {
+    acknowledged: true,
+    matchedCount: 30,
+    modifiedCount: 30
+  }
+
+Change:
+  All 30 international students updated with visa status
+
+Use Case:
+  New visa requirement for all international students
+
+
+EXAMPLE #2: UPDATE ALL HONOR STUDENTS
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateMany(
+    { gpa: { $gte: 3.9 } },
+    { $set: { status: 'honor' } }
+  )
+
+Result:
+  {
+    matchedCount: 17,
+    modifiedCount: 17
+  }
+
+Students Updated:
+  Neha Gupta, Esha Chatterjee, Maya Kapoor, Harleen Kaur, Anaya Sharma,
+  Kavya Mishra, Simran Kaur, Shreya Prabhu, Sudha Lakshmi, Zara Ahmed,
+  Daksh Chauhan, Prisha Yadav, Ritika Saxena, Sakshi Goyal, Aisha Mirza,
+  Pooja Bhat, Prithvi Nambiar
+
+Use Case:
+  Mark honor roll students
+
+
+EXAMPLE #3: UPDATE ALL STUDENTS (REMOVE FIELD)
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateMany(
+    {},
+    { $unset: { tempField: '' } }
+  )
+
+Result:
+  {
+    matchedCount: 60,
+    modifiedCount: 60
+  }
+
+Change:
+  All 60 students updated (field removed)
+
+Use Case:
+  Schema cleanup, remove temporary field from all
+
+
+EXAMPLE #4: CONDITIONAL BULK UPDATE
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateMany(
+    { 'scholarshipDetails.renewable': true, gpa: { $gte: 3.5 } },
+    { $set: { 'scholarshipDetails.renewalDate': new Date() } }
+  )
+
+Result:
+  Multiple students with renewable scholarships and high GPA updated
+
+Use Case:
+  Renew scholarships for eligible students
+
+
+REAL-WORLD SCENARIOS FOR updateMany:
+
+1. END OF SEMESTER - FINALIZE GRADES:
+   Finalize grades for all students
+   Code:
+     db.students.updateMany(
+       { semester: 'Spring2024' },
+       { $set: { finalGradePosted: true, gradePostDate: new Date() } }
+     )
+
+2. GRADUATION - UPDATE CLASS OF 2024:
+   Mark all graduating class as graduated
+   Code:
+     db.students.updateMany(
+       { graduationYear: 2024 },
+       { $set: { status: 'graduated', graduationDate: new Date() } }
+     )
+
+3. ADD REQUIRED COURSE TO ALL STUDENTS:
+   New core requirement for all students
+   Code:
+     db.students.updateMany(
+       {},
+       { $push: { courses: { courseCode: 'CORE-100', credits: 3, grade: 'Not Started' } } }
+     )
+
+4. REMOVE EXPIRED SCHOLARSHIPS:
+   Clean up expired scholarships
+   Code:
+     db.students.updateMany(
+       { 'scholarshipDetails.endDate': { $lt: new Date() } },
+       { $set: { scholarshipDetails: null } }
+     )
+
+5. MIGRATE DATA - UPDATE FORMAT:
+   Change data format across collection
+   Code:
+     db.students.updateMany(
+       { createdAt: { $exists: false } },
+       { $set: { createdAt: new Date() } }
+     )
+
+6. BATCH STATUS CHANGE:
+   Deactivate all students from old semester
+   Code:
+     db.students.updateMany(
+       { semester: 'Fall2023' },
+       { $set: { status: 'inactive' } }
+     )
+
+
+CHARACTERISTICS:
+  ✓ Updates all matching documents
+  ✓ Single database operation
+  ✓ Fast for bulk (~20-50ms for 30 updates)
+  ✓ Perfect for batch operations
+  ✓ Efficient network usage
+  ✓ Returns total counts
+
+✗ High risk if filter is wrong (affects many)
+✗ Must be careful with filter
+✗ Harder to undo if mistake
+
+
+IMPORTANT: TEST FILTER BEFORE updateMany!
+────────────────────────────────────────────────────────────────────────────
+
+SAFE APPROACH:
+  1. Test filter with find() first
+     db.students.find({ isInternational: true }).count()
+     Result: 30 (confirms 30 international students)
+
+  2. Then run updateMany with same filter
+     db.students.updateMany(
+       { isInternational: true },
+       { $set: { visaStatus: 'F-1' } }
+     )
+
+RISKY APPROACH (DON'T DO THIS):
+  db.students.updateMany({}, { $set: { field: value } })
+  // Empty filter matches ALL 60 students!
+
+
+================================================================================
+SECTION 4: PERFORMANCE COMPARISON
+================================================================================
+
+SCENARIO: UPDATE ALL 30 INTERNATIONAL STUDENTS
+
+METHOD 1: Loop with updateOne (30 separate calls)
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  internationalStudents.forEach(student => {
+    db.students.updateOne(
+      { studentId: student.studentId },
+      { $set: { visaStatus: 'F-1' } }
+    )
+  })
+
+Time breakdown:
+  Each updateOne: ~2-5ms
+  30 students: 30 × (2-5ms) = 60-150ms
+
+Network calls: 30 (one per student)
+
+Result:
+  Total time: ~60-150ms
+
+
+METHOD 2: Single updateMany call
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  db.students.updateMany(
+    { isInternational: true },
+    { $set: { visaStatus: 'F-1' } }
+  )
+
+Time breakdown:
+  Single call: ~10-30ms for all 30
+
+Network calls: 1 (all at once)
+
+Result:
+  Total time: ~10-30ms
+
+
+COMPARISON:
+────────────────────────────────────────────────────────────────────────────
+
+updateOne loop: 60-150ms   (30 network calls)
+updateMany:     10-30ms    (1 network call)
+
+SPEEDUP: updateMany is 2-3x FASTER
+
+
+SCENARIO: UPDATE SINGLE STUDENT
+
+METHOD 1: updateOne
+────────────────────────────────────────────────────────────────────────────
+Code: db.students.updateOne({ studentId: 20260001 }, { $set: { gpa: 3.95 } })
+Time: ~1-5ms
+Network calls: 1
+
+METHOD 2: updateMany
+────────────────────────────────────────────────────────────────────────────
+Code: db.students.updateMany({ studentId: 20260001 }, { $set: { gpa: 3.95 } })
+Time: ~2-8ms
+Network calls: 1
+
+DIFFERENCE: ~1-3ms (minimal)
+
+RECOMMENDATION: Use updateOne (simpler, clearer intent)
+
+
+================================================================================
+SECTION 5: UPDATE OPERATORS
+================================================================================
+
+OPERATOR #1: $set (SET FIELD VALUE)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax: { $set: { field: value } }
+
+Example 1 - Update GPA:
+  db.students.updateOne({ studentId: 20260001 }, { $set: { gpa: 3.95 } })
+
+Example 2 - Update nested field:
+  db.students.updateOne({ studentId: 20260001 }, { $set: { 'name.first': 'Daksh Kumar' } })
+
+Example 3 - Update multiple fields:
+  db.students.updateOne({ studentId: 20260001 }, { $set: { gpa: 3.95, age: 21 } })
+
+
+OPERATOR #2: $inc (INCREMENT NUMERIC FIELD)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax: { $inc: { field: number } }
+
+Example 1 - Increment age on birthday:
+  db.students.updateOne({ studentId: 20260001 }, { $inc: { age: 1 } })
+  Result: age changes from 20 to 21
+
+Example 2 - Decrement (negative increment):
+  db.students.updateOne({ studentId: 20260001 }, { $inc: { coursesRemaining: -1 } })
+  Result: coursesRemaining decreases by 1
+
+
+OPERATOR #3: $push (ADD TO ARRAY)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax: { $push: { arrayField: value } }
+
+Example 1 - Add single skill:
+  db.students.updateOne({ studentId: 20260001 }, { $push: { skills: 'Docker' } })
+
+Example 2 - Add multiple values:
+  db.students.updateOne({ studentId: 20260001 }, { $push: { skills: { $each: ['Docker', 'Kubernetes'] } } })
+
+
+OPERATOR #4: $pull (REMOVE FROM ARRAY)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax: { $pull: { arrayField: value } }
+
+Example 1 - Remove skill:
+  db.students.updateOne({ studentId: 20260001 }, { $pull: { skills: 'Python' } })
+
+Example 2 - Remove by condition:
+  db.students.updateOne({ studentId: 20260001 }, { $pull: { courses: { grade: 'F' } } })
+
+
+OPERATOR #5: $unset (REMOVE FIELD)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax: { $unset: { field: '' } }
+
+Example:
+  db.students.updateOne({ studentId: 20260001 }, { $unset: { tempField: '' } })
+  Result: Field removed completely
+
+
+================================================================================
+SECTION 6: REAL-WORLD DECISION MATRIX
+================================================================================
+
+USE CASE #1: UPDATE ONE STUDENT'S GRADE
+────────────────────────────────────────────────────────────────────────────
+Scenario: Teacher enters grade for student
+
+Documents: 1 student
+Recommended: updateOne
+
+Code:
+  db.students.updateOne(
+    { studentId: 20260001, 'courses.courseCode': 'DS-401' },
+    { $set: { 'courses.$.grade': 'A+' } }
+  )
+
+Why: Single record, real-time change
+
+
+USE CASE #2: VISA STATUS FOR ALL INTERNATIONAL STUDENTS
+────────────────────────────────────────────────────────────────────────────
+Scenario: New visa requirement for international students
+
+Documents: 30 international students
+Recommended: updateMany
+
+Code:
+  db.students.updateMany(
+    { isInternational: true },
+    { $set: { visaStatus: 'F-1', requiresVisa: true } }
+  )
+
+Why: Multiple students, bulk operation, 2-3x faster
+
+
+USE CASE #3: END OF SEMESTER - FINALIZE ALL GRADES
+────────────────────────────────────────────────────────────────────────────
+Scenario: Finalize grades for all students
+
+Documents: 60 students
+Recommended: updateMany
+
+Code:
+  db.students.updateMany(
+    {},
+    { $set: { finalGradePosted: true, gradePostDate: new Date() } }
+  )
+
+Why: All students, bulk operation
+
+
+USE CASE #4: STUDENT CHANGES MAJOR
+────────────────────────────────────────────────────────────────────────────
+Scenario: One student switches degree program
+
+Documents: 1 student
+Recommended: updateOne
+
+Code:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { major: 'Cloud Computing' } }
+  )
+
+Why: Only one student's record changes
+
+
+USE CASE #5: RENEW SCHOLARSHIPS FOR ELIGIBLE STUDENTS
+────────────────────────────────────────────────────────────────────────────
+Scenario: Renew scholarships for students with GPA >= 3.5
+
+Documents: Many (conditional match)
+Recommended: updateMany
+
+Code:
+  db.students.updateMany(
+    { gpa: { $gte: 3.5 }, 'scholarshipDetails.renewable': true },
+    { $set: { 'scholarshipDetails.renewalDate': new Date() } }
+  )
+
+Why: Multiple matching students get updated
+
+
+USE CASE #6: HONOR ROLL STATUS
+────────────────────────────────────────────────────────────────────────────
+Scenario: Mark all honor students
+
+Documents: 17 honor students
+Recommended: updateMany
+
+Code:
+  db.students.updateMany(
+    { gpa: { $gte: 3.9 } },
+    { $set: { status: 'honor' } }
+  )
+
+Why: Multiple students with same criteria
+
+
+================================================================================
+SECTION 7: SAFETY TIPS
+================================================================================
+
+⚠️ DANGER: Empty filter matches ALL!
+────────────────────────────────────────────────────────────────────────────
+
+❌ DON'T DO THIS:
+  db.students.updateMany({}, { $set: { field: value } })
+  // Updates ALL 60 students!
+
+✓ ALWAYS TEST FIRST:
+  db.students.find({ isInternational: true }).count()  // Returns 30
+  Then safe to run:
+  db.students.updateMany({ isInternational: true }, { $set: { ... } })
+
+
+⚠️ DANGER: Wrong filter affects more than expected
+────────────────────────────────────────────────────────────────────────────
+
+❌ DON'T DO THIS:
+  db.students.updateMany({ age: 20 }, { $set: { status: 'junior' } })
+  // Affects 2 students, but next year 2 different students turn 20!
+
+✓ BE SPECIFIC:
+  db.students.updateMany(
+    { age: 20, enrollmentYear: 2022 },
+    { $set: { status: 'junior' } }
+  )
+
+
+✓ BEST PRACTICE: VERIFY FIRST
+────────────────────────────────────────────────────────────────────────────
+
+Step 1: Test filter
+  db.students.find({ isInternational: true }).count()
+
+Step 2: Verify count is expected
+  Result: 30 (good, matches known international students)
+
+Step 3: Run updateMany with same filter
+  db.students.updateMany(
+    { isInternational: true },
+    { $set: { visaStatus: 'F-1' } }
+  )
+
+
+================================================================================
+SECTION 8: BEST PRACTICES
+================================================================================
+
+✓ Use updateOne for single records
+  db.students.updateOne({ studentId: id }, { $set: { gpa: value } })
+  Benefit: Clear intent, prevents accidents
+
+✓ Use updateMany for bulk operations
+  db.students.updateMany({ isInternational: true }, { $set: { visaStatus: 'F-1' } })
+  Benefit: 2-3x faster than repeated updateOne
+
+✓ Check modifiedCount after update
+  const result = db.students.updateOne({...}, {...})
+  console.log(result.modifiedCount)  // 0 or 1
+
+✓ Test filter before updateMany
+  db.students.find({ filter }).count()  // Verify count first
+
+✓ Combine operators in single update
+  { $set: { gpa: 3.95 }, $push: { skills: 'Docker' } }
+  Benefit: Single database operation for multiple changes
+
+✓ Use specific field paths
+  { $set: { 'scholarshipDetails.amount': 20000 } }
+  Benefit: Only update what needs changing
+
+✓ Verify both matchedCount and modifiedCount
+  matchedCount: Documents that matched filter
+  modifiedCount: Documents that actually changed
+
+
+================================================================================
+SECTION 9: SUMMARY TABLE
+================================================================================
+
+Operation        Filter        Expected   Best For
+──────────────────────────────────────────────────────────────────────────
+updateOne        {id: X}       1 doc      Single student update
+updateMany       {int: true}   30 docs    International students
+updateMany       {gpa: >=3.9}  17 docs    Honor students
+updateMany       {}            60 docs    All students (careful!)
+
+
+================================================================================
+SECTION 10: QUICK DECISION GUIDE
+================================================================================
+
+How many documents to update?
+
+  ├─ 1 document?
+  │  └─ Use: updateOne()
+  │     Examples: Update grade, change major, update profile
+  │
+  └─ 2 or more documents?
+     ├─ Is it specific matching (e.g., international students)?
+     │  └─ Use: updateMany()
+     │     Examples: Update all 30 international, all 17 honor
+     │
+     └─ Is it bulk/all documents?
+        └─ Use: updateMany() + TEST FILTER FIRST!
+           Examples: Update all 60 students
+
+
+RULE OF THUMB:
+────────────────────────────────────────────────────────────────────────────
+
+1 document?     → updateOne()
+2-30 documents? → updateMany()
+60 documents?   → updateMany() (test filter first!)
+Unsure?         → Find first to verify count, then updateMany
+
+
+================================================================================
+                              FINAL RECOMMENDATION
+================================================================================
+
+updateOne:
+  Use for single student updates
+  Examples: Grade, major, profile changes
+  Time: ~1-5ms
+
+updateMany:
+  Use for bulk/batch updates
+  Examples: All international, all honor, all graduating
+  Time: ~20-50ms for 30 updates (2-3x faster than updateOne loop)
+  Warning: Always test filter first!
+
+Choose based on scope:
+  Single record → updateOne()
+  Multiple records → updateMany() (2-3x faster)
+
+================================================================================
+                              END OF GUIDE
+================================================================================

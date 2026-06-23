@@ -1,0 +1,553 @@
+{
+  "title": "MongoDB Comparison Operators - Complete Guide",
+  "description": "Comprehensive guide on comparison operators for querying and filtering documents",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "comparison_operators_overview": {
+    "definition": "Comparison operators are used in queries to compare field values",
+    "purpose": [
+      "Filter documents by numeric values",
+      "Filter documents by string values",
+      "Find documents within ranges",
+      "Exclude specific values",
+      "Match against value lists",
+      "Complex filtering logic"
+    ],
+    "operators_count": 8,
+    "syntax_pattern": "{ field: { $operator: value } }"
+  },
+  "section_1_equality_operators": {
+    "title": "Equality Operators: $eq and $ne",
+    "operator_eq": {
+      "name": "$eq (Equal)",
+      "syntax": "{ field: { $eq: value } }",
+      "alternate_syntax": "{ field: value } (implicit $eq)",
+      "meaning": "Matches documents where field equals value",
+      "use_cases": [
+        "Find specific student by ID",
+        "Find students with specific major",
+        "Filter by boolean value",
+        "Filter by string value"
+      ],
+      "examples": [
+        {
+          "query": "db.students.find({ studentId: { $eq: '20260001' } })",
+          "equivalent": "db.students.find({ studentId: '20260001' })",
+          "result": "1 student: Daksh Chauhan (20260001)",
+          "use_case": "Find specific student by ID"
+        },
+        {
+          "query": "db.students.find({ major: { $eq: 'Data Science' } })",
+          "result": "Students with major = 'Data Science'",
+          "use_case": "Find students by major field"
+        },
+        {
+          "query": "db.students.find({ isInternational: { $eq: true } })",
+          "result": "30 international students",
+          "use_case": "Find international students"
+        },
+        {
+          "query": "db.students.find({ age: { $eq: 20 } })",
+          "result": "2 students (age pattern: 20, 20, 25, 25, ...)",
+          "use_case": "Find students of specific age"
+        }
+      ]
+    },
+    "operator_ne": {
+      "name": "$ne (Not Equal)",
+      "syntax": "{ field: { $ne: value } }",
+      "meaning": "Matches documents where field does NOT equal value",
+      "use_cases": [
+        "Exclude specific value",
+        "Find all except one",
+        "Filter non-matching"
+      ],
+      "examples": [
+        {
+          "query": "db.students.find({ major: { $ne: 'Data Science' } })",
+          "result": "All students except Data Science majors (~59 students if 1 DS major)",
+          "use_case": "Find students NOT in specific major"
+        },
+        {
+          "query": "db.students.find({ isInternational: { $ne: true } })",
+          "result": "30 domestic students (not international)",
+          "use_case": "Find domestic (non-international) students"
+        },
+        {
+          "query": "db.students.find({ gpa: { $ne: 3.50 } })",
+          "result": "All students except those with GPA = 3.50",
+          "use_case": "Exclude specific GPA value"
+        }
+      ]
+    }
+  },
+  "section_2_numeric_range_operators": {
+    "title": "Numeric Range Operators: $gt, $gte, $lt, $lte",
+    "operator_gt": {
+      "name": "$gt (Greater Than)",
+      "syntax": "{ field: { $gt: value } }",
+      "meaning": "Matches documents where field > value",
+      "examples": [
+        {
+          "query": "db.students.find({ gpa: { $gt: 3.5 } })",
+          "result": "17 honor students with GPA > 3.5",
+          "use_case": "Find high-achieving students"
+        },
+        {
+          "query": "db.students.find({ age: { $gt: 25 } })",
+          "result": "Students older than 25",
+          "use_case": "Find older students"
+        },
+        {
+          "query": "db.students.find({ enrollmentDate: { $gt: ISODate('2023-06-01') } })",
+          "result": "Students enrolled after June 1, 2023",
+          "use_case": "Find recent enrollments"
+        }
+      ]
+    },
+    "operator_gte": {
+      "name": "$gte (Greater Than or Equal)",
+      "syntax": "{ field: { $gte: value } }",
+      "meaning": "Matches documents where field >= value",
+      "examples": [
+        {
+          "query": "db.students.find({ gpa: { $gte: 3.5 } })",
+          "result": "17 honor students including those with exactly 3.5",
+          "use_case": "Find honor roll (GPA >= 3.5)"
+        },
+        {
+          "query": "db.students.find({ age: { $gte: 20 } })",
+          "result": "All 60 students (all 20 or older)",
+          "use_case": "Find adult students"
+        }
+      ]
+    },
+    "operator_lt": {
+      "name": "$lt (Less Than)",
+      "syntax": "{ field: { $lt: value } }",
+      "meaning": "Matches documents where field < value",
+      "examples": [
+        {
+          "query": "db.students.find({ gpa: { $lt: 3.5 } })",
+          "result": "43 students with GPA < 3.5",
+          "use_case": "Find below-honor students"
+        },
+        {
+          "query": "db.students.find({ age: { $lt: 25 } })",
+          "result": "Students younger than 25",
+          "use_case": "Find younger students"
+        }
+      ]
+    },
+    "operator_lte": {
+      "name": "$lte (Less Than or Equal)",
+      "syntax": "{ field: { $lte: value } }",
+      "meaning": "Matches documents where field <= value",
+      "examples": [
+        {
+          "query": "db.students.find({ gpa: { $lte: 3.5 } })",
+          "result": "All students with GPA <= 3.5",
+          "use_case": "Find students below/at threshold"
+        }
+      ]
+    }
+  },
+  "section_3_range_queries": {
+    "title": "Combining Operators for Range Queries",
+    "range_query_pattern": "{ field: { $gte: min, $lte: max } }",
+    "examples": [
+      {
+        "query": "db.students.find({ gpa: { $gte: 3.0, $lte: 3.5 } })",
+        "meaning": "GPA between 3.0 and 3.5 (inclusive)",
+        "result": "Students in GPA range",
+        "use_case": "Find students in specific GPA band"
+      },
+      {
+        "query": "db.students.find({ age: { $gte: 20, $lt: 25 } })",
+        "meaning": "Age 20-24 (inclusive-exclusive)",
+        "result": "Students aged 20-24",
+        "use_case": "Find students in age range"
+      },
+      {
+        "query": "db.students.find({ enrollmentDate: { $gte: ISODate('2023-08-01'), $lte: ISODate('2023-08-31') } })",
+        "meaning": "Enrolled in August 2023",
+        "result": "First month enrollments",
+        "use_case": "Find records by date range"
+      }
+    ]
+  },
+  "section_4_array_membership_operators": {
+    "title": "Array Membership: $in and $nin",
+    "operator_in": {
+      "name": "$in (In Array)",
+      "syntax": "{ field: { $in: [value1, value2, value3, ...] } }",
+      "meaning": "Matches documents where field equals any value in array",
+      "use_cases": [
+        "Match against multiple values",
+        "Whitelist approach",
+        "Filter by category",
+        "Multiple conditions (OR)"
+      ],
+      "examples": [
+        {
+          "query": "db.students.find({ major: { $in: ['Data Science', 'Computer Science', 'Engineering'] } })",
+          "result": "Students with one of these 3 majors",
+          "use_case": "Find students in multiple majors"
+        },
+        {
+          "query": "db.students.find({ studentId: { $in: ['20260001', '20260002', '20260003'] } })",
+          "result": "Specific 3 students",
+          "use_case": "Find specific students by IDs"
+        },
+        {
+          "query": "db.students.find({ age: { $in: [20, 25, 26] } })",
+          "result": "Students with age 20, 25, or 26",
+          "use_case": "Find students of specific ages"
+        },
+        {
+          "query": "db.students.find({ 'scholarshipDetails.awarded': { $in: [true, false] } })",
+          "result": "All students (both scholarship and non-scholarship)",
+          "use_case": "Match any value (like OR)"
+        }
+      ]
+    },
+    "operator_nin": {
+      "name": "$nin (Not In Array)",
+      "syntax": "{ field: { $nin: [value1, value2, value3, ...] } }",
+      "meaning": "Matches documents where field is NOT in array",
+      "use_cases": [
+        "Exclude multiple values",
+        "Blacklist approach",
+        "Inverse filtering"
+      ],
+      "examples": [
+        {
+          "query": "db.students.find({ major: { $nin: ['Data Science', 'Computer Science'] } })",
+          "result": "Students NOT in these 2 majors (~58 of 60)",
+          "use_case": "Find students in other majors"
+        },
+        {
+          "query": "db.students.find({ studentId: { $nin: ['20260001', '20260002'] } })",
+          "result": "All students except these 2",
+          "use_case": "Exclude specific students"
+        },
+        {
+          "query": "db.students.find({ age: { $nin: [20, 25, 26] } })",
+          "result": "Students not aged 20, 25, or 26",
+          "use_case": "Exclude specific ages"
+        }
+      ]
+    }
+  },
+  "section_5_student_data_examples": {
+    "title": "Real Examples with 60 Student Data",
+    "data_characteristics": {
+      "age_range": "20 to 53 (pattern: 20,20,25,25,26,26,27,27...53,53)",
+      "gpa_range": "3.21 to 3.98",
+      "students_count": 60,
+      "international_students": 30,
+      "honor_students": "17 (GPA >= 3.9)",
+      "with_scholarships": "30"
+    },
+    "example_queries": [
+      {
+        "query": "db.students.find({ age: { $eq: 20 } })",
+        "result": 2,
+        "interpretation": "2 students aged exactly 20"
+      },
+      {
+        "query": "db.students.find({ gpa: { $gte: 3.9 } })",
+        "result": 17,
+        "interpretation": "17 honor students (top performers)"
+      },
+      {
+        "query": "db.students.find({ gpa: { $lt: 3.3 } })",
+        "result": 15,
+        "interpretation": "15 students below 3.3 GPA"
+      },
+      {
+        "query": "db.students.find({ age: { $gte: 30, $lte: 35 } })",
+        "result": 6,
+        "interpretation": "6 students aged 30-35"
+      },
+      {
+        "query": "db.students.find({ major: { $in: ['Data Science', 'Computer Science', 'Engineering'] } })",
+        "result": 3,
+        "interpretation": "3 students in STEM fields"
+      },
+      {
+        "query": "db.students.find({ isInternational: { $ne: true } })",
+        "result": 30,
+        "interpretation": "30 domestic students"
+      }
+    ]
+  },
+  "section_6_use_cases_by_operator": {
+    "usecase_eq": {
+      "title": "Use Cases for $eq",
+      "cases": [
+        {
+          "use_case": "Exact student lookup",
+          "query": "db.students.find({ studentId: '20260001' })"
+        },
+        {
+          "use_case": "Find all active students",
+          "query": "db.students.find({ status: { $eq: 'active' } })"
+        },
+        {
+          "use_case": "Find international students",
+          "query": "db.students.find({ isInternational: true })"
+        }
+      ]
+    },
+    "usecase_ne": {
+      "title": "Use Cases for $ne",
+      "cases": [
+        {
+          "use_case": "Find all non-international students",
+          "query": "db.students.find({ isInternational: { $ne: true } })"
+        },
+        {
+          "use_case": "Find students without scholarship",
+          "query": "db.students.find({ 'scholarshipDetails.awarded': { $ne: true } })"
+        }
+      ]
+    },
+    "usecase_gt_gte_lt_lte": {
+      "title": "Use Cases for Numeric Operators",
+      "cases": [
+        {
+          "use_case": "Find honor students",
+          "query": "db.students.find({ gpa: { $gte: 3.9 } })"
+        },
+        {
+          "use_case": "Find students needing academic support",
+          "query": "db.students.find({ gpa: { $lt: 3.5 } })"
+        },
+        {
+          "use_case": "Find adult students",
+          "query": "db.students.find({ age: { $gte: 21 } })"
+        },
+        {
+          "use_case": "Find recent graduates (by age)",
+          "query": "db.students.find({ age: { $lte: 25 } })"
+        },
+        {
+          "use_case": "Find GPA in middle band",
+          "query": "db.students.find({ gpa: { $gte: 3.5, $lt: 3.9 } })"
+        }
+      ]
+    },
+    "usecase_in_nin": {
+      "title": "Use Cases for Array Membership",
+      "cases": [
+        {
+          "use_case": "Find students in specific majors",
+          "query": "db.students.find({ major: { $in: ['Data Science', 'Engineering'] } })"
+        },
+        {
+          "use_case": "Find students with specific skills",
+          "query": "db.students.find({ skills: { $in: ['Python', 'Java'] } })"
+        },
+        {
+          "use_case": "Exclude specific students",
+          "query": "db.students.find({ studentId: { $nin: ['20260001', '20260002'] } })"
+        },
+        {
+          "use_case": "Exclude inactive statuses",
+          "query": "db.students.find({ status: { $nin: ['inactive', 'suspended'] } })"
+        }
+      ]
+    }
+  },
+  "section_7_complex_queries": {
+    "title": "Complex Queries Combining Operators",
+    "example_1": {
+      "query": "db.students.find({ gpa: { $gte: 3.5, $lt: 3.9 }, isInternational: true })",
+      "meaning": "International students with GPA 3.5-3.89",
+      "interpretation": "Strong international students (not yet honor level)"
+    },
+    "example_2": {
+      "query": "db.students.find({ age: { $in: [20, 25, 26] }, gpa: { $gte: 3.8 } })",
+      "meaning": "High-performing students of ages 20, 25, or 26",
+      "interpretation": "Top students in specific age groups"
+    },
+    "example_3": {
+      "query": "db.students.find({ major: { $nin: ['Data Science', 'Engineering'] }, age: { $lt: 30 } })",
+      "meaning": "Young students not in STEM fields",
+      "interpretation": "Non-STEM students under 30"
+    },
+    "example_4": {
+      "query": "db.students.find({ gpa: { $gte: 3.9 }, 'scholarshipDetails.awarded': true })",
+      "meaning": "Honor students with scholarships",
+      "interpretation": "High achievers receiving financial support"
+    },
+    "example_5": {
+      "query": "db.students.find({ age: { $gte: 20, $lte: 25 }, skills: { $in: ['Python', 'SQL'] } })",
+      "meaning": "Students aged 20-25 with Python or SQL",
+      "interpretation": "Younger students with database/data skills"
+    }
+  },
+  "section_8_performance_considerations": {
+    "title": "Performance and Index Usage",
+    "indexed_operators": [
+      {
+        "operator": "$eq",
+        "index_usage": "Can use index directly",
+        "performance": "Very fast with index"
+      },
+      {
+        "operator": "$ne",
+        "index_usage": "Cannot use index (opposite match)",
+        "performance": "Full collection scan"
+      },
+      {
+        "operator": "$gt, $gte, $lt, $lte",
+        "index_usage": "Can use range index",
+        "performance": "Fast with index, slow without"
+      },
+      {
+        "operator": "$in",
+        "index_usage": "Can use index on each value",
+        "performance": "Good with index"
+      },
+      {
+        "operator": "$nin",
+        "index_usage": "Cannot use index",
+        "performance": "Full collection scan"
+      }
+    ],
+    "recommendation": "Create indexes on frequently queried fields (age, gpa, major, status)"
+  },
+  "section_9_best_practices": {
+    "practice_1_use_eq_for_exact_match": {
+      "rule": "Use $eq (or implicit) for exact matches",
+      "example": "db.students.find({ studentId: '20260001' })"
+    },
+    "practice_2_use_range_operators_efficiently": {
+      "rule": "Create indexes on fields with range queries",
+      "example": "db.students.createIndex({ gpa: 1 })"
+    },
+    "practice_3_use_in_for_multiple_exact_values": {
+      "rule": "Use $in instead of multiple $eq conditions",
+      "bad": "{ $or: [ { status: 'active' }, { status: 'pending' } ] }",
+      "good": "{ status: { $in: ['active', 'pending'] } }"
+    },
+    "practice_4_understand_ne_performance": {
+      "rule": "$ne requires full collection scan",
+      "note": "Avoid $ne on large collections if possible"
+    },
+    "practice_5_combine_for_range": {
+      "rule": "Use $gte and $lte together for ranges",
+      "example": "{ age: { $gte: 20, $lte: 30 } }"
+    }
+  },
+  "section_10_common_mistakes": {
+    "mistake_1_using_ne_instead_of_nin": {
+      "mistake": "Using $ne with arrays",
+      "problem": "Doesn't exclude array elements properly",
+      "solution": "Use $nin for array exclusion"
+    },
+    "mistake_2_forgetting_operators": {
+      "mistake": "Using { field: value } instead of { field: { $operator: value } }",
+      "when_ok": "For $eq only (implicit operator)",
+      "when_wrong": "For other operators"
+    },
+    "mistake_3_wrong_operator_choice": {
+      "mistake": "Using $gt instead of $gte",
+      "impact": "Off-by-one results",
+      "solution": "Choose right operator for inclusive/exclusive"
+    },
+    "mistake_4_inefficient_queries": {
+      "mistake": "Using $nin without index",
+      "problem": "Full collection scan",
+      "solution": "Use $in when possible, or add index"
+    },
+    "mistake_5_complex_logic": {
+      "mistake": "Too many operators in single query",
+      "solution": "Simplify logic or use aggregation pipeline"
+    }
+  },
+  "section_11_operator_comparison_table": {
+    "title": "Quick Comparison of All Operators",
+    "table": [
+      {
+        "operator": "$eq",
+        "meaning": "Equal",
+        "syntax_example": "{ age: { $eq: 20 } }",
+        "index_support": "Yes",
+        "common_use": "Exact match"
+      },
+      {
+        "operator": "$ne",
+        "meaning": "Not equal",
+        "syntax_example": "{ status: { $ne: 'inactive' } }",
+        "index_support": "No",
+        "common_use": "Exclude value"
+      },
+      {
+        "operator": "$gt",
+        "meaning": "Greater than",
+        "syntax_example": "{ gpa: { $gt: 3.5 } }",
+        "index_support": "Yes (range)",
+        "common_use": "Above threshold"
+      },
+      {
+        "operator": "$gte",
+        "meaning": "Greater than or equal",
+        "syntax_example": "{ age: { $gte: 21 } }",
+        "index_support": "Yes (range)",
+        "common_use": "At or above threshold"
+      },
+      {
+        "operator": "$lt",
+        "meaning": "Less than",
+        "syntax_example": "{ gpa: { $lt: 2.5 } }",
+        "index_support": "Yes (range)",
+        "common_use": "Below threshold"
+      },
+      {
+        "operator": "$lte",
+        "meaning": "Less than or equal",
+        "syntax_example": "{ age: { $lte: 65 } }",
+        "index_support": "Yes (range)",
+        "common_use": "At or below threshold"
+      },
+      {
+        "operator": "$in",
+        "meaning": "In array",
+        "syntax_example": "{ status: { $in: ['active', 'pending'] } }",
+        "index_support": "Yes",
+        "common_use": "Match multiple values"
+      },
+      {
+        "operator": "$nin",
+        "meaning": "Not in array",
+        "syntax_example": "{ status: { $nin: ['deleted'] } }",
+        "index_support": "No",
+        "common_use": "Exclude multiple values"
+      }
+    ]
+  },
+  "summary": {
+    "definition": "Comparison operators filter documents by comparing field values",
+    "operators": [
+      "$eq - Equal",
+      "$ne - Not equal",
+      "$gt - Greater than",
+      "$gte - Greater than or equal",
+      "$lt - Less than",
+      "$lte - Less than or equal",
+      "$in - In array",
+      "$nin - Not in array"
+    ],
+    "key_uses": [
+      "Exact matching ($eq, $in)",
+      "Range queries ($gt, $gte, $lt, $lte)",
+      "Exclusion ($ne, $nin)",
+      "Multiple value matching ($in)"
+    ],
+    "best_practice": "Index frequently queried fields, use $in instead of $or, combine operators for ranges",
+    "performance": "Most operators support indexing except $ne and $nin"
+  }
+}

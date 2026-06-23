@@ -1,0 +1,476 @@
+{
+  "title": "MongoDB Authentication & RBAC - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on user authentication, roles, permissions, and role-based access control",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "authentication_rbac_overview": {
+    "definition": "RBAC (Role-Based Access Control) is a security model that grants permissions to roles, then assigns roles to users",
+    "purpose": [
+      "Control who can access database",
+      "Control what data users can access",
+      "Control what operations users can perform",
+      "Audit user actions",
+      "Implement least privilege principle",
+      "Manage multi-tenant systems"
+    ],
+    "two_components": [
+      "Authentication: Who are you? (username/password, X.509, LDAP)",
+      "Authorization: What can you do? (roles and permissions)"
+    ],
+    "key_concepts": [
+      "User: Account with credentials",
+      "Role: Set of permissions",
+      "Database: Scope of permissions",
+      "Privilege: Specific permission on resource",
+      "Resource: Database/collection/index"
+    ]
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Authentication & Authorization Concepts",
+    "definitions": [
+      {
+        "term": "Authentication",
+        "definition": "Verifying user identity (who are you?)",
+        "example": "Checking username/password"
+      },
+      {
+        "term": "Authorization",
+        "definition": "Determining what user can do (what can you do?)",
+        "example": "User role has read access to students collection"
+      },
+      {
+        "term": "Role",
+        "definition": "Named set of permissions",
+        "example": "dbAdmin role has full database access"
+      },
+      {
+        "term": "Privilege",
+        "definition": "Permission to perform action on resource",
+        "example": "insert on students collection"
+      },
+      {
+        "term": "Scope",
+        "definition": "Database where privilege applies",
+        "example": "Role applies to 'student_db' database"
+      }
+    ]
+  },
+  "section_2_beginner_user_creation": {
+    "title": "BEGINNER: Creating Users",
+    "definition": "Users must be created with credentials and assigned roles",
+    "syntax": "db.createUser({ user: 'username', pwd: 'password', roles: [{role: 'roleName', db: 'database'}] })",
+    "beginner_examples": [
+      {
+        "title": "Create admin user",
+        "query": "db.createUser({\n  user: 'admin',\n  pwd: 'securePassword123',\n  roles: [{ role: 'root', db: 'admin' }]\n})",
+        "database": "admin",
+        "role": "root (superuser)",
+        "access": "Full access to everything",
+        "use_case": "Database administrator"
+      },
+      {
+        "title": "Create application user",
+        "query": "db.createUser({\n  user: 'app_user',\n  pwd: 'appPassword456',\n  roles: [{ role: 'readWrite', db: 'student_db' }]\n})",
+        "database": "student_db",
+        "role": "readWrite",
+        "access": "Read and write to all collections",
+        "use_case": "Application accessing database"
+      },
+      {
+        "title": "Create read-only user",
+        "query": "db.createUser({\n  user: 'reporter',\n  pwd: 'reportPassword789',\n  roles: [{ role: 'read', db: 'student_db' }]\n})",
+        "database": "student_db",
+        "role": "read",
+        "access": "Read only",
+        "use_case": "Analytics/reporting user"
+      }
+    ],
+    "important_notes": [
+      "Users created in 'admin' database apply globally",
+      "Users created in specific database are limited to that database",
+      "Roles assigned during creation",
+      "Passwords must be strong (minimum requirements vary)"
+    ]
+  },
+  "section_3_beginner_builtin_roles": {
+    "title": "BEGINNER: Built-in Roles",
+    "definition": "MongoDB provides predefined roles for common scenarios",
+    "database_roles": [
+      {
+        "role": "read",
+        "description": "Read data from any collection",
+        "operations": "find, aggregate (no write)"
+      },
+      {
+        "role": "readWrite",
+        "description": "Read and write to any collection",
+        "operations": "find, insert, update, delete"
+      },
+      {
+        "role": "dbAdmin",
+        "description": "Full database administration",
+        "operations": "All database management, no data modification"
+      },
+      {
+        "role": "dbOwner",
+        "description": "Read, write, and admin operations",
+        "operations": "read, write, dbAdmin combined"
+      }
+    ],
+    "admin_roles": [
+      {
+        "role": "root",
+        "description": "Superuser with all permissions everywhere",
+        "scope": "All databases",
+        "use_case": "Initial admin"
+      },
+      {
+        "role": "userAdmin",
+        "description": "Manage users and roles",
+        "operations": "Create users, grant roles, change passwords"
+      },
+      {
+        "role": "userAdminAnyDatabase",
+        "description": "User admin on all databases",
+        "scope": "Global",
+        "use_case": "Central user management"
+      }
+    ],
+    "beginner_examples": [
+      {
+        "title": "Assign read role",
+        "setup": "User can only read, no modifications",
+        "role": "read",
+        "scope": "Specific database",
+        "use_case": "Analyst accessing reports"
+      },
+      {
+        "title": "Assign readWrite role",
+        "setup": "User can read and modify data",
+        "role": "readWrite",
+        "scope": "Specific database",
+        "use_case": "Application updating student records"
+      },
+      {
+        "title": "Assign dbAdmin role",
+        "setup": "User manages indexes, collections, backups",
+        "role": "dbAdmin",
+        "scope": "Specific database",
+        "use_case": "Database administrator"
+      }
+    ]
+  },
+  "section_4_intermediate_custom_roles": {
+    "title": "INTERMEDIATE: Custom Roles",
+    "definition": "Create custom roles with specific permissions for fine-grained access control",
+    "syntax": "db.createRole({ role: 'roleName', privileges: [...], roles: [...] })",
+    "intermediate_examples": [
+      {
+        "title": "Teacher role (read + update grades)",
+        "query": "db.createRole({\n  role: 'teacher',\n  privileges: [\n    { resource: { db: 'student_db', collection: 'students' }, actions: ['find'] },\n    { resource: { db: 'student_db', collection: 'grades' }, actions: ['find', 'insert', 'update'] }\n  ],\n  roles: []\n})",
+        "permissions": "Read students, read/write grades",
+        "use_case": "Teacher updating grades only"
+      },
+      {
+        "title": "Advisor role (read student data)",
+        "query": "db.createRole({\n  role: 'advisor',\n  privileges: [\n    { resource: { db: 'student_db', collection: 'students' }, actions: ['find'] },\n    { resource: { db: 'student_db', collection: 'enrollments' }, actions: ['find'] }\n  ],\n  roles: []\n})",
+        "permissions": "Read students and enrollments only",
+        "use_case": "Academic advisor viewing student info"
+      },
+      {
+        "title": "Audit role (read-only on all)",
+        "query": "db.createRole({\n  role: 'auditor',\n  privileges: [\n    { resource: { db: 'student_db' }, actions: ['find'] }\n  ],\n  roles: []\n})",
+        "permissions": "Read from all collections in database",
+        "use_case": "Audit trail review"
+      }
+    ],
+    "privileges_available": [
+      "find - Query documents",
+      "insert - Insert documents",
+      "update - Modify documents",
+      "delete - Remove documents",
+      "create - Create collections",
+      "dropCollection - Delete collections",
+      "dropIndex - Remove indexes",
+      "createIndex - Create indexes",
+      "createRole - Create roles",
+      "dropRole - Remove roles",
+      "grantRole - Assign roles to users",
+      "revokeRole - Remove roles from users"
+    ]
+  },
+  "section_5_intermediate_role_inheritance": {
+    "title": "INTERMEDIATE: Role Inheritance",
+    "definition": "Roles can inherit permissions from other roles",
+    "syntax": "db.createRole({ role: 'name', privileges: [...], roles: ['inheritedRole'] })",
+    "intermediate_examples": [
+      {
+        "title": "Department head (inherits teacher)",
+        "query": "db.createRole({\n  role: 'deptHead',\n  privileges: [\n    { resource: { db: 'student_db' }, actions: ['createRole', 'dropRole'] }\n  ],\n  roles: ['teacher']  // Inherits teacher permissions\n})",
+        "inheritance": "Inherits all teacher permissions plus admin operations",
+        "use_case": "Department manager with additional admin powers"
+      },
+      {
+        "title": "Support staff (inherits advisor)",
+        "query": "db.createRole({\n  role: 'supportStaff',\n  privileges: [\n    { resource: { db: 'student_db', collection: 'students' }, actions: ['update'] }\n  ],\n  roles: ['advisor']  // Inherits advisor read permissions\n})",
+        "inheritance": "Inherits advisor read + can update students",
+        "use_case": "Support team with limited update access"
+      }
+    ]
+  },
+  "section_6_intermediate_manage_users": {
+    "title": "INTERMEDIATE: Managing Users & Roles",
+    "intermediate_examples": [
+      {
+        "title": "Change user password",
+        "query": "db.changeUserPassword('username', 'newPassword123')"
+      },
+      {
+        "title": "Grant role to user",
+        "query": "db.grantRolesToUser('username', [{ role: 'read', db: 'database' }])"
+      },
+      {
+        "title": "Revoke role from user",
+        "query": "db.revokeRolesFromUser('username', [{ role: 'read', db: 'database' }])"
+      },
+      {
+        "title": "View user info",
+        "query": "db.getUser('username')"
+      },
+      {
+        "title": "List all users",
+        "query": "db.getUsers()"
+      },
+      {
+        "title": "Drop user",
+        "query": "db.dropUser('username')"
+      }
+    ]
+  },
+  "section_7_advanced_granular_permissions": {
+    "title": "ADVANCED: Granular Permissions",
+    "definition": "Fine-grained control at collection or field level",
+    "advanced_examples": [
+      {
+        "title": "Collection-specific role",
+        "query": "db.createRole({\n  role: 'gradeManager',\n  privileges: [\n    { resource: { db: 'student_db', collection: 'grades' }, actions: ['find', 'insert', 'update'] },\n    { resource: { db: 'student_db', collection: 'students' }, actions: ['find'] }\n  ],\n  roles: []\n})",
+        "effect": "User can modify only grades, read only students",
+        "use_case": "Grade entry staff"
+      },
+      {
+        "title": "Index management role",
+        "query": "db.createRole({\n  role: 'indexManager',\n  privileges: [\n    { resource: { db: 'student_db' }, actions: ['createIndex', 'dropIndex', 'collStats'] }\n  ],\n  roles: []\n})",
+        "effect": "User can only manage indexes, not data",
+        "use_case": "Performance tuning specialist"
+      },
+      {
+        "title": "Backup operator role",
+        "query": "db.createRole({\n  role: 'backupOperator',\n  privileges: [\n    { resource: { db: 'student_db' }, actions: ['find', 'collStats', 'dbStats'] }\n  ],\n  roles: []\n})",
+        "effect": "User can only read statistics for backups",
+        "use_case": "Backup/disaster recovery"
+      }
+    ]
+  },
+  "section_8_advanced_security_patterns": {
+    "title": "ADVANCED: Security Patterns",
+    "advanced_examples": [
+      {
+        "title": "Least privilege principle",
+        "pattern": "Grant minimum necessary permissions",
+        "example": "Teacher role: only grades update, not student records",
+        "benefit": "Limits damage if credentials compromised"
+      },
+      {
+        "title": "Role hierarchy",
+        "pattern": "Base roles → Manager roles → Admin roles",
+        "example": "advisor → deptHead → director",
+        "benefit": "Manageable permission structure"
+      },
+      {
+        "title": "Service accounts",
+        "pattern": "Dedicated accounts for applications",
+        "example": "app_user with readWrite on specific collections",
+        "benefit": "Can audit application actions separately"
+      },
+      {
+        "title": "Temporary access",
+        "pattern": "Create temporary users with time limit",
+        "note": "Delete when access no longer needed",
+        "benefit": "Limits exposure window"
+      }
+    ]
+  },
+  "section_9_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Admin user",
+        "setup": "Root role on admin database",
+        "access": "Full database control"
+      },
+      {
+        "use_case": "Application user",
+        "setup": "readWrite on application database",
+        "access": "Read/write app data"
+      },
+      {
+        "use_case": "Analyst user",
+        "setup": "Read on reporting database",
+        "access": "Query-only, no modifications"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Teacher",
+        "setup": "Custom role: read students, update grades",
+        "access": "Grade entry + student info"
+      },
+      {
+        "use_case": "Advisor",
+        "setup": "Read on students and enrollments",
+        "access": "View student academic data"
+      },
+      {
+        "use_case": "Department admin",
+        "setup": "Inherits teacher + role management",
+        "access": "Manage staff + own capabilities"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Security audit team",
+        "setup": "Complex role hierarchy with read-only access everywhere",
+        "access": "Monitor all actions without modifying"
+      },
+      {
+        "use_case": "Multi-tenant system",
+        "setup": "Per-tenant roles limiting to tenant database",
+        "access": "Tenant sees only own data"
+      },
+      {
+        "use_case": "Regulatory compliance",
+        "setup": "Granular roles with audit trail",
+        "access": "Track who did what when"
+      }
+    ]
+  },
+  "section_10_best_practices": {
+    "practice_1_principle_of_least_privilege": {
+      "rule": "Grant minimum necessary permissions",
+      "good": "Teacher role: update grades only, not students",
+      "avoid": "Teacher role: full database access",
+      "why": "Limits damage from compromise"
+    },
+    "practice_2_use_custom_roles": {
+      "rule": "Create custom roles instead of using built-in",
+      "good": "Create 'teacher' role with specific privileges",
+      "avoid": "Use 'dbOwner' for everyone",
+      "why": "Fine-grained control"
+    },
+    "practice_3_regular_audits": {
+      "rule": "Review users and permissions regularly",
+      "action": "Run db.getUsers() quarterly",
+      "check": "Remove inactive users, verify appropriate access"
+    },
+    "practice_4_strong_passwords": {
+      "rule": "Enforce strong password policy",
+      "requirement": "Length >= 12, mix of character types",
+      "tool": "Use password managers for rotation"
+    },
+    "practice_5_service_accounts": {
+      "rule": "Dedicated accounts for applications",
+      "good": "app_user for application, separate from admin",
+      "benefit": "Audit trail per service"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_root_for_everything": {
+      "mistake": "Use root/superuser for all access",
+      "problem": "Massive security risk if compromised",
+      "solution": "Create custom roles for each function"
+    },
+    "mistake_2_no_role_review": {
+      "mistake": "Never review user permissions",
+      "problem": "Accumulate stale/excessive access",
+      "solution": "Quarterly access reviews"
+    },
+    "mistake_3_weak_passwords": {
+      "mistake": "Allow simple passwords like 'password123'",
+      "problem": "Easy to compromise",
+      "solution": "Enforce strong password requirements"
+    },
+    "mistake_4_excessive_privileges": {
+      "mistake": "Give dbOwner to data entry staff",
+      "problem": "Operator can delete everything",
+      "solution": "Specific role: insert/update only"
+    },
+    "mistake_5_no_audit_trail": {
+      "mistake": "Don't enable auditing",
+      "problem": "Can't track who did what",
+      "solution": "Enable --auditLog in production"
+    }
+  },
+  "section_12_authentication_methods": {
+    "title": "Authentication Methods",
+    "methods": [
+      {
+        "method": "Username/Password",
+        "description": "Traditional credentials",
+        "pros": "Simple to set up",
+        "cons": "Passwords can be weak"
+      },
+      {
+        "method": "X.509 Certificate",
+        "description": "Client certificates for authentication",
+        "pros": "Very secure, no passwords",
+        "cons": "Complex certificate management"
+      },
+      {
+        "method": "LDAP",
+        "description": "Authenticate against LDAP directory",
+        "pros": "Central authentication, sync with AD",
+        "cons": "Requires LDAP server"
+      },
+      {
+        "method": "Kerberos",
+        "description": "Use Kerberos tokens",
+        "pros": "Enterprise standard",
+        "cons": "Requires Kerberos infrastructure"
+      }
+    ]
+  },
+  "section_13_progression": {
+    "beginner": [
+      "Understand authentication vs authorization",
+      "Create users with built-in roles",
+      "Assign read/readWrite roles",
+      "Connect with credentials"
+    ],
+    "intermediate": [
+      "Create custom roles",
+      "Role inheritance",
+      "Manage users and roles",
+      "Granular permissions by collection"
+    ],
+    "advanced": [
+      "Complex role hierarchies",
+      "Security patterns",
+      "Audit trail implementation",
+      "Multi-tenant access control"
+    ]
+  },
+  "summary": {
+    "core_concept": "RBAC: Assign permissions to roles, assign roles to users",
+    "two_parts": [
+      "Authentication: Verify identity (who are you)",
+      "Authorization: Grant permissions (what can you do)"
+    ],
+    "key_steps": [
+      "1. Create roles with specific privileges",
+      "2. Create users with credentials",
+      "3. Assign roles to users",
+      "4. Connect with user credentials"
+    ],
+    "best_practice": "Least privilege - grant minimum necessary access",
+    "progression": "Beginner: Built-in roles → Intermediate: Custom roles → Advanced: Granular control and hierarchies"
+  }
+}

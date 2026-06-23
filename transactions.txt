@@ -1,0 +1,865 @@
+================================================================================
+                     MONGODB TRANSACTIONS - COMPLETE GUIDE
+                (Beginner to Advanced Level - ACID Transactions & Atomicity)
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Multi-document transactions, atomicity, ACID properties, error handling
+EXAMPLES: Using 60 Student Records from data.json
+LEVEL: Beginner → Intermediate → Advanced
+
+TRANSACTIONS = Atomic operations ensuring all-or-nothing consistency
+
+
+================================================================================
+PART 1: BEGINNER LEVEL
+================================================================================
+
+SECTION 1.1: UNDERSTANDING TRANSACTIONS & ACID
+================================================================================
+
+DEFINITION:
+  Group of operations executed as single atomic unit
+  All succeed or all fail, never partial
+
+PROBLEM WITHOUT TRANSACTIONS:
+
+Transfer $5000 from Alice to Bob:
+
+Step 1: Debit Alice
+  db.students.updateOne({ name: 'Alice' }, { $inc: { scholarship: -5000 } })
+  Result: Alice has -5000
+
+Step 2: Credit Bob (network failure!)
+  Connection lost, update fails
+  Bob never gets +5000
+
+RESULT: $5000 LOST! Alice's balance correct but missing from Bob's
+
+SOLUTION: Use transaction
+
+With transaction:
+  Start transaction
+  Debit Alice: -5000
+  Credit Bob: +5000
+  Commit (all changes applied together)
+
+If network fails:
+  Transaction rolls back
+  Both Alice and Bob unchanged
+  No money lost!
+
+
+ACID PROPERTIES:
+
+Atomicity:
+  All operations succeed or all fail
+  No partial updates
+  Either-or, never both-and-half
+
+Consistency:
+  Data stays in valid state
+  Relationships maintained
+  No orphaned records
+
+Isolation:
+  Concurrent transactions don't interfere
+  See own changes and others' committed
+  Not uncommitted changes from others
+
+Durability:
+  Committed data persists
+  Survives failures
+  Written to disk/replicas
+
+
+WHEN TO USE TRANSACTIONS:
+
+✓ Use when:
+  Multiple operations must succeed together
+  Financial transfers, payments
+  Complex multi-step workflows
+  Relationships between documents
+
+✗ Don't use when:
+  Single document update (already atomic)
+  Simple insert/delete
+  No interdependencies
+
+
+================================================================================
+SECTION 1.2: BEGINNER - BASIC TRANSACTION SYNTAX
+================================================================================
+
+REQUIREMENTS:
+  MongoDB 4.0+
+  Replica set (at least 3 members)
+  WiredTiger storage engine (default)
+
+
+BASIC SYNTAX:
+
+Step 1: Create session
+  session = db.getMongo().startSession()
+
+Step 2: Start transaction
+  session.startTransaction()
+
+Step 3: Perform operations
+  db.students.updateOne({name: 'Alice'}, {$inc: {scholarship: -5000}}, {session})
+  db.students.updateOne({name: 'Bob'}, {$inc: {scholarship: 5000}}, {session})
+
+Step 4: Commit
+  session.commitTransaction()
+
+Step 5: End session
+  session.endSession()
+
+
+BEGINNER EXAMPLE #1: Simple transfer
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  session = db.getMongo().startSession()
+  session.startTransaction()
+
+  // Debit Alice
+  db.students.updateOne(
+    { name: 'Alice' },
+    { $inc: { scholarship: -5000 } },
+    { session }
+  )
+
+  // Credit Bob
+  db.students.updateOne(
+    { name: 'Bob' },
+    { $inc: { scholarship: 5000 } },
+    { session }
+  )
+
+  // Apply all changes
+  session.commitTransaction()
+  session.endSession()
+
+Result:
+  Both operations succeed together
+  Alice -5000, Bob +5000
+  If error at any point, both unchanged
+
+
+BEGINNER EXAMPLE #2: With error handling
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  session = db.getMongo().startSession()
+
+  try {
+    session.startTransaction()
+
+    // Operations
+    db.students.updateOne({name: 'Alice'}, {$inc: {scholarship: -5000}}, {session})
+    db.students.updateOne({name: 'Bob'}, {$inc: {scholarship: 5000}}, {session})
+
+    // If here, commit
+    session.commitTransaction()
+
+  } catch (err) {
+    // Error occurred, rollback
+    session.abortTransaction()
+    console.log('Transaction failed:', err)
+
+  } finally {
+    // Always clean up
+    session.endSession()
+  }
+
+Behavior:
+  If any operation fails: abortTransaction() rolls back ALL changes
+  Both Alice and Bob remain unchanged
+  Data integrity maintained
+
+
+================================================================================
+SECTION 1.3: BEGINNER - SESSION & COMMIT/ABORT
+================================================================================
+
+SESSION:
+  Context for transaction operations
+  Maintains transaction state
+  Required parameter for all operations
+
+
+CREATE SESSION:
+
+Command:
+  session = db.getMongo().startSession()
+
+Result:
+  Session object for use in operations
+
+
+START TRANSACTION:
+
+Command:
+  session.startTransaction()
+
+Behavior:
+  Begins transaction context
+  All subsequent operations part of transaction
+
+
+COMMIT TRANSACTION:
+
+Command:
+  session.commitTransaction()
+
+Behavior:
+  Applies all changes
+  Makes changes permanent
+  Ends transaction
+
+Returns:
+  OK status if successful
+  Error if failed
+
+
+ABORT TRANSACTION:
+
+Command:
+  session.abortTransaction()
+
+Behavior:
+  Rolls back all changes
+  Reverts to state before transaction
+  Ends transaction
+
+
+END SESSION:
+
+Command:
+  session.endSession()
+
+Behavior:
+  Closes session
+  Releases resources
+  Must call to prevent memory leak
+
+
+CLEANUP:
+
+Best practice:
+  Always end session in finally block
+
+Code:
+  try {
+    // transaction
+  } catch (err) {
+    // handle error
+  } finally {
+    session.endSession()  // Always!
+  }
+
+
+================================================================================
+PART 2: INTERMEDIATE LEVEL
+================================================================================
+
+SECTION 2.1: INTERMEDIATE - ERROR HANDLING & ROLLBACK
+================================================================================
+
+ERROR TYPES:
+
+Transient Errors:
+  Network failure, temporary lock contention
+  WriteConflict: Another transaction modified same document
+  TransactionAbortedDueToInterrupt
+  Solution: Retry transaction
+
+Permanent Errors:
+  Invalid operations, constraint violations
+  Out of range, type mismatch
+  Solution: Fix and retry
+
+Non-recoverable:
+  Authentication failure, invalid database
+  Solution: Don't retry
+
+
+INTERMEDIATE EXAMPLE #1: Error handling with rollback
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  session = db.getMongo().startSession()
+
+  try {
+    session.startTransaction()
+
+    // Operation 1 succeeds
+    db.students.updateOne({name: 'Alice'}, {$inc: {balance: -100}}, {session})
+
+    // Operation 2 fails
+    db.students.updateOne(
+      {name: 'Bob'},
+      {$set: {balance: 'invalid'}},  // Type error!
+      {session}
+    )
+
+    // Doesn't reach here
+    session.commitTransaction()
+
+  } catch (err) {
+    // Automatic rollback
+    session.abortTransaction()
+
+    // Alice's -100 rolled back
+    // Both unchanged
+
+    console.log('Transaction aborted:', err)
+
+  } finally {
+    session.endSession()
+  }
+
+Result:
+  Alice and Bob both unchanged
+  No partial updates
+  Data consistent
+
+
+INTERMEDIATE EXAMPLE #2: Transient error retry
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  function transferWithRetry(from, to, amount) {
+    const maxRetries = 3
+    let lastError
+
+    for (let i = 0; i < maxRetries; i++) {
+      session = db.getMongo().startSession()
+
+      try {
+        session.startTransaction()
+
+        db.students.updateOne(
+          {name: from},
+          {$inc: {scholarship: -amount}},
+          {session}
+        )
+
+        db.students.updateOne(
+          {name: to},
+          {$inc: {scholarship: amount}},
+          {session}
+        )
+
+        session.commitTransaction()
+        session.endSession()
+        return true  // Success
+
+      } catch (err) {
+        session.abortTransaction()
+        session.endSession()
+
+        if (err.hasErrorLabel('TransientTransactionError')) {
+          lastError = err
+          // Retry
+        } else {
+          throw err  // Non-transient, don't retry
+        }
+      }
+    }
+
+    throw lastError  // Failed after retries
+  }
+
+Behavior:
+  Retries on WriteConflict or transient errors
+  Gives up after 3 attempts
+  Throws on permanent errors
+
+
+================================================================================
+SECTION 2.2: INTERMEDIATE - ISOLATION LEVELS
+================================================================================
+
+ISOLATION LEVEL = Control how concurrent transactions interact
+
+DEFAULT: Snapshot Isolation
+
+SNAPSHOT ISOLATION:
+  Reads own writes
+  Reads others' committed data
+  Doesn't see others' uncommitted data
+
+Behavior:
+  Transaction sees snapshot of database
+  Consistent view throughout
+  Ignores changes from other transactions
+
+
+INTERMEDIATE EXAMPLE #1: Snapshot isolation in action
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Transaction A reads balance
+  Transaction B changes balance
+  Transaction A reads again
+
+Behavior:
+  Transaction A sees same balance both times
+  Even though B modified it
+  A's view is isolated (snapshot)
+
+Code:
+  session1.startTransaction({ readConcern: 'snapshot' })
+  balance1 = db.students.findOne({name: 'Alice'}, {session: session1}).balance
+  // Meanwhile, transaction 2 changes balance
+  balance2 = db.students.findOne({name: 'Alice'}, {session: session1}).balance
+  // balance1 === balance2 (both from snapshot)
+
+
+INTERMEDIATE EXAMPLE #2: Write concern with transaction
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  session.startTransaction({
+    readConcern: 'snapshot',
+    writeConcern: { w: 'majority' }
+  })
+
+Behavior:
+  Snapshot isolation for reads
+  Majority replicas confirm writes
+  High durability
+
+
+================================================================================
+SECTION 2.3: INTERMEDIATE - MULTI-DOCUMENT TRANSACTIONS
+================================================================================
+
+DEFINITION:
+  Transactions spanning multiple collections
+  All operations succeed or all fail
+
+INTERMEDIATE EXAMPLE #1: Complex enrollment
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Student enrolls in course
+  Must update 3 collections atomically:
+    1. Insert new enrollment document
+    2. Update student enrollmentCount
+    3. Update course enrollmentCount
+
+Code:
+  session = db.getMongo().startSession()
+
+  try {
+    session.startTransaction()
+
+    // Insert enrollment
+    db.enrollments.insertOne(
+      { studentId: '20260001', courseId: 'CS101', grade: null },
+      { session }
+    )
+
+    // Update student count
+    db.students.updateOne(
+      { studentId: '20260001' },
+      { $inc: { enrollmentCount: 1 } },
+      { session }
+    )
+
+    // Update course count
+    db.courses.updateOne(
+      { courseId: 'CS101' },
+      { $inc: { enrollmentCount: 1 } },
+      { session }
+    )
+
+    session.commitTransaction()
+
+  } catch (err) {
+    session.abortTransaction()
+    throw err
+
+  } finally {
+    session.endSession()
+  }
+
+Result:
+  All 3 operations succeed together
+  If any fails, all 3 rolled back
+  Counts always match reality
+
+
+================================================================================
+PART 3: ADVANCED LEVEL
+================================================================================
+
+SECTION 3.1: ADVANCED - WRITE CONFLICTS & DEADLOCK PREVENTION
+================================================================================
+
+WRITE CONFLICT:
+  Two transactions try to modify same document
+  One succeeds, other gets WriteConflict error
+
+CAUSE:
+  Transaction A modifies document
+  Transaction B tries to modify same document
+  One transaction wins, other fails
+
+PREVENTION STRATEGY #1: Consistent Ordering
+
+Rule: Always acquire locks in same order
+
+Wrong (can deadlock):
+  Transaction A: Update students, then courses
+  Transaction B: Update courses, then students
+
+  A locks students, waiting for courses
+  B locks courses, waiting for students
+  DEADLOCK!
+
+Right (no deadlock):
+  Transaction A: Update courses, then students
+  Transaction B: Update courses, then students
+
+  Both lock in same order
+  One waits for other to finish
+  No deadlock
+
+
+PREVENTION STRATEGY #2: Keep Transactions Short
+
+Rule: Minimize time holding locks
+
+Benefits:
+  Lower probability of conflicts
+  Faster lock release
+  Other transactions can proceed
+
+
+ADVANCED EXAMPLE #1: Conflict handling
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Two teachers update same student's grade simultaneously
+
+Teacher A:
+  session1.startTransaction()
+  db.grades.updateOne({studentId, courseId}, {$set: {grade: 'A'}}, {session: session1})
+  session1.commitTransaction()
+
+Teacher B:
+  session2.startTransaction()
+  db.grades.updateOne({studentId, courseId}, {$set: {grade: 'B'}}, {session: session2})
+  session2.commitTransaction()
+
+Result:
+  One commits (say B)
+  Other gets WriteConflict error
+  A must retry
+
+Solution:
+  Implement retry logic
+  A retries, sees B's 'B' grade
+  A can update or accept
+
+
+================================================================================
+SECTION 3.2: ADVANCED - DISTRIBUTED TRANSACTIONS
+================================================================================
+
+DEFINITION:
+  Transactions across sharded clusters
+  Multiple shards involved in single transaction
+
+REQUIREMENTS:
+  MongoDB 4.2+
+  Sharded cluster
+  Each shard is replica set
+
+
+ADVANCED EXAMPLE #1: Cross-shard transfer
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Student on Shard 1 transfers to student on Shard 2
+  Mongos coordinates transaction across shards
+
+Code:
+  session = db.getMongo().startSession()
+
+  session.startTransaction()
+
+  // Shard 1 operation
+  db.students.updateOne(
+    { studentId: '20260001', shard: 'shard1' },
+    { $inc: { balance: -100 } },
+    { session }
+  )
+
+  // Shard 2 operation
+  db.students.updateOne(
+    { studentId: '20260099', shard: 'shard2' },
+    { $inc: { balance: 100 } },
+    { session }
+  )
+
+  session.commitTransaction()
+
+Mongos:
+  Coordinates across shards
+  Ensures all-or-nothing
+  Handles distributed locking
+
+
+================================================================================
+SECTION 3.3: ADVANCED - TRANSACTION CONSTRAINTS & LIMITS
+================================================================================
+
+TIME LIMIT:
+  Default: 60 seconds
+  Configurable: transactionLifetimeLimitSeconds
+  Automatic abort if exceeded
+
+SIZE LIMIT:
+  Maximum 16 MB total writes
+  All write operations combined
+  Prevent runaway transactions
+
+SCOPE:
+  Can read/write multiple databases
+  Can read/write multiple collections
+  Cannot read sharded collections and unsharded simultaneously
+
+
+ADVANCED EXAMPLE #1: Long transaction (AVOID)
+────────────────────────────────────────────────────────────────────────────
+
+Bad code:
+  session.startTransaction()
+  for (let i = 0; i < 10000; i++) {
+    db.log.insertOne({ message: 'Entry ' + i }, { session })
+  }
+  session.commitTransaction()
+
+Problem:
+  Exceeds 16 MB limit (write limit error)
+  Holds locks for long time
+  Risk of timeout
+
+Better code:
+  for (let i = 0; i < 10000; i++) {
+    session.startTransaction()
+    db.log.insertOne({ message: 'Entry ' + i }, { session })
+    session.commitTransaction()
+  }
+
+Or better:
+  db.log.insertMany([...array...])  // No transaction needed
+
+
+================================================================================
+SECTION 3.4: BEST PRACTICES & COMMON MISTAKES
+================================================================================
+
+BEST PRACTICES:
+
+1. KEEP SHORT
+   ✓ Only include operations requiring atomicity
+   ✓ Move setup/cleanup outside transaction
+   Why: Reduces lock time, lowers deadlock risk
+
+2. ERROR HANDLING
+   ✓ Always abort on error
+   ✓ Implement try-catch-finally
+   Why: Prevents orphaned transactions
+
+3. RETRY LOGIC
+   ✓ Retry on transient errors
+   ✓ Check hasErrorLabel('TransientTransactionError')
+   Why: Improves reliability
+
+4. SESSION CLEANUP
+   ✓ Always endSession in finally
+   ✓ Don't reuse session for new transaction
+   Why: Prevents resource leaks
+
+5. CONSISTENT ORDERING
+   ✓ Lock documents in same order
+   ✓ Sort IDs before updating
+   Why: Prevents deadlocks
+
+6. WRITE CONCERN
+   ✓ Use w: 'majority' for important data
+   ✓ Ensures durability across replicas
+   Why: Data survives failures
+
+
+COMMON MISTAKES:
+
+❌ NESTED TRANSACTIONS
+   Mistake: startTransaction inside transaction
+   Problem: Not supported
+   Solution: Use single transaction for all
+
+❌ FORGETTING ROLLBACK
+   Mistake: Not calling abortTransaction on error
+   Problem: Locks held, resources wasted
+   Solution: Use try-catch with proper handling
+
+❌ NO RETRY LOGIC
+   Mistake: Don't retry WriteConflict
+   Problem: Fails even though retry would work
+   Solution: Implement exponential backoff retry
+
+❌ LONG TRANSACTIONS
+   Mistake: Too many operations
+   Problem: High contention, deadlock risk
+   Solution: Keep focused and short
+
+❌ WRONG ISOLATION
+   Mistake: Use wrong isolation level
+   Problem: Inconsistent reads or performance issues
+   Solution: Snapshot (default) works for most
+
+❌ NO SESSION CLEANUP
+   Mistake: Forget endSession()
+   Problem: Memory leak
+   Solution: Use finally block
+
+
+================================================================================
+SECTION 3.5: USE CASES SUMMARY
+================================================================================
+
+BEGINNER USE CASES:
+
+Financial transfer: $500 from Alice to Bob
+  Both operations must succeed
+
+Order creation: Create order, deduct inventory, charge fee
+  All or nothing (don't partially charge)
+
+Enrollment: Add course, update counts, process fee
+  Atomic consistency needed
+
+
+INTERMEDIATE USE CASES:
+
+Complex workflow: Multiple steps, interdependent
+  Rollback if any step fails
+
+Inventory management: Update stock, create shipment, log
+  Consistent state across collections
+
+Accounting: Journal entry across accounts
+  Debits must equal credits
+
+
+ADVANCED USE CASES:
+
+Payment processing: Multi-currency, multi-step
+  ACID guarantees critical
+
+Cross-border transfers: Complex workflows
+  Deadlock prevention needed
+
+High-throughput systems: Millions concurrent
+  Isolation and performance optimization
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Basic Transaction:
+────────────────────────────────────────────────────────────────────────────
+session = db.getMongo().startSession()
+try {
+  session.startTransaction()
+  // operations with {session} parameter
+  session.commitTransaction()
+} catch (err) {
+  session.abortTransaction()
+} finally {
+  session.endSession()
+}
+
+Retry Pattern:
+────────────────────────────────────────────────────────────────────────────
+for (let i = 0; i < 3; i++) {
+  try {
+    session.startTransaction()
+    // operations
+    session.commitTransaction()
+    break  // Success
+  } catch (err) {
+    session.abortTransaction()
+    if (!err.hasErrorLabel('TransientTransactionError')) throw err
+  }
+}
+
+Multi-Collection:
+────────────────────────────────────────────────────────────────────────────
+session.startTransaction()
+db.collection1.updateOne({...}, {...}, {session})
+db.collection2.insertOne({...}, {session})
+db.collection3.deleteOne({...}, {session})
+session.commitTransaction()
+
+Options:
+────────────────────────────────────────────────────────────────────────────
+readConcern: 'snapshot'           - Snapshot isolation (default)
+writeConcern: { w: 'majority' }   - Majority replication
+readPreference: 'primary'         - Read from primary
+
+Requirements:
+────────────────────────────────────────────────────────────────────────────
+MongoDB 4.0+
+Replica set (minimum 3 members)
+WiredTiger storage engine
+
+Limits:
+────────────────────────────────────────────────────────────────────────────
+Time: 60 seconds default
+Size: 16 MB writes total
+Scope: Multiple collections/databases
+
+Error Handling:
+────────────────────────────────────────────────────────────────────────────
+err.hasErrorLabel('TransientTransactionError')  - Retry
+err.hasErrorLabel('WriteConflict')              - Retry
+Other errors                                    - Don't retry
+
+Remember progression:
+  Beginner: Basic syntax, commit/abort, error handling
+  Intermediate: Multi-document, isolation, rollback
+  Advanced: Conflicts, distributed, performance
+
+KEY PRINCIPLES:
+  • ACID: All operations succeed or all fail
+  • Session required for transaction context
+  • Always endSession to prevent leaks
+  • Implement retry logic for conflicts
+  • Keep transactions short and focused
+  • Use w: 'majority' for durability
+  • Prevent deadlocks with consistent ordering
+
+WHEN TO USE TRANSACTIONS:
+  ✓ Multiple operations needing atomicity
+  ✓ Financial, accounting, payment operations
+  ✓ Complex multi-step workflows
+  ✓ Relationships between documents
+
+WHEN NOT TO USE:
+  ✗ Single document (already atomic)
+  ✗ No interdependencies
+  ✗ Simple inserts/deletes
+  ✗ Don't need all-or-nothing guarantee
+
+================================================================================

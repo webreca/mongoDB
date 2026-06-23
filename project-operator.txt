@@ -1,0 +1,831 @@
+================================================================================
+                      MONGODB $project OPERATOR - COMPLETE GUIDE
+            (Beginner to Advanced Level - Field Selection & Transformation)
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: $project for reshaping documents with field selection and computation
+EXAMPLES: Using 60 Student Records from data.json
+LEVEL: Beginner → Intermediate → Advanced
+
+$PROJECT OPERATOR = Reshape documents by selecting, renaming, hiding, and computing fields
+
+
+================================================================================
+PART 1: BEGINNER LEVEL
+================================================================================
+
+SECTION 1.1: WHAT IS $PROJECT?
+================================================================================
+
+DEFINITION:
+  Operator that reshapes documents by selecting, transforming, and reorganizing fields
+
+CONCEPT:
+  Like SELECT in SQL, but much more powerful
+  Can include/exclude, rename, calculate, and restructure
+
+PURPOSE:
+  ✓ Select specific fields (reduce output size)
+  ✓ Hide sensitive information
+  ✓ Rename fields for clarity
+  ✓ Compute new fields from expressions
+  ✓ Restructure document hierarchy
+  ✓ Format data for API responses
+
+SYNTAX:
+  db.collection.aggregate([
+    { $project: {
+        field1: 1,           // Include
+        field2: 0,           // Exclude
+        newName: '$oldName', // Rename
+        computed: expression // Calculate
+      }
+    }
+  ])
+
+VALUES:
+  1 = INCLUDE field in output
+  0 = EXCLUDE field from output
+  '$fieldName' = Reference to existing field
+  expression = Compute new value
+
+
+================================================================================
+SECTION 1.2: BEGINNER - FIELD SELECTION
+================================================================================
+
+BEGINNER EXAMPLE #1: Include specific fields
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: { name: 1, gpa: 1, major: 1 } }
+  ])
+
+Input:  { _id, studentId, name, age, gpa, major, skills, ... }
+Output: { _id, name, gpa, major }
+
+Note:
+  _id automatically included (even though not specified)
+  Only name, gpa, major selected from input
+
+Use Case:
+  Show only essential fields
+
+
+BEGINNER EXAMPLE #2: Exclude sensitive fields
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: { enrollmentDetails: 0, contactInfo: 0, ssn: 0 } }
+  ])
+
+Result:
+  All fields EXCEPT enrollmentDetails, contactInfo, ssn
+  Everything else included
+
+Use Case:
+  Hide private information in API
+
+
+BEGINNER EXAMPLE #3: Exclude _id
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: { _id: 0, name: 1, gpa: 1 } }
+  ])
+
+Output:
+  { name: 'Alice', gpa: 3.85 }
+  Note: _id explicitly excluded
+
+Use Case:
+  Clean output without _id
+
+
+BEGINNER EXAMPLE #4: Include all except one field
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: { enrollmentDetails: 0 } }
+  ])
+
+Result:
+  All fields EXCEPT enrollmentDetails
+  _id still included
+
+Use Case:
+  Remove large/unwanted field
+
+
+KEY RULE:
+  Can't mix inclusion (1) and exclusion (0) in same project
+  Except: _id can be excluded when including other fields
+
+
+================================================================================
+SECTION 1.3: BEGINNER - RENAMING FIELDS
+================================================================================
+
+DEFINITION:
+  Change field name in output without changing data
+
+SYNTAX:
+  { $project: { newName: '$oldName' } }
+
+NOTE:
+  $ prefix required for field references!
+
+BEGINNER EXAMPLE #1: Simple field rename
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        studentName: '$name',
+        gradePointAverage: '$gpa',
+        studentMajor: '$major'
+      }
+    }
+  ])
+
+Before: { name: 'Alice', gpa: 3.85, major: 'CS' }
+After:  { studentName: 'Alice', gradePointAverage: 3.85, studentMajor: 'CS' }
+
+Use Case:
+  Match API naming conventions
+
+
+BEGINNER EXAMPLE #2: Rename with selection
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        id: '$studentId',
+        fullName: '$name',
+        gpa: 1
+      }
+    }
+  ])
+
+Result:
+  Selected fields with some renamed
+
+Use Case:
+  Customize output schema
+
+
+BEGINNER EXAMPLE #3: Flatten nested field
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        scholarshipAmount: '$scholarshipDetails.amount'
+      }
+    }
+  ])
+
+Before: { name: 'Alice', scholarshipDetails: { amount: 10000 } }
+After:  { name: 'Alice', scholarshipAmount: 10000 }
+
+Use Case:
+  Flatten nested structure
+
+
+================================================================================
+PART 2: INTERMEDIATE LEVEL
+================================================================================
+
+SECTION 2.1: INTERMEDIATE - COMPUTED FIELDS
+================================================================================
+
+DEFINITION:
+  Create new fields using expressions and calculations
+
+SYNTAX:
+  { $project: { newField: { operator: [operands] } } }
+
+INTERMEDIATE EXAMPLE #1: Simple arithmetic
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        gpa: 1,
+        gpaPercent: { $multiply: ['$gpa', 100] }
+      }
+    }
+  ])
+
+Calculation: GPA × 100
+Before: gpa: 3.85
+After:  gpaPercent: 385
+
+Use Case:
+  Convert to percentage
+
+
+INTERMEDIATE EXAMPLE #2: String concatenation
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        fullInfo: { $concat: ['$name', ' - ', '$major'] }
+      }
+    }
+  ])
+
+Output:
+  { fullInfo: 'Alice - Computer Science' }
+
+Use Case:
+  Combine fields for display
+
+
+INTERMEDIATE EXAMPLE #3: String operations
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        nameUpper: { $toUpper: '$name' },
+        nameLower: { $toLower: '$name' },
+        nameLength: { $strLenCP: '$name' }
+      }
+    }
+  ])
+
+Output:
+  {
+    name: 'Alice',
+    nameUpper: 'ALICE',
+    nameLower: 'alice',
+    nameLength: 5
+  }
+
+Use Case:
+  String transformations
+
+
+INTERMEDIATE EXAMPLE #4: Math operations
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        gpa: 1,
+        doubled: { $multiply: ['$gpa', 2] },
+        divided: { $divide: ['$gpa', 4.0] },
+        rounded: { $round: ['$gpa', 1] },
+        ceiling: { $ceil: '$gpa' },
+        floor: { $floor: '$gpa' }
+      }
+    }
+  ])
+
+Use Case:
+  Various numeric calculations
+
+
+================================================================================
+SECTION 2.2: INTERMEDIATE - CONDITIONAL FIELDS
+================================================================================
+
+DEFINITION:
+  Include fields or compute values based on conditions
+
+SYNTAX:
+  { $project: { field: { $cond: [condition, trueValue, falseValue] } } }
+
+INTERMEDIATE EXAMPLE #1: Simple conditional
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        gpa: 1,
+        status: { $cond: [{ $gte: ['$gpa', 3.8] }, 'Honors', 'Regular'] }
+      }
+    }
+  ])
+
+Logic:
+  IF gpa >= 3.8 THEN 'Honors' ELSE 'Regular'
+
+Output:
+  { name: 'Alice', gpa: 3.85, status: 'Honors' }
+
+Use Case:
+  Simple categorization
+
+
+INTERMEDIATE EXAMPLE #2: Nested conditionals
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        gpa: 1,
+        grade: {
+          $cond: [
+            { $gte: ['$gpa', 3.8] },
+            'A',
+            { $cond: [
+                { $gte: ['$gpa', 3.5] },
+                'B',
+                { $cond: [
+                    { $gte: ['$gpa', 3.0] },
+                    'C',
+                    'F'
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ])
+
+Output:
+  Multiple conditions evaluated (A/B/C/F)
+
+Use Case:
+  Grade assignment
+
+
+INTERMEDIATE EXAMPLE #3: Multi-branch with $switch
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        performance: {
+          $switch: {
+            branches: [
+              { case: { $gte: ['$gpa', 3.8] }, then: 'Excellent' },
+              { case: { $gte: ['$gpa', 3.5] }, then: 'Good' },
+              { case: { $gte: ['$gpa', 3.0] }, then: 'Satisfactory' }
+            ],
+            default: 'Needs Improvement'
+          }
+        }
+      }
+    }
+  ])
+
+Use Case:
+  Cleaner multi-branch logic
+
+
+================================================================================
+SECTION 2.3: INTERMEDIATE - ARRAY OPERATIONS
+================================================================================
+
+INTERMEDIATE EXAMPLE #1: Array size
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        skills: 1,
+        skillCount: { $size: '$skills' }
+      }
+    }
+  ])
+
+Output:
+  { name: 'Alice', skills: [...], skillCount: 5 }
+
+Use Case:
+  Count array elements
+
+
+INTERMEDIATE EXAMPLE #2: Get array element
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        firstSkill: { $arrayElemAt: ['$skills', 0] },
+        lastSkill: { $arrayElemAt: ['$skills', -1] }
+      }
+    }
+  ])
+
+Use Case:
+  Access specific array elements
+
+
+INTERMEDIATE EXAMPLE #3: Filter array
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        pythonSkills: {
+          $filter: {
+            input: '$skills',
+            as: 'skill',
+            cond: { $eq: ['$$skill', 'Python'] }
+          }
+        }
+      }
+    }
+  ])
+
+Use Case:
+  Select specific array elements
+
+
+INTERMEDIATE EXAMPLE #4: Map array elements
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        skillsUpper: {
+          $map: {
+            input: '$skills',
+            as: 'skill',
+            in: { $toUpper: '$$skill' }
+          }
+        }
+      }
+    }
+  ])
+
+Use Case:
+  Transform all array elements
+
+
+================================================================================
+PART 3: ADVANCED LEVEL
+================================================================================
+
+SECTION 3.1: ADVANCED - NESTED OBJECT CREATION
+================================================================================
+
+ADVANCED EXAMPLE #1: Restructure into objects
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        contact: {
+          name: '$name',
+          phone: '$phone',
+          email: '$email'
+        },
+        academic: {
+          gpa: '$gpa',
+          major: '$major',
+          year: '$enrollmentYear'
+        }
+      }
+    }
+  ])
+
+Before: { name: 'Alice', phone: '...', email: '...', gpa: 3.85, major: 'CS', ... }
+After:  {
+          contact: { name: 'Alice', phone: '...', email: '...' },
+          academic: { gpa: 3.85, major: 'CS', year: 2 }
+        }
+
+Use Case:
+  Organize output by category
+
+
+ADVANCED EXAMPLE #2: Nested with computed fields
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        personal: {
+          name: '$name',
+          age: '$age'
+        },
+        academics: {
+          gpa: '$gpa',
+          performance: {
+            $cond: [
+              { $gte: ['$gpa', 3.8] },
+              'Top',
+              'Regular'
+            ]
+          }
+        }
+      }
+    }
+  ])
+
+Use Case:
+  Combine nesting with calculations
+
+
+================================================================================
+SECTION 3.2: ADVANCED - TYPE CONVERSION
+================================================================================
+
+ADVANCED EXAMPLE #1: Convert data types
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        gpaString: { $toString: '$gpa' },
+        ageNumber: { $toInt: '$age' },
+        enrollmentDate: { $toDate: '$enrollmentDate' }
+      }
+    }
+  ])
+
+Conversions:
+  gpa (number) → string
+  age (mixed) → integer
+  enrollmentDate → date object
+
+Use Case:
+  Type consistency for APIs
+
+
+ADVANCED EXAMPLE #2: Date operations
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        enrollmentYear: { $year: '$enrollmentDate' },
+        enrollmentMonth: { $month: '$enrollmentDate' },
+        enrollmentDay: { $dayOfMonth: '$enrollmentDate' },
+        enrollmentDateFormatted: {
+          $dateToString: {
+            format: '%Y-%m-%d',
+            date: '$enrollmentDate'
+          }
+        }
+      }
+    }
+  ])
+
+Use Case:
+  Extract and format dates
+
+
+================================================================================
+SECTION 3.3: ADVANCED - COMPLEX EXPRESSIONS
+================================================================================
+
+ADVANCED EXAMPLE #1: Multi-level nested structure
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        profile: {
+          identity: {
+            name: '$name',
+            id: '$studentId'
+          },
+          education: {
+            major: '$major',
+            gpa: '$gpa',
+            performance: {
+              $switch: {
+                branches: [
+                  { case: { $gte: ['$gpa', 3.8] }, then: 'Honors' },
+                  { case: { $gte: ['$gpa', 3.5] }, then: 'Dean' }
+                ],
+                default: 'Good'
+              }
+            }
+          }
+        }
+      }
+    }
+  ])
+
+Result:
+  Multi-level nested output structure
+
+Use Case:
+  Complex document restructuring
+
+
+ADVANCED EXAMPLE #2: Array of key-value pairs
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.aggregate([
+    { $project: {
+        name: 1,
+        metadata: [
+          { key: 'gpa', value: '$gpa' },
+          { key: 'major', value: '$major' },
+          { key: 'age', value: '$age' }
+        ]
+      }
+    }
+  ])
+
+Use Case:
+  Flexible data representation
+
+
+================================================================================
+SECTION 3.4: BEST PRACTICES & PERFORMANCE
+================================================================================
+
+BEST PRACTICE #1: Early projection
+────────────────────────────────────────────────────────────────────────────
+
+Good Pipeline:
+  [$match, $project (select fields), $group, $sort]
+
+Bad Pipeline:
+  [$match, $group, $sort, $project]
+
+Why:
+  Early projection reduces data through pipeline
+  Can be 2-10x faster
+
+
+BEST PRACTICE #2: Exclude unneeded fields
+────────────────────────────────────────────────────────────────────────────
+
+Good:
+  { $project: { name: 1, gpa: 1 } }
+
+Bad:
+  { $project: { enrollmentDetails: 0 } } (keeps large arrays)
+
+Why:
+  Smaller documents = faster processing
+
+
+BEST PRACTICE #3: Clear naming
+────────────────────────────────────────────────────────────────────────────
+
+Good:
+  { studentName: '$name', gradePointAverage: '$gpa' }
+
+Bad:
+  { n: '$name', g: '$gpa' }
+
+Why:
+  Clear names improve readability
+
+
+BEST PRACTICE #4: Organize with nesting
+────────────────────────────────────────────────────────────────────────────
+
+Good:
+  { contact: { name, phone }, academics: { gpa, major } }
+
+Bad:
+  { contactName, contactPhone, academicsGPA, academicsMajor }
+
+Why:
+  Hierarchical structure clearer
+
+
+COMMON MISTAKES:
+
+❌ Forgetting $ for field reference
+   Wrong: { name: name }
+   Right: { name: '$name' }
+
+❌ Mixing include/exclude
+   Wrong: { name: 1, age: 0 }
+   Right: { name: 1, gpa: 1 } or { age: 0, phone: 0 }
+
+❌ Nested object syntax error
+   Wrong: { 'contact.name': '$name' }
+   Right: { contact: { name: '$name' } }
+
+❌ Heavy computation on large arrays
+   Problem: $filter on 1000-element array
+   Solution: Use $unwind first or limit earlier
+
+❌ Wrong operator name
+   Wrong: { $multiply: 'field1', 'field2' }
+   Right: { $multiply: ['$field1', '$field2'] }
+
+
+================================================================================
+SECTION 3.5: OPERATORS QUICK REFERENCE
+================================================================================
+
+STRING OPERATORS:
+  $concat       - Concatenate strings
+  $toUpper      - Convert to uppercase
+  $toLower      - Convert to lowercase
+  $substr       - Extract substring
+  $strLenCP     - String length
+  $split        - Split string
+
+MATH OPERATORS:
+  $add          - Addition
+  $subtract     - Subtraction
+  $multiply     - Multiplication
+  $divide       - Division
+  $round        - Round to N decimals
+  $ceil         - Round up
+  $floor        - Round down
+  $abs          - Absolute value
+
+ARRAY OPERATORS:
+  $size         - Array length
+  $arrayElemAt  - Element at index
+  $filter       - Filter elements
+  $map          - Transform elements
+  $concat       - Join arrays
+
+CONDITIONAL:
+  $cond         - If-then-else
+  $switch       - Multi-branch
+  $ifNull       - Handle nulls
+
+DATE:
+  $year         - Extract year
+  $month        - Extract month
+  $dayOfMonth   - Extract day
+  $hour         - Extract hour
+  $dateToString - Format date
+
+TYPE:
+  $type         - Get type
+  $toString     - Convert to string
+  $toInt        - Convert to integer
+  $toDouble     - Convert to double
+  $toDate       - Convert to date
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Basic Syntax:
+────────────────────────────────────────────────────────────────────────────
+db.collection.aggregate([
+  { $project: {
+      field1: 1,                              // Include
+      field2: 0,                              // Exclude
+      newName: '$oldName',                    // Rename
+      computed: { $multiply: ['$a', '$b'] }  // Calculate
+    }
+  }
+])
+
+Common Patterns:
+────────────────────────────────────────────────────────────────────────────
+Include only:        { name: 1, gpa: 1, major: 1 }
+Exclude sensitive:   { ssn: 0, password: 0 }
+No _id:              { _id: 0, name: 1, gpa: 1 }
+Rename:              { studentName: '$name', academicGPA: '$gpa' }
+
+Computed field:      { gpaPercent: { $multiply: ['$gpa', 100] } }
+String concat:       { fullInfo: { $concat: ['$name', ' - ', '$major'] } }
+Conditional:         { grade: { $cond: [{ $gte: ['$gpa', 3.8] }, 'A', 'B'] } }
+Multi-branch:        { category: { $switch: { branches: [...] } } }
+
+Nested object:       { contact: { name: '$name', phone: '$phone' } }
+Array size:          { skillCount: { $size: '$skills' } }
+Array element:       { firstSkill: { $arrayElemAt: ['$skills', 0] } }
+
+Remember progression:
+  Beginner: Include/exclude, rename
+  Intermediate: Computed fields, conditionals, arrays
+  Advanced: Nested objects, type conversion, complex expressions
+
+KEY PRINCIPLES:
+  • 1 = include, 0 = exclude field
+  • $ prefix required for field references
+  • Can't mix include/exclude (except _id)
+  • Place early to reduce pipeline size
+  • Expressions enable powerful transformations
+  • Nested objects possible for hierarchy
+
+================================================================================

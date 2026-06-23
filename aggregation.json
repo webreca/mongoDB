@@ -1,0 +1,483 @@
+{
+  "title": "MongoDB Aggregation Pipeline - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on aggregation pipeline stages, operators, and data transformation",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "aggregation_overview": {
+    "definition": "Aggregation pipeline processes data through multiple stages to transform and analyze collections",
+    "concept": "Data flows through stages; each stage transforms data for next stage",
+    "purpose": [
+      "Filter data ($match)",
+      "Transform fields ($project)",
+      "Group and aggregate ($group)",
+      "Join collections ($lookup)",
+      "Sort results ($sort)",
+      "Reshape documents ($unwind, $replaceRoot)",
+      "Create multi-faceted views ($facet)"
+    ],
+    "common_stages": [
+      "$match - Filter documents (like WHERE)",
+      "$project - Select/transform fields (like SELECT)",
+      "$group - Group and aggregate (like GROUP BY)",
+      "$sort - Order results (like ORDER BY)",
+      "$limit/$skip - Pagination",
+      "$unwind - Expand arrays",
+      "$lookup - Join other collections",
+      "$facet - Multiple pipelines in one"
+    ]
+  },
+  "section_1_beginner_concept": {
+    "title": "BEGINNER: What is Aggregation Pipeline?",
+    "definition": "Series of stages that process and transform document data",
+    "syntax": "db.collection.aggregate([\n  { $stage1: {...} },\n  { $stage2: {...} },\n  { $stage3: {...} }\n])",
+    "concept": "Each stage processes output of previous stage",
+    "beginner_examples": [
+      {
+        "title": "Simple pipeline (2 stages)",
+        "stages": [
+          "Stage 1: $match - Filter to Data Science students",
+          "Stage 2: $project - Show only name and GPA"
+        ],
+        "query": "db.students.aggregate([\n  { $match: { major: 'Data Science' } },\n  { $project: { name: 1, gpa: 1 } }\n])",
+        "flow": "All students → Filter DS students (10) → Show name/GPA",
+        "use_case": "Show Data Science student names and GPAs"
+      },
+      {
+        "title": "Pipeline with 3 stages",
+        "stages": [
+          "Stage 1: $match - CS students only",
+          "Stage 2: $group - Count by age",
+          "Stage 3: $sort - By count descending"
+        ],
+        "query": "db.students.aggregate([\n  { $match: { major: 'CS' } },\n  { $group: { _id: '$age', count: { $sum: 1 } } },\n  { $sort: { count: -1 } }\n])",
+        "use_case": "Age distribution of CS students"
+      }
+    ],
+    "pipeline_characteristics": [
+      "Stages execute in order",
+      "Each stage filters/transforms for next",
+      "Early $match improves performance",
+      "Memory usage depends on data volume"
+    ]
+  },
+  "section_2_beginner_match": {
+    "title": "BEGINNER: $MATCH Stage (Filtering)",
+    "definition": "$match filters documents based on conditions (like WHERE clause)",
+    "syntax": "{ $match: { field: value or { operator: value } } }",
+    "beginner_examples": [
+      {
+        "title": "Match single condition",
+        "query": "db.students.aggregate([\n  { $match: { major: 'CS' } }\n])",
+        "input": "60 documents (all students)",
+        "output": "15 documents (CS students only)",
+        "use_case": "Filter by major"
+      },
+      {
+        "title": "Match with comparison operator",
+        "query": "db.students.aggregate([\n  { $match: { gpa: { $gt: 3.8 } } }\n])",
+        "input": "60 documents",
+        "output": "~8 documents (high GPA students)",
+        "use_case": "Find top students"
+      },
+      {
+        "title": "Match with multiple conditions",
+        "query": "db.students.aggregate([\n  { $match: { major: 'Data Science', gpa: { $gte: 3.5 } } }\n])",
+        "input": "60 documents",
+        "output": "~5 documents (DS students with good GPA)",
+        "use_case": "Find qualified students in major"
+      }
+    ],
+    "important_note": "Place $match early for performance; reduces data for following stages"
+  },
+  "section_3_beginner_project": {
+    "title": "BEGINNER: $PROJECT Stage (Field Selection)",
+    "definition": "$project selects, renames, and transforms fields",
+    "syntax": "{ $project: { field1: 1, field2: 1, newField: expression } }",
+    "meaning": "1 = include; 0 = exclude; expression = calculate new field",
+    "beginner_examples": [
+      {
+        "title": "Select specific fields",
+        "query": "db.students.aggregate([\n  { $match: { major: 'CS' } },\n  { $project: { name: 1, gpa: 1, major: 1 } }\n])",
+        "output": "Only name, gpa, major (plus _id by default)",
+        "use_case": "Show subset of fields"
+      },
+      {
+        "title": "Exclude fields",
+        "query": "db.students.aggregate([\n  { $project: { enrollmentDetails: 0, contactInfo: 0 } }\n])",
+        "output": "All fields except specified",
+        "use_case": "Hide sensitive data"
+      },
+      {
+        "title": "Create new calculated field",
+        "query": "db.students.aggregate([\n  { $project: { name: 1, gpa: 1, gpaPercent: { $multiply: ['$gpa', 10] } } }\n])",
+        "output": "Original fields plus new gpaPercent (GPA × 10)",
+        "use_case": "Add computed field"
+      },
+      {
+        "title": "Rename field",
+        "query": "db.students.aggregate([\n  { $project: { studentName: '$name', gradePointAverage: '$gpa' } }\n])",
+        "output": "Fields renamed in output",
+        "use_case": "Rename fields for API response"
+      }
+    ]
+  },
+  "section_4_intermediate_group": {
+    "title": "INTERMEDIATE: $GROUP Stage (Aggregation)",
+    "definition": "$group collects documents and aggregates values (like GROUP BY)",
+    "syntax": "{ $group: { _id: groupExpression, field: { $aggregator: value } } }",
+    "intermediate_examples": [
+      {
+        "title": "Count documents by major",
+        "query": "db.students.aggregate([\n  { $group: { _id: '$major', count: { $sum: 1 } } }\n])",
+        "output": [
+          { _id: 'CS', count: 15 },
+          { _id: 'Data Science', count: 10 },
+          { _id: 'Mathematics', count: 12 }
+        ],
+        "use_case": "Distribution by major"
+      },
+      {
+        "title": "Calculate average GPA by major",
+        "query": "db.students.aggregate([\n  { $group: { _id: '$major', avgGpa: { $avg: '$gpa' } } }\n])",
+        "output": [
+          { _id: 'CS', avgGpa: 3.65 },
+          { _id: 'Data Science', avgGpa: 3.72 }
+        ],
+        "use_case": "Compare majors by average GPA"
+      },
+      {
+        "title": "Multiple aggregations",
+        "query": "db.students.aggregate([\n  { $group: { _id: '$major', count: { $sum: 1 }, avgGpa: { $avg: '$gpa' }, maxAge: { $max: '$age' } } }\n])",
+        "fields": "Count, average GPA, and max age per major",
+        "use_case": "Comprehensive major statistics"
+      },
+      {
+        "title": "Group by null (total aggregation)",
+        "query": "db.students.aggregate([\n  { $group: { _id: null, totalCount: { $sum: 1 }, avgGpa: { $avg: '$gpa' } } }\n])",
+        "output": "{ _id: null, totalCount: 60, avgGpa: 3.68 }",
+        "use_case": "Overall collection statistics"
+      }
+    ],
+    "aggregation_operators": [
+      "$sum - Total/count",
+      "$avg - Average",
+      "$min - Minimum value",
+      "$max - Maximum value",
+      "$first - First value in group",
+      "$last - Last value in group",
+      "$push - Array of values",
+      "$addToSet - Array of unique values"
+    ]
+  },
+  "section_5_intermediate_sort_skip_limit": {
+    "title": "INTERMEDIATE: $SORT, $SKIP, $LIMIT Stages",
+    "intermediate_examples": [
+      {
+        "title": "Sort results",
+        "query": "db.students.aggregate([\n  { $match: { major: 'CS' } },\n  { $sort: { gpa: -1 } }\n])",
+        "output": "CS students sorted by GPA (highest first)",
+        "use_case": "Rank students by GPA"
+      },
+      {
+        "title": "Pagination (skip + limit)",
+        "query": "db.students.aggregate([\n  { $sort: { gpa: -1 } },\n  { $skip: 10 },\n  { $limit: 5 }\n])",
+        "output": "Students 11-15 (ranked by GPA)",
+        "use_case": "Display page 3 of results"
+      },
+      {
+        "title": "Top 5 students by GPA",
+        "query": "db.students.aggregate([\n  { $sort: { gpa: -1 } },\n  { $limit: 5 }\n])",
+        "output": "5 highest GPA students",
+        "use_case": "Honor roll"
+      }
+    ]
+  },
+  "section_6_intermediate_unwind": {
+    "title": "INTERMEDIATE: $UNWIND Stage (Array Expansion)",
+    "definition": "$unwind expands array field into separate documents",
+    "syntax": "{ $unwind: '$arrayField' }",
+    "intermediate_examples": [
+      {
+        "title": "Unwind skills array",
+        "query": "db.students.aggregate([\n  { $unwind: '$skills' },\n  { $group: { _id: '$skills', count: { $sum: 1 } } }\n])",
+        "before": "Student 1: skills: ['Python', 'JavaScript']",
+        "after": "Student 1 - Python, Student 1 - JavaScript (separate docs)",
+        "use_case": "Count skill frequency"
+      },
+      {
+        "title": "Multiple unwind operations",
+        "query": "db.students.aggregate([\n  { $unwind: '$skills' },\n  { $unwind: '$courses' },\n  { $group: { _id: { skill: '$skills', course: '$courses' }, count: { $sum: 1 } } }\n])",
+        "use_case": "Skill-course combinations"
+      }
+    ]
+  },
+  "section_7_advanced_lookup": {
+    "title": "ADVANCED: $LOOKUP Stage (Join Collections)",
+    "definition": "$lookup joins collection documents with related collection",
+    "syntax": "{ $lookup: { from: 'otherCollection', localField: 'fieldA', foreignField: 'fieldB', as: 'arrayName' } }",
+    "advanced_examples": [
+      {
+        "title": "Join students with enrollments",
+        "query": "db.students.aggregate([\n  { $lookup: { from: 'enrollments', localField: 'studentId', foreignField: 'studentId', as: 'enrollmentDetails' } },\n  { $project: { name: 1, enrollmentDetails: 1 } }\n])",
+        "result": "Each student includes array of their enrollments",
+        "use_case": "Get student's course enrollments"
+      },
+      {
+        "title": "Left outer join (all students, even without enrollments)",
+        "query": "db.students.aggregate([\n  { $lookup: { from: 'enrollments', localField: 'studentId', foreignField: 'studentId', as: 'enrollments' } }\n])",
+        "behavior": "Students without enrollments have empty array",
+        "use_case": "Find students not enrolled"
+      },
+      {
+        "title": "Lookup with multiple matches",
+        "query": "db.students.aggregate([\n  { $lookup: { from: 'grades', localField: 'studentId', foreignField: 'studentId', as: 'allGrades' } },\n  { $unwind: '$allGrades' },\n  { $group: { _id: '$studentId', avgGrade: { $avg: '$allGrades.score' } } }\n])",
+        "use_case": "Calculate average across related documents"
+      }
+    ]
+  },
+  "section_8_advanced_facet": {
+    "title": "ADVANCED: $FACET Stage (Multi-faceted Aggregation)",
+    "definition": "$facet processes single collection through multiple pipelines simultaneously",
+    "syntax": "{ $facet: { facet1: [...pipeline...], facet2: [...pipeline...] } }",
+    "advanced_examples": [
+      {
+        "title": "Multiple statistics in one query",
+        "query": "db.students.aggregate([\n  { $facet: { byMajor: [ { $group: { _id: '$major', count: { $sum: 1 } } } ], topGPA: [ { $sort: { gpa: -1 } }, { $limit: 3 } ] } }\n])",
+        "result": "{\n  byMajor: [{_id: 'CS', count: 15}, ...],\n  topGPA: [{name: '...', gpa: 3.98}, ...]\n}",
+        "use_case": "Dashboard with multiple views"
+      },
+      {
+        "title": "Faceted search results",
+        "query": "db.students.aggregate([\n  { $facet: {\n    byMajor: [{ $group: { _id: '$major', count: { $sum: 1 } } }],\n    byGPA: [{ $group: { _id: { $cond: [{ $gte: ['$gpa', 3.8] }, 'High', 'Other'] }, count: { $sum: 1 } } }],\n    topStudents: [{ $sort: { gpa: -1 } }, { $limit: 5 }]\n  }}\n])",
+        "use_case": "Search results with categories and highlights"
+      }
+    ]
+  },
+  "section_9_advanced_complex_pipeline": {
+    "title": "ADVANCED: Complex Pipeline Example",
+    "advanced_examples": [
+      {
+        "title": "Full analytics pipeline",
+        "query": "db.students.aggregate([\n  { $match: { major: { $in: ['CS', 'Data Science'] } } },\n  { $unwind: '$skills' },\n  { $group: { _id: { major: '$major', skill: '$skills' }, count: { $sum: 1 } } },\n  { $sort: { count: -1 } },\n  { $limit: 10 }\n])",
+        "stages": [
+          "1. Filter to CS and Data Science",
+          "2. Expand skills array",
+          "3. Group by major and skill",
+          "4. Sort by frequency",
+          "5. Top 10 skills"
+        ],
+        "use_case": "Most popular skills by major"
+      },
+      {
+        "title": "Enrollment summary with lookup",
+        "query": "db.students.aggregate([\n  { $match: { status: 'active' } },\n  { $lookup: { from: 'enrollments', localField: 'studentId', foreignField: 'studentId', as: 'courses' } },\n  { $group: { _id: '$major', avgEnrollments: { $avg: { $size: '$courses' } }, totalStudents: { $sum: 1 } } },\n  { $sort: { avgEnrollments: -1 } }\n])",
+        "use_case": "Course load by major"
+      }
+    ]
+  },
+  "section_10_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Filter and display",
+        "query": "Find CS students and show name/GPA",
+        "pipeline": "[$match, $project]",
+        "stages": 2
+      },
+      {
+        "use_case": "Count by category",
+        "query": "Count students per major",
+        "pipeline": "[$group, $sort]",
+        "stages": 2
+      },
+      {
+        "use_case": "Simple aggregation",
+        "query": "Average GPA overall",
+        "pipeline": "[$group]",
+        "stages": 1
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Filtered aggregation",
+        "query": "Avg GPA by major for active students",
+        "pipeline": "[$match, $group, $sort]",
+        "stages": 3
+      },
+      {
+        "use_case": "Top N results",
+        "query": "Top 5 students by GPA",
+        "pipeline": "[$sort, $limit]",
+        "stages": 2
+      },
+      {
+        "use_case": "Array analysis",
+        "query": "Count skill frequency",
+        "pipeline": "[$unwind, $group, $sort]",
+        "stages": 3
+      },
+      {
+        "use_case": "Pagination",
+        "query": "Page 3 of sorted results",
+        "pipeline": "[$sort, $skip, $limit]",
+        "stages": 3
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Join with aggregation",
+        "query": "Student enrollments with stats",
+        "pipeline": "[$lookup, $unwind, $group]",
+        "stages": 3
+      },
+      {
+        "use_case": "Multi-faceted analysis",
+        "query": "Dashboard data in one query",
+        "pipeline": "[$facet with multiple sub-pipelines]",
+        "stages": 1
+      },
+      {
+        "use_case": "Complex transformation",
+        "query": "Skills by major, ranked",
+        "pipeline": "[$match, $unwind, $group, $sort, $limit]",
+        "stages": 5
+      }
+    ]
+  },
+  "section_11_performance": {
+    "title": "Performance Considerations",
+    "early_match": {
+      "benefit": "Place $match early to filter data before other stages",
+      "example": "[$match, $group] faster than [$group, $match]",
+      "impact": "Reduces memory usage, improves speed significantly"
+    },
+    "indexing": {
+      "note": "Indexes help $match performance",
+      "recommendation": "Index fields used in $match filters",
+      "benefit": "Dramatically speeds up filtering"
+    },
+    "memory_limits": {
+      "note": "Pipeline results stored in memory",
+      "limit": "100MB default limit",
+      "solution": "Use $limit to reduce data or allowDiskUse: true"
+    },
+    "allow_disk_use": {
+      "syntax": "db.collection.aggregate([...], { allowDiskUse: true })",
+      "benefit": "Allows spilling to disk if >100MB",
+      "tradeoff": "Slower but handles larger datasets"
+    },
+    "stage_performance": {
+      "$match": "Very fast (uses indexes)",
+      "$project": "Fast (field selection)",
+      "$group": "Moderate (memory intensive)",
+      "$lookup": "Slow (joins other collection)",
+      "$sort": "Moderate to slow (can use index)",
+      "$unwind": "Moderate (array expansion)"
+    }
+  },
+  "section_12_best_practices": {
+    "practice_1_early_match": {
+      "rule": "Place $match early in pipeline",
+      "good": "[$match, $group, $sort]",
+      "avoid": "[$group, $sort, $match]",
+      "why": "Reduces documents for following stages"
+    },
+    "practice_2_project_early": {
+      "rule": "Use $project to select needed fields early",
+      "good": "[$match, $project, $group]",
+      "why": "Reduces memory usage"
+    },
+    "practice_3_index_for_match": {
+      "rule": "Index fields used in $match",
+      "example": "db.students.createIndex({ major: 1 })",
+      "why": "Speeds up filtering dramatically"
+    },
+    "practice_4_avoid_unnecessary_stages": {
+      "rule": "Minimize pipeline stages",
+      "avoid": "Multiple $project or $sort stages",
+      "solution": "Combine operations when possible"
+    },
+    "practice_5_use_allowDiskUse": {
+      "rule": "For large datasets, allow spilling to disk",
+      "syntax": "aggregate([...], { allowDiskUse: true })",
+      "when": "Processing >100MB data"
+    }
+  },
+  "section_13_common_mistakes": {
+    "mistake_1_late_match": {
+      "mistake": "Placing $match at end of pipeline",
+      "problem": "Processes all documents before filtering",
+      "solution": "Move $match to beginning"
+    },
+    "mistake_2_missing_id_in_group": {
+      "mistake": "Using fields in $group without referencing",
+      "wrong": "{ $group: { _id: '$major', name: '$name' } }",
+      "right": "{ $group: { _id: '$major', majorName: { $first: '$name' } } }",
+      "why": "Can't reference individual fields in group"
+    },
+    "mistake_3_reference_syntax": {
+      "mistake": "Forgetting $ for field reference",
+      "wrong": "{ $group: { _id: major } }",
+      "right": "{ $group: { _id: '$major' } }",
+      "impact": "Uses literal string instead of field value"
+    },
+    "mistake_4_memory_overflow": {
+      "mistake": "Processing huge dataset without allowDiskUse",
+      "problem": "Exceeds 100MB memory limit",
+      "solution": "Add { allowDiskUse: true } option"
+    },
+    "mistake_5_wrong_aggregation_operator": {
+      "mistake": "Using $sum instead of $avg for average",
+      "wrong": "avgGpa: { $sum: '$gpa' }",
+      "right": "avgGpa: { $avg: '$gpa' }",
+      "impact": "Returns wrong calculation"
+    },
+    "mistake_6_lookup_performance": {
+      "mistake": "Using $lookup without optimization",
+      "problem": "Slow nested loops",
+      "solution": "Index foreign key field, use localField optimization"
+    }
+  },
+  "section_14_progression": {
+    "beginner": [
+      "$match for filtering",
+      "$project for field selection",
+      "$group for basic aggregation",
+      "$sort for ordering"
+    ],
+    "intermediate": [
+      "$group with multiple aggregators",
+      "$skip and $limit for pagination",
+      "$unwind for array expansion",
+      "Multi-stage pipelines"
+    ],
+    "advanced": [
+      "$lookup for joins",
+      "$facet for multi-pipeline analysis",
+      "Complex pipelines with many stages",
+      "Performance optimization",
+      "allowDiskUse for large datasets"
+    ]
+  },
+  "summary": {
+    "core_stages": [
+      "$match - Filter documents",
+      "$project - Select/transform fields",
+      "$group - Aggregate by groups",
+      "$sort - Order results",
+      "$skip/$limit - Pagination",
+      "$unwind - Expand arrays",
+      "$lookup - Join collections",
+      "$facet - Multiple pipelines"
+    ],
+    "key_concepts": [
+      "Pipeline processes documents through stages in order",
+      "Early $match improves performance",
+      "$group requires $ for field references",
+      "Indexes help $match and $sort",
+      "Memory limit 100MB (use allowDiskUse for more)",
+      "Aggregation for complex analytics vs find() for simple queries"
+    ],
+    "best_practice": "Start with $match, use indexes, minimize stages, plan data flow carefully",
+    "progression": "Beginner: Basic stages ($match, $project, $group) → Intermediate: Complex pipelines, pagination → Advanced: Joins, faceting, optimization"
+  }
+}

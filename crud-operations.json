@@ -1,0 +1,516 @@
+{
+  "title": "MongoDB CRUD Operations - Complete Guide",
+  "description": "Brief guide on Create, Read, Update, Delete operations using student data",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "crud_overview": {
+    "C": "CREATE - Insert new documents",
+    "R": "READ - Query and retrieve documents",
+    "U": "UPDATE - Modify existing documents",
+    "D": "DELETE - Remove documents"
+  },
+  "section_1_create_operations": {
+    "title": "CREATE - Insert Documents",
+    "description": "Adding new documents to the collection",
+    "operations": [
+      {
+        "operation": "insertOne",
+        "syntax": "db.collection.insertOne(document)",
+        "description": "Insert single document",
+        "example": {
+          "command": "db.students.insertOne({ studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, age: 20, major: 'Data Science', gpa: 3.85, isInternational: false, skills: ['Python', 'SQL', 'TensorFlow'], courses: [{ courseCode: 'DS-401', credits: 4, grade: 'A' }] })",
+          "result": "Acknowledged, inserted 1 document with _id: ObjectId(...)",
+          "use_case": "Add single student record"
+        }
+      },
+      {
+        "operation": "insertMany",
+        "syntax": "db.collection.insertMany([document1, document2, ...])",
+        "description": "Insert multiple documents at once",
+        "example": {
+          "command": "db.students.insertMany([{ studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, age: 20, major: 'Data Science', ... }, { studentId: 20260002, name: { first: 'Anaya', last: 'Sharma' }, age: 20, major: 'Frontend Engineering', ... }, ... ])",
+          "result": "Acknowledged, inserted 60 documents",
+          "use_case": "Bulk import of all 60 student records"
+        }
+      },
+      {
+        "operation": "insertMany with ordered",
+        "syntax": "db.collection.insertMany([docs], { ordered: true/false })",
+        "description": "Control whether to stop on error",
+        "example": {
+          "command": "db.students.insertMany([docs], { ordered: false })",
+          "result": "Insert all valid documents even if some have errors",
+          "use_case": "Skip duplicate studentIds and continue inserting others"
+        }
+      },
+      {
+        "operation": "updateOne with upsert",
+        "syntax": "db.collection.updateOne(filter, update, { upsert: true })",
+        "description": "Insert if document doesn't exist",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260099 }, { $set: { name: { first: 'New', last: 'Student' }, age: 21 } }, { upsert: true })",
+          "result": "Creates document if studentId 20260099 doesn't exist",
+          "use_case": "Insert or update based on condition"
+        }
+      }
+    ]
+  },
+  "section_2_read_operations": {
+    "title": "READ - Query Documents",
+    "description": "Retrieving and finding documents",
+    "operations": [
+      {
+        "operation": "find (all)",
+        "syntax": "db.collection.find()",
+        "description": "Retrieve all documents",
+        "example": {
+          "command": "db.students.find()",
+          "result": "Returns cursor to all 60 student documents",
+          "use_case": "Get entire collection"
+        }
+      },
+      {
+        "operation": "findOne",
+        "syntax": "db.collection.findOne(filter)",
+        "description": "Find single document",
+        "example": {
+          "command": "db.students.findOne({ studentId: 20260001 })",
+          "result": "Returns Daksh Chauhan document",
+          "use_case": "Get specific student by ID"
+        }
+      },
+      {
+        "operation": "find with filter",
+        "syntax": "db.collection.find({ field: value })",
+        "description": "Find documents matching condition",
+        "example_1": {
+          "command": "db.students.find({ major: 'Data Science' })",
+          "result": "Returns Daksh Chauhan (only student with Data Science major)",
+          "use_case": "Find all Data Science majors"
+        },
+        "example_2": {
+          "command": "db.students.find({ isInternational: true })",
+          "result": "Returns 30 international students",
+          "use_case": "Find all international students"
+        },
+        "example_3": {
+          "command": "db.students.find({ gpa: { $gte: 3.9 } })",
+          "result": "Returns 17 honor students with GPA >= 3.9",
+          "use_case": "Find high achievers"
+        }
+      },
+      {
+        "operation": "find with array match",
+        "syntax": "db.collection.find({ arrayField: value })",
+        "description": "Find documents with specific array value",
+        "example": {
+          "command": "db.students.find({ skills: 'Python' })",
+          "result": "Returns all students with Python skill",
+          "use_case": "Find students by skill"
+        }
+      },
+      {
+        "operation": "find with nested field",
+        "syntax": "db.collection.find({ 'nestedObject.field': value })",
+        "description": "Query nested document fields",
+        "example": {
+          "command": "db.students.find({ 'name.first': 'Daksh' })",
+          "result": "Returns Daksh Chauhan",
+          "use_case": "Find student by first name"
+        }
+      },
+      {
+        "operation": "find with multiple conditions",
+        "syntax": "db.collection.find({ condition1, condition2, ... })",
+        "description": "Find documents matching all conditions (AND)",
+        "example": {
+          "command": "db.students.find({ major: 'Data Science', gpa: { $gte: 3.8 } })",
+          "result": "Data Science students with high GPA",
+          "use_case": "Find top Data Science students"
+        }
+      },
+      {
+        "operation": "find with OR condition",
+        "syntax": "db.collection.find({ $or: [condition1, condition2] })",
+        "description": "Find documents matching any condition",
+        "example": {
+          "command": "db.students.find({ $or: [{ major: 'Data Science' }, { major: 'Machine Learning' }] })",
+          "result": "Returns students in either major",
+          "use_case": "Find STEM majors"
+        }
+      },
+      {
+        "operation": "find with projection",
+        "syntax": "db.collection.find(filter, { field1: 1, field2: 0 })",
+        "description": "Select which fields to return (1=include, 0=exclude)",
+        "example": {
+          "command": "db.students.find({ major: 'Data Science' }, { name: 1, gpa: 1, major: 1 })",
+          "result": "Returns only name, gpa, major of Data Science students",
+          "use_case": "Get only needed fields for performance"
+        }
+      },
+      {
+        "operation": "find with sort",
+        "syntax": "db.collection.find().sort({ field: 1/-1 })",
+        "description": "Sort results (1=ascending, -1=descending)",
+        "example": {
+          "command": "db.students.find().sort({ gpa: -1 }).limit(10)",
+          "result": "Returns top 10 students by GPA",
+          "use_case": "Get highest performing students"
+        }
+      },
+      {
+        "operation": "find with limit and skip",
+        "syntax": "db.collection.find().limit(n).skip(n)",
+        "description": "Pagination - limit results and skip some",
+        "example": {
+          "command": "db.students.find().sort({ _id: 1 }).skip(10).limit(10)",
+          "result": "Returns students 11-20",
+          "use_case": "Implement pagination (page 2 with 10 items per page)"
+        }
+      },
+      {
+        "operation": "count documents",
+        "syntax": "db.collection.countDocuments(filter)",
+        "description": "Count documents matching filter",
+        "example_1": {
+          "command": "db.students.countDocuments()",
+          "result": "60",
+          "use_case": "Total number of students"
+        },
+        "example_2": {
+          "command": "db.students.countDocuments({ isInternational: true })",
+          "result": "30",
+          "use_case": "Count international students"
+        }
+      },
+      {
+        "operation": "distinct",
+        "syntax": "db.collection.distinct(field)",
+        "description": "Get unique values of a field",
+        "example": {
+          "command": "db.students.distinct('major')",
+          "result": "[60 unique majors]",
+          "use_case": "Get all available majors"
+        }
+      },
+      {
+        "operation": "aggregate",
+        "syntax": "db.collection.aggregate([stage1, stage2, ...])",
+        "description": "Complex data analysis with pipeline",
+        "example_1": {
+          "command": "db.students.aggregate([{ $group: { _id: '$major', count: { $sum: 1 }, avgGPA: { $avg: '$gpa' } } }])",
+          "result": "Count and average GPA by major",
+          "use_case": "Analyze students by major"
+        },
+        "example_2": {
+          "command": "db.students.aggregate([{ $match: { isInternational: true } }, { $group: { _id: '$age', count: { $sum: 1 } } }])",
+          "result": "Count international students by age",
+          "use_case": "International student age distribution"
+        }
+      }
+    ]
+  },
+  "section_3_update_operations": {
+    "title": "UPDATE - Modify Documents",
+    "description": "Changing existing document data",
+    "operations": [
+      {
+        "operation": "updateOne",
+        "syntax": "db.collection.updateOne(filter, update)",
+        "description": "Update first matching document",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $set: { gpa: 3.90 } })",
+          "result": "Daksh Chauhan's GPA updated to 3.90",
+          "use_case": "Update single student's grade"
+        }
+      },
+      {
+        "operation": "updateMany",
+        "syntax": "db.collection.updateMany(filter, update)",
+        "description": "Update all matching documents",
+        "example": {
+          "command": "db.students.updateMany({ isInternational: true }, { $set: { status: 'International' } })",
+          "result": "30 international students updated",
+          "use_case": "Update all international students"
+        }
+      },
+      {
+        "operation": "$set operator",
+        "syntax": "{ $set: { field: value } }",
+        "description": "Set field value (creates if doesn't exist)",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $set: { 'scholarshipDetails.amount': 20000 } })",
+          "result": "Scholarship amount updated for Daksh",
+          "use_case": "Update scholarship amount"
+        }
+      },
+      {
+        "operation": "$inc operator",
+        "syntax": "{ $inc: { field: number } }",
+        "description": "Increment field value",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $inc: { age: 1 } })",
+          "result": "Daksh's age incremented from 20 to 21",
+          "use_case": "Increment numeric values"
+        }
+      },
+      {
+        "operation": "$push operator (array)",
+        "syntax": "{ $push: { arrayField: value } }",
+        "description": "Add element to array",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $push: { skills: 'Docker' } })",
+          "result": "Docker added to Daksh's skills",
+          "use_case": "Add new skill to student"
+        }
+      },
+      {
+        "operation": "$pull operator (array)",
+        "syntax": "{ $pull: { arrayField: value } }",
+        "description": "Remove element from array",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $pull: { skills: 'TensorFlow' } })",
+          "result": "TensorFlow removed from Daksh's skills",
+          "use_case": "Remove skill from student"
+        }
+      },
+      {
+        "operation": "$unset operator",
+        "syntax": "{ $unset: { field: '' } }",
+        "description": "Remove field from document",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $unset: { scholarshipDetails: '' } })",
+          "result": "scholarshipDetails field removed",
+          "use_case": "Remove optional field"
+        }
+      },
+      {
+        "operation": "$addToSet operator",
+        "syntax": "{ $addToSet: { arrayField: value } }",
+        "description": "Add element to array only if it doesn't exist",
+        "example": {
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $addToSet: { skills: 'Python' } })",
+          "result": "Python not added (already exists)",
+          "use_case": "Add skill without duplicates"
+        }
+      },
+      {
+        "operation": "replaceOne",
+        "syntax": "db.collection.replaceOne(filter, newDocument)",
+        "description": "Replace entire document",
+        "example": {
+          "command": "db.students.replaceOne({ studentId: 20260001 }, { studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, age: 21, major: 'Data Science', gpa: 3.95, isInternational: false })",
+          "result": "Entire document replaced with new version",
+          "use_case": "Complete student record overwrite"
+        }
+      },
+      {
+        "operation": "findOneAndUpdate",
+        "syntax": "db.collection.findOneAndUpdate(filter, update, options)",
+        "description": "Update document and return it",
+        "example": {
+          "command": "db.students.findOneAndUpdate({ studentId: 20260001 }, { $set: { gpa: 3.95 } }, { returnNewDocument: true })",
+          "result": "Returns updated document with new GPA",
+          "use_case": "Update and immediately get updated data"
+        }
+      }
+    ]
+  },
+  "section_4_delete_operations": {
+    "title": "DELETE - Remove Documents",
+    "description": "Deleting documents from collection",
+    "operations": [
+      {
+        "operation": "deleteOne",
+        "syntax": "db.collection.deleteOne(filter)",
+        "description": "Delete first matching document",
+        "example": {
+          "command": "db.students.deleteOne({ studentId: 20260099 })",
+          "result": "Deleted 1 document (if it exists)",
+          "use_case": "Remove specific student"
+        }
+      },
+      {
+        "operation": "deleteMany",
+        "syntax": "db.collection.deleteMany(filter)",
+        "description": "Delete all matching documents",
+        "example_1": {
+          "command": "db.students.deleteMany({ age: { $gte: 50 } })",
+          "result": "Deleted all students aged 50+",
+          "use_case": "Remove mature students"
+        },
+        "example_2": {
+          "command": "db.students.deleteMany({ scholarshipDetails: null })",
+          "result": "Deleted 30 students without scholarships",
+          "use_case": "Remove students without scholarship"
+        }
+      },
+      {
+        "operation": "deleteMany (all)",
+        "syntax": "db.collection.deleteMany({})",
+        "description": "Delete all documents (dangerous!)",
+        "example": {
+          "command": "db.students.deleteMany({})",
+          "result": "All 60 students deleted",
+          "use_case": "Clear entire collection (use with caution)"
+        }
+      },
+      {
+        "operation": "findOneAndDelete",
+        "syntax": "db.collection.findOneAndDelete(filter)",
+        "description": "Delete document and return it",
+        "example": {
+          "command": "db.students.findOneAndDelete({ studentId: 20260001 })",
+          "result": "Returns Daksh Chauhan document before deletion",
+          "use_case": "Delete and archive student record"
+        }
+      },
+      {
+        "operation": "deleteOne with sort",
+        "syntax": "db.collection.deleteOne(filter, { sort: { field: 1/-1 } })",
+        "description": "Delete first document after sorting",
+        "example": {
+          "command": "db.students.deleteOne({ major: 'Data Science' }, { sort: { age: 1 } })",
+          "result": "Deletes youngest Data Science student",
+          "use_case": "Delete specific record by criteria"
+        }
+      }
+    ]
+  },
+  "practical_examples": {
+    "example_1_complete_workflow": {
+      "title": "Complete CRUD Workflow - Managing Student Record",
+      "steps": [
+        {
+          "step": 1,
+          "operation": "CREATE",
+          "command": "db.students.insertOne({ studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, age: 20, major: 'Data Science', gpa: 3.85 })",
+          "description": "Insert new student"
+        },
+        {
+          "step": 2,
+          "operation": "READ",
+          "command": "db.students.findOne({ studentId: 20260001 })",
+          "description": "Verify student was created"
+        },
+        {
+          "step": 3,
+          "operation": "UPDATE",
+          "command": "db.students.updateOne({ studentId: 20260001 }, { $set: { gpa: 3.90 }, $push: { skills: 'Docker' } })",
+          "description": "Update GPA and add skill"
+        },
+        {
+          "step": 4,
+          "operation": "READ",
+          "command": "db.students.findOne({ studentId: 20260001 })",
+          "description": "Verify updates"
+        },
+        {
+          "step": 5,
+          "operation": "DELETE",
+          "command": "db.students.deleteOne({ studentId: 20260001 })",
+          "description": "Remove student record"
+        }
+      ]
+    },
+    "example_2_batch_operations": {
+      "title": "Batch Operations - Managing Multiple Students",
+      "operations": [
+        {
+          "operation": "Insert 60 students",
+          "command": "db.students.insertMany([...60 student documents...])"
+        },
+        {
+          "operation": "Update all international students",
+          "command": "db.students.updateMany({ isInternational: true }, { $set: { visaStatus: 'F-1' } })"
+        },
+        {
+          "operation": "Read all honor students",
+          "command": "db.students.find({ gpa: { $gte: 3.9 } })"
+        },
+        {
+          "operation": "Delete inactive students",
+          "command": "db.students.deleteMany({ status: 'inactive' })"
+        }
+      ]
+    },
+    "example_3_conditional_operations": {
+      "title": "Conditional Operations - By Criteria",
+      "operations": [
+        {
+          "condition": "By Major",
+          "read": "db.students.find({ major: 'Data Science' })",
+          "update": "db.students.updateMany({ major: 'Data Science' }, { $set: { programHead: 'Dr. Smith' } })",
+          "delete": "db.students.deleteMany({ major: 'Obsolete Major' })"
+        },
+        {
+          "condition": "By GPA",
+          "read": "db.students.find({ gpa: { $lt: 2.0 } })",
+          "update": "db.students.updateMany({ gpa: { $lt: 2.0 } }, { $set: { status: 'probation' } })",
+          "delete": "db.students.deleteMany({ gpa: 0 })"
+        },
+        {
+          "condition": "By International Status",
+          "read": "db.students.find({ isInternational: true })",
+          "update": "db.students.updateMany({ isInternational: true }, { $set: { requiresVisa: true } })",
+          "delete": "db.students.deleteMany({ isInternational: true, status: 'graduated' })"
+        }
+      ]
+    }
+  },
+  "operators_reference": {
+    "comparison_operators": {
+      "$eq": "Equal to",
+      "$ne": "Not equal to",
+      "$gt": "Greater than",
+      "$gte": "Greater than or equal",
+      "$lt": "Less than",
+      "$lte": "Less than or equal",
+      "$in": "In array",
+      "$nin": "Not in array"
+    },
+    "logical_operators": {
+      "$and": "All conditions true",
+      "$or": "Any condition true",
+      "$not": "Negate condition",
+      "$nor": "No conditions true"
+    },
+    "array_operators": {
+      "$all": "All array values match",
+      "$elemMatch": "Element matches condition",
+      "$size": "Array size equals",
+      "$push": "Add to array",
+      "$pull": "Remove from array",
+      "$addToSet": "Add if not exists"
+    },
+    "update_operators": {
+      "$set": "Set field value",
+      "$unset": "Remove field",
+      "$inc": "Increment field",
+      "$mul": "Multiply field",
+      "$rename": "Rename field",
+      "$push": "Add to array",
+      "$pull": "Remove from array"
+    }
+  },
+  "best_practices": [
+    "Use projections to reduce network traffic (only fetch needed fields)",
+    "Create indexes on frequently queried fields",
+    "Use bulk operations for better performance",
+    "Always use filter conditions before update/delete",
+    "Use transactions for multi-document consistency",
+    "Validate data before insertion",
+    "Archive old data instead of deleting",
+    "Use findOneAndUpdate for atomic operations",
+    "Limit result sets with .limit() for large collections",
+    "Use aggregation for complex data analysis"
+  ],
+  "summary": {
+    "create": "INSERT new documents using insertOne, insertMany, or upsert",
+    "read": "QUERY documents using find, findOne, aggregate, with filters and projections",
+    "update": "MODIFY documents using updateOne, updateMany with operators like $set, $push, $pull",
+    "delete": "REMOVE documents using deleteOne, deleteMany with appropriate filters",
+    "key_point": "Always use proper filters in UPDATE and DELETE to avoid unintended changes"
+  }
+}

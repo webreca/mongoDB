@@ -1,0 +1,387 @@
+{
+  "title": "MongoDB Advanced Update Operators - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on $inc, $min, $max, $mul, $unset, $rename operators and Upsert",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "advanced_update_overview": {
+    "definition": "Advanced update operators modify specific field values without replacing entire document",
+    "purpose": [
+      "Increment numeric values",
+      "Set minimum/maximum values",
+      "Multiply numeric values",
+      "Remove fields",
+      "Rename fields",
+      "Insert or update (upsert)"
+    ],
+    "operators_covered": [
+      "$inc - Increment by value",
+      "$min - Set to minimum",
+      "$max - Set to maximum",
+      "$mul - Multiply by value",
+      "$unset - Remove field",
+      "$rename - Rename field",
+      "Upsert - Insert if not found"
+    ]
+  },
+  "section_1_beginner_inc": {
+    "title": "BEGINNER: $INC Operator",
+    "definition": "$inc increments numeric field by specified amount",
+    "syntax": "{ $inc: { field: value } }",
+    "meaning": "field += value (positive or negative)",
+    "beginner_examples": [
+      {
+        "title": "Award student scholarship",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $inc: { 'scholarshipDetails.amount': 5000 } })",
+        "before": "scholarshipDetails.amount: 15000",
+        "after": "scholarshipDetails.amount: 20000",
+        "use_case": "Increase scholarship amount"
+      },
+      {
+        "title": "Deduct scholarship",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $inc: { 'scholarshipDetails.amount': -2000 } })",
+        "before": "scholarshipDetails.amount: 20000",
+        "after": "scholarshipDetails.amount: 18000",
+        "use_case": "Reduce scholarship (negative increment)"
+      },
+      {
+        "title": "Increment login count",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $inc: { loginCount: 1 } })",
+        "before": "loginCount: 10",
+        "after": "loginCount: 11",
+        "use_case": "Track user activity"
+      },
+      {
+        "title": "Multiple increments",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $inc: { loginCount: 1, coursesCompleted: 1 } })",
+        "before": "loginCount: 10, coursesCompleted: 8",
+        "after": "loginCount: 11, coursesCompleted: 9",
+        "use_case": "Update multiple counters"
+      }
+    ],
+    "important_note": "Creates field if doesn't exist, initializing to 0 before increment"
+  },
+  "section_2_beginner_unset": {
+    "title": "BEGINNER: $UNSET Operator",
+    "definition": "$unset removes field from document",
+    "syntax": "{ $unset: { field: '' or 1 } }",
+    "meaning": "Field is deleted from document (value in operator doesn't matter)",
+    "beginner_examples": [
+      {
+        "title": "Remove scholarship notes",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $unset: { 'scholarshipDetails.notes': '' } })",
+        "before": "{ scholarshipDetails: { amount: 15000, notes: 'Merit-based' } }",
+        "after": "{ scholarshipDetails: { amount: 15000 } }",
+        "use_case": "Remove unwanted field"
+      },
+      {
+        "title": "Delete middle name",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $unset: { 'name.middle': '' } })",
+        "before": "name: { first: 'Daksh', middle: 'Kumar', last: 'Chauhan' }",
+        "after": "name: { first: 'Daksh', last: 'Chauhan' }",
+        "use_case": "Remove optional field"
+      },
+      {
+        "title": "Remove deprecated field",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $unset: { legacyField: 1 } })",
+        "before": "Has legacyField",
+        "after": "legacyField removed",
+        "use_case": "Clean up old schema"
+      }
+    ]
+  },
+  "section_3_beginner_rename": {
+    "title": "BEGINNER: $RENAME Operator",
+    "definition": "$rename renames field in document",
+    "syntax": "{ $rename: { oldName: newName } }",
+    "meaning": "Field is renamed (data preserved)",
+    "beginner_examples": [
+      {
+        "title": "Rename field during migration",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $rename: { 'phone': 'contact.phone' } })",
+        "before": "{ phone: '555-1234' }",
+        "after": "{ contact: { phone: '555-1234' } }",
+        "use_case": "Schema migration (flatten to nested)"
+      },
+      {
+        "title": "Rename to clearer name",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $rename: { 'gpa': 'gradePointAverage' } })",
+        "before": "{ gpa: 3.85 }",
+        "after": "{ gradePointAverage: 3.85 }",
+        "use_case": "Improve clarity"
+      },
+      {
+        "title": "Multiple renames",
+        "query": "db.students.updateMany({}, { $rename: { 'phone': 'contact.phone', 'email': 'contact.email' } })",
+        "use_case": "Bulk schema migration"
+      }
+    ]
+  },
+  "section_4_intermediate_minmax": {
+    "title": "INTERMEDIATE: $MIN and $MAX Operators",
+    "definition": "$min sets field to minimum value; $max sets to maximum",
+    "syntax_min": "{ $min: { field: value } }",
+    "syntax_max": "{ $max: { field: value } }",
+    "meaning_min": "If value < field, set field = value",
+    "meaning_max": "If value > field, set field = value",
+    "intermediate_examples": [
+      {
+        "title": "Track minimum GPA",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $min: { minGpaAchieved: 3.85 } })",
+        "before": "minGpaAchieved: 3.5",
+        "after": "minGpaAchieved: 3.5 (3.85 > 3.5, not updated)",
+        "use_case": "Maintain lowest GPA record"
+      },
+      {
+        "title": "Track maximum GPA",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $max: { maxGpaAchieved: 3.85 } })",
+        "before": "maxGpaAchieved: 3.8",
+        "after": "maxGpaAchieved: 3.85 (3.85 > 3.8, updated)",
+        "use_case": "Maintain highest GPA record"
+      },
+      {
+        "title": "Track min scholarship",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $min: { minScholarship: 10000 } })",
+        "use_case": "Lowest scholarship amount offered"
+      }
+    ]
+  },
+  "section_5_intermediate_mul": {
+    "title": "INTERMEDIATE: $MUL Operator",
+    "definition": "$mul multiplies numeric field by value",
+    "syntax": "{ $mul: { field: multiplier } }",
+    "meaning": "field *= multiplier",
+    "intermediate_examples": [
+      {
+        "title": "Scale scholarship by percentage",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $mul: { 'scholarshipDetails.amount': 1.1 } })",
+        "before": "scholarshipDetails.amount: 10000",
+        "after": "scholarshipDetails.amount: 11000 (10% increase)",
+        "use_case": "Annual scholarship increase"
+      },
+      {
+        "title": "Reduce by percentage",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $mul: { 'scholarshipDetails.amount': 0.9 } })",
+        "before": "scholarshipDetails.amount: 10000",
+        "after": "scholarshipDetails.amount: 9000 (10% decrease)",
+        "use_case": "Budget cut"
+      },
+      {
+        "title": "Calculate weighted score",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $mul: { gpa: 0.5 } })",
+        "use_case": "Apply weighting formula"
+      }
+    ]
+  },
+  "section_6_advanced_upsert": {
+    "title": "ADVANCED: Upsert",
+    "definition": "Upsert = Update if exists, Insert if not found",
+    "syntax": "db.collection.updateOne(filter, update, { upsert: true })",
+    "behavior": [
+      "Filter matches documents: Update those documents",
+      "Filter matches 0 documents: Insert new document with filter + update"
+    ],
+    "advanced_examples": [
+      {
+        "title": "Track student visits (create if first visit)",
+        "query": "db.studentVisits.updateOne(\n  { studentId: '20260001', date: '2024-06-23' },\n  { $inc: { visits: 1 } },\n  { upsert: true }\n)",
+        "behavior": "First visit: Creates doc with visits=1; Subsequent: Increments visits",
+        "use_case": "Activity tracking"
+      },
+      {
+        "title": "Upsert with initialization",
+        "query": "db.students.updateOne(\n  { studentId: '20260099' },\n  { $set: { name: 'New Student', gpa: 0 }, $inc: { loginCount: 1 } },\n  { upsert: true }\n)",
+        "behavior": "If exists: Increment loginCount; If new: Insert with name, gpa=0, loginCount=1",
+        "use_case": "Auto-create student on first login"
+      },
+      {
+        "title": "Bulk upsert",
+        "query": "db.students.updateMany(\n  { major: 'Data Science' },\n  { $set: { department: 'Engineering' } },\n  { upsert: true }\n)",
+        "behavior": "Update all DS students; If none exist, insert one",
+        "use_case": "Ensure department tracking"
+      }
+    ]
+  },
+  "section_7_advanced_combined": {
+    "title": "ADVANCED: Combined Complex Updates",
+    "advanced_examples": [
+      {
+        "title": "Complete profile initialization",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $set: { name: 'Daksh' }, $inc: { loginCount: 1 }, $min: { firstLoginDate: new Date() } },\n  {}\n)",
+        "use_case": "Track user journey"
+      },
+      {
+        "title": "Bulk increment with filter",
+        "query": "db.students.updateMany(\n  { major: 'Data Science' },\n  { $inc: { 'scholarshipDetails.amount': 5000 } }\n)",
+        "use_case": "Bulk scholarship increase for department"
+      },
+      {
+        "title": "Schema cleanup and update",
+        "query": "db.students.updateMany(\n  {},\n  { $rename: { 'phone': 'contact.phone' }, $unset: { legacyField: 1 } }\n)",
+        "use_case": "Migrate schema structure"
+      }
+    ]
+  },
+  "section_8_use_cases": {
+    "beginner": [
+      {
+        "operator": "$inc",
+        "use_case": "Login counter",
+        "query": "{ $inc: { loginCount: 1 } }"
+      },
+      {
+        "operator": "$unset",
+        "use_case": "Remove deprecated field",
+        "query": "{ $unset: { oldField: '' } }"
+      },
+      {
+        "operator": "$rename",
+        "use_case": "Rename field",
+        "query": "{ $rename: { old: 'new' } }"
+      }
+    ],
+    "intermediate": [
+      {
+        "operator": "$min/$max",
+        "use_case": "Track extreme values",
+        "query": "{ $max: { bestGpa: 3.85 } }"
+      },
+      {
+        "operator": "$mul",
+        "use_case": "Scale amounts",
+        "query": "{ $mul: { amount: 1.1 } }"
+      }
+    ],
+    "advanced": [
+      {
+        "operator": "Upsert",
+        "use_case": "Auto-create or update",
+        "query": "updateOne({...}, {...}, {upsert:true})"
+      },
+      {
+        "operator": "Combined",
+        "use_case": "Complex initialization",
+        "query": "Multiple operators in one update"
+      }
+    ]
+  },
+  "section_9_performance": {
+    "title": "Performance Considerations",
+    "inc_performance": {
+      "description": "$inc is very efficient",
+      "note": "Atomic operation, no read needed",
+      "use": "Preferred for counters"
+    },
+    "unset_performance": {
+      "description": "$unset is fast",
+      "note": "Just removes field reference",
+      "use": "Cleaning up fields"
+    },
+    "rename_performance": {
+      "description": "$rename is moderate",
+      "note": "Rewrites field keys",
+      "use": "Use in batch operations at off-peak"
+    },
+    "upsert_performance": {
+      "description": "Upsert with unindexed filter is slower",
+      "note": "May need to scan collection",
+      "solution": "Index the filter fields"
+    },
+    "bulk_updates": {
+      "tip": "Use updateMany instead of loops",
+      "benefit": "Single operation vs many round-trips",
+      "example": "updateMany({ filter }, { operators })"
+    }
+  },
+  "section_10_best_practices": {
+    "practice_1_use_inc_for_counters": {
+      "rule": "Use $inc for numeric counters",
+      "good": "{ $inc: { loginCount: 1 } }",
+      "why": "Atomic, efficient, prevents race conditions"
+    },
+    "practice_2_atomic_operations": {
+      "rule": "Update single document atomically when possible",
+      "good": "Single update with multiple operators",
+      "why": "Prevents partial updates if failure occurs"
+    },
+    "practice_3_upsert_careful": {
+      "rule": "Use upsert only when necessary",
+      "why": "Insert creates document with potentially incomplete data",
+      "solution": "Ensure $set has required fields"
+    },
+    "practice_4_bulk_operations": {
+      "rule": "Use updateMany for multiple documents",
+      "good": "updateMany({filter}, {operators})",
+      "avoid": "Loop with updateOne"
+    },
+    "practice_5_index_filter_fields": {
+      "rule": "Index fields used in upsert filter",
+      "command": "createIndex({ studentId: 1 })",
+      "why": "Faster upsert (avoids full scan)"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_unset_syntax": {
+      "mistake": "Wrong $unset value",
+      "wrong": "{ $unset: { field: true } }",
+      "right": "{ $unset: { field: '' } }",
+      "note": "Value doesn't matter, often use empty string or 1"
+    },
+    "mistake_2_rename_overwrites": {
+      "mistake": "Renaming to existing field",
+      "problem": "Overwrites target field with source",
+      "solution": "Check target doesn't exist"
+    },
+    "mistake_3_upsert_incomplete": {
+      "mistake": "Upsert without $set for required fields",
+      "problem": "Inserted document missing required fields",
+      "solution": "Use $set to initialize all required fields"
+    },
+    "mistake_4_no_index_upsert": {
+      "mistake": "Upsert on unindexed filter field",
+      "problem": "Slow (full collection scan on not found)",
+      "solution": "Create index on filter field"
+    },
+    "mistake_5_inc_on_string": {
+      "mistake": "Using $inc on string field",
+      "problem": "Error or unexpected behavior",
+      "solution": "Ensure field is numeric"
+    }
+  },
+  "section_12_progression": {
+    "beginner": [
+      "$inc for simple counters",
+      "$unset to remove fields",
+      "$rename for field renaming"
+    ],
+    "intermediate": [
+      "$min and $max for tracking extremes",
+      "$mul for scaling",
+      "Multiple operators in one update"
+    ],
+    "advanced": [
+      "Upsert for insert-or-update",
+      "Complex updates with multiple operators",
+      "Bulk operations with filters"
+    ]
+  },
+  "summary": {
+    "operators": [
+      "$inc - Increment numeric value",
+      "$min - Set to minimum",
+      "$max - Set to maximum",
+      "$mul - Multiply value",
+      "$unset - Remove field",
+      "$rename - Rename field",
+      "Upsert - Insert or update"
+    ],
+    "key_concepts": [
+      "$inc/$mul are atomic and efficient",
+      "$unset removes field completely",
+      "$rename preserves data, changes key",
+      "Upsert = update if found, insert if not",
+      "Combine multiple operators in single update"
+    ],
+    "best_practice": "Use $inc for counters, upsert for auto-create, combine operators for atomic updates",
+    "progression": "Beginner: $inc/$unset/$rename → Intermediate: $min/$max/$mul → Advanced: Upsert + combinations"
+  }
+}

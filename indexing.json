@@ -1,0 +1,472 @@
+{
+  "title": "MongoDB Indexing - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on index creation, types, strategies, and performance optimization",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "indexing_overview": {
+    "definition": "Indexes are data structures that improve query performance by organizing data for faster retrieval",
+    "purpose": [
+      "Speed up query execution",
+      "Support efficient sorting",
+      "Enable range queries",
+      "Support unique constraints",
+      "Enable full-text search",
+      "Support geospatial queries"
+    ],
+    "tradeoff": "Indexes speed reads but slow writes (inserts/updates/deletes)",
+    "indexes_covered": [
+      "Single field indexes",
+      "Compound indexes (multi-field)",
+      "Unique indexes",
+      "Sparse indexes",
+      "Text indexes",
+      "TTL indexes",
+      "Partial indexes"
+    ]
+  },
+  "section_1_beginner_single_field": {
+    "title": "BEGINNER: Single Field Indexes",
+    "definition": "Index on a single field to speed up queries on that field",
+    "syntax": "db.collection.createIndex({ fieldName: 1 })",
+    "meaning": "1 = ascending order; -1 = descending order",
+    "beginner_examples": [
+      {
+        "title": "Index on studentId (primary identifier)",
+        "query": "db.students.createIndex({ studentId: 1 })",
+        "impact": "Speeds up queries: db.students.find({ studentId: '20260001' })",
+        "performance_before": "~5-10ms (full scan of 60 documents)",
+        "performance_after": "~0.1ms (direct index lookup)",
+        "use_case": "Every query by student ID benefits"
+      },
+      {
+        "title": "Index on major (department lookup)",
+        "query": "db.students.createIndex({ major: 1 })",
+        "impact": "Speeds up: db.students.find({ major: 'Data Science' })",
+        "queries_benefit": "Department listings, major-specific analysis",
+        "cardinality": "Low (only ~15 unique majors)",
+        "use_case": "Filter students by major"
+      },
+      {
+        "title": "Index on gpa (range queries)",
+        "query": "db.students.createIndex({ gpa: 1 })",
+        "impact": "Speeds up: db.students.find({ gpa: { $gt: 3.8 } })",
+        "queries_benefit": "GPA range queries, top students",
+        "cardinality": "High (60 different values)",
+        "use_case": "Find high-achieving students"
+      },
+      {
+        "title": "Index on age (sorting)",
+        "query": "db.students.createIndex({ age: 1 })",
+        "impact": "Speeds up: db.students.find().sort({ age: 1 })",
+        "note": "Without index, MongoDB sorts in memory",
+        "use_case": "Sort students by age"
+      }
+    ],
+    "important_note": "Every index consumes memory and slows writes; index only fields queried frequently"
+  },
+  "section_2_beginner_viewing": {
+    "title": "BEGINNER: Viewing and Deleting Indexes",
+    "beginner_examples": [
+      {
+        "title": "List all indexes on collection",
+        "query": "db.students.getIndexes()",
+        "output": "[{ key: { _id: 1 }, name: '_id_' }, { key: { studentId: 1 }, name: 'studentId_1' }, ...]",
+        "use_case": "See what indexes exist"
+      },
+      {
+        "title": "Get index information",
+        "query": "db.students.getIndexStats()",
+        "shows": "Index usage statistics, size, operations",
+        "use_case": "Monitor index usage"
+      },
+      {
+        "title": "Drop single index",
+        "query": "db.students.dropIndex('studentId_1')",
+        "effect": "Removes index, speeds up writes but slows related queries",
+        "use_case": "Remove unused index"
+      },
+      {
+        "title": "Drop all indexes (except _id)",
+        "query": "db.students.dropIndexes()",
+        "note": "_id index always exists and can't be removed",
+        "use_case": "Clean up collection"
+      }
+    ]
+  },
+  "section_3_intermediate_compound": {
+    "title": "INTERMEDIATE: Compound Indexes (Multi-field)",
+    "definition": "Index on multiple fields to support queries filtering on multiple criteria",
+    "syntax": "db.collection.createIndex({ field1: 1, field2: -1 })",
+    "meaning": "Field order matters; first field is primary sort",
+    "intermediate_examples": [
+      {
+        "title": "Index on major + gpa",
+        "query": "db.students.createIndex({ major: 1, gpa: -1 })",
+        "benefits_query1": "db.students.find({ major: 'CS' })",
+        "benefits_query2": "db.students.find({ major: 'CS', gpa: { $gt: 3.5 } })",
+        "benefits_query3": "db.students.find({ major: 'CS' }).sort({ gpa: -1 })",
+        "note": "Major first (common filter), GPA second (often sorted)",
+        "use_case": "Find high-GPA students in each major"
+      },
+      {
+        "title": "Index on major + age + gpa",
+        "query": "db.students.createIndex({ major: 1, age: 1, gpa: -1 })",
+        "benefits": "Supports queries on major, age, gpa or any prefix combination",
+        "query_example": "db.students.find({ major: 'CS', age: { $gt: 25 } })",
+        "note": "Prefix usage: can use major, or major+age, or all three",
+        "use_case": "Complex filtering on multiple fields"
+      },
+      {
+        "title": "Index field order optimization",
+        "order_rules": [
+          "1. Equality fields first (major: 1)",
+          "2. Range fields second (age: 1)",
+          "3. Sort fields third (gpa: -1)"
+        ],
+        "example": "Query: find({ major: 'CS', age: { $gt: 25 } }).sort({ gpa: -1 })",
+        "optimal_index": "{ major: 1, age: 1, gpa: -1 }",
+        "why": "Uses ESR rule (Equality-Sort-Range)"
+      }
+    ],
+    "important_note": "Order matters; field order should match query pattern"
+  },
+  "section_4_intermediate_special": {
+    "title": "INTERMEDIATE: Special Index Types",
+    "intermediate_examples": [
+      {
+        "title": "Unique index (prevents duplicates)",
+        "query": "db.students.createIndex({ email: 1 }, { unique: true })",
+        "effect": "Two documents can't have same email",
+        "use_case": "Ensure email uniqueness; combined with index benefit"
+      },
+      {
+        "title": "Sparse index (ignores null/missing)",
+        "query": "db.students.createIndex({ 'scholarshipDetails.scholarship': 1 }, { sparse: true })",
+        "effect": "Includes only documents where field exists",
+        "benefit": "Smaller index, faster queries for 'has scholarship'",
+        "note": "Documents without field not indexed",
+        "use_case": "Optional field that most documents lack"
+      },
+      {
+        "title": "Unique + Sparse (combination)",
+        "query": "db.students.createIndex({ phoneNumber: 1 }, { unique: true, sparse: true })",
+        "effect": "Multiple nulls allowed (sparse), but values unique",
+        "use_case": "Optional phone field, unique when present"
+      },
+      {
+        "title": "TTL index (auto-delete)",
+        "query": "db.sessions.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 })",
+        "effect": "Documents deleted automatically 1 hour after creation",
+        "use_case": "Sessions, temporary data"
+      }
+    ]
+  },
+  "section_5_intermediate_text": {
+    "title": "INTERMEDIATE: Text Indexes (Full-text Search)",
+    "definition": "Specialized index for searching text content",
+    "syntax": "db.collection.createIndex({ fieldName: 'text' })",
+    "intermediate_examples": [
+      {
+        "title": "Single field text index",
+        "query": "db.students.createIndex({ bio: 'text' })",
+        "search_query": "db.students.find({ $text: { $search: 'passionate learner' } })",
+        "benefit": "Finds documents containing any of the words",
+        "use_case": "Search student bios"
+      },
+      {
+        "title": "Multiple field text index",
+        "query": "db.students.createIndex({ name: 'text', bio: 'text', major: 'text' })",
+        "search_query": "db.students.find({ $text: { $search: 'computer science' } })",
+        "benefit": "Searches across multiple fields",
+        "use_case": "Full-text search across name, bio, major"
+      },
+      {
+        "title": "Text index with weights",
+        "query": "db.students.createIndex({ name: 'text', bio: 'text' }, { weights: { name: 10, bio: 1 } })",
+        "effect": "Name matches ranked higher than bio",
+        "use_case": "Prioritize exact name matches over content"
+      }
+    ]
+  },
+  "section_6_advanced_partial": {
+    "title": "ADVANCED: Partial Indexes (Conditional)",
+    "definition": "Index only documents matching a filter condition",
+    "syntax": "db.collection.createIndex({ field: 1 }, { partialFilterExpression: {...} })",
+    "advanced_examples": [
+      {
+        "title": "Index only scholarship students",
+        "query": "db.students.createIndex(\n  { gpa: 1 },\n  { partialFilterExpression: { hasScholarship: true } }\n)",
+        "benefit": "Smaller index, faster queries on scholarship students",
+        "query": "db.students.find({ hasScholarship: true, gpa: { $gt: 3.5 } })",
+        "use_case": "Queries only on subset of documents"
+      },
+      {
+        "title": "Index only active students",
+        "query": "db.students.createIndex(\n  { major: 1, gpa: -1 },\n  { partialFilterExpression: { status: 'active' } }\n)",
+        "benefit": "Excludes dropped/graduated students from index",
+        "use_case": "Current student queries"
+      },
+      {
+        "title": "Index with complex condition",
+        "query": "db.students.createIndex(\n  { enrollmentDate: 1 },\n  { partialFilterExpression: { age: { $gt: 18 }, status: { $in: ['active', 'onleave'] } } }\n)",
+        "benefit": "Only indexes adults who are active or on leave",
+        "use_case": "Specific subset filtering"
+      }
+    ],
+    "important_note": "Partial indexes save space and improve write performance"
+  },
+  "section_7_advanced_optimization": {
+    "title": "ADVANCED: Index Optimization Strategies",
+    "advanced_examples": [
+      {
+        "title": "Dropping unused indexes",
+        "identify": "db.students.aggregate([{ $indexStats: {} }])",
+        "check": "accesses.ops = 0 means unused",
+        "action": "db.students.dropIndex('index_name')",
+        "benefit": "Speeds up writes, saves memory",
+        "use_case": "Cleanup unnecessary indexes"
+      },
+      {
+        "title": "Building index in background",
+        "query": "db.students.createIndex({ email: 1 }, { background: true })",
+        "note": "Allows queries during index build (slower build)",
+        "use_case": "Production systems where blocking unacceptable"
+      },
+      {
+        "title": "Covering index (eliminates collection scan)",
+        "scenario": "Query: db.students.find({ major: 'CS', age: 25 }, { _id: 0, major: 1, age: 1, name: 1 })",
+        "index": "db.students.createIndex({ major: 1, age: 1, name: 1 })",
+        "benefit": "Returns all data from index without reading collection",
+        "performance": "Extremely fast - no disk I/O except index",
+        "use_case": "Projection only needed fields in index"
+      },
+      {
+        "title": "Collation for language-specific sorting",
+        "query": "db.students.createIndex({ name: 1 }, { collation: { locale: 'en_US' } })",
+        "benefit": "Case-insensitive, accent-insensitive sorting",
+        "use_case": "International names"
+      }
+    ]
+  },
+  "section_8_use_cases": {
+    "beginner": [
+      {
+        "scenario": "Find student by ID",
+        "query": "db.students.find({ studentId: '20260001' })",
+        "index": "{ studentId: 1 }",
+        "benefit": "Direct lookup instead of scan"
+      },
+      {
+        "scenario": "List students by major",
+        "query": "db.students.find({ major: 'CS' })",
+        "index": "{ major: 1 }",
+        "benefit": "Quick filtering by department"
+      },
+      {
+        "scenario": "Sort students by GPA",
+        "query": "db.students.find().sort({ gpa: -1 })",
+        "index": "{ gpa: -1 }",
+        "benefit": "Index-sorted result, no memory sort"
+      }
+    ],
+    "intermediate": [
+      {
+        "scenario": "Find high-GPA students in major",
+        "query": "db.students.find({ major: 'CS', gpa: { $gt: 3.8 } }).sort({ gpa: -1 })",
+        "index": "{ major: 1, gpa: -1 }",
+        "benefit": "Single index supports filter and sort"
+      },
+      {
+        "scenario": "Unique email addresses",
+        "query": "Prevent duplicate emails during insert",
+        "index": "{ email: 1, unique: true }",
+        "benefit": "Enforces uniqueness + speeds lookup"
+      },
+      {
+        "scenario": "Search student bios",
+        "query": "db.students.find({ $text: { $search: 'passionate' } })",
+        "index": "{ bio: 'text' }",
+        "benefit": "Full-text search capability"
+      }
+    ],
+    "advanced": [
+      {
+        "scenario": "Query only active scholarship students",
+        "query": "db.students.find({ hasScholarship: true, gpa: { $gt: 3.5 } })",
+        "index": "{ gpa: 1 } with partialFilterExpression",
+        "benefit": "Smaller index, faster on subset"
+      },
+      {
+        "scenario": "Covering query (no collection scan)",
+        "query": "db.students.find({ major: 'CS' }, { major: 1, gpa: 1 })",
+        "index": "{ major: 1, gpa: 1 }",
+        "benefit": "All data from index, zero collection I/O"
+      },
+      {
+        "scenario": "Bulk operation on large collection",
+        "query": "db.students.updateMany({ age: { $gt: 25 } }, {...})",
+        "index": "{ age: 1 }",
+        "benefit": "Quick location of matching documents"
+      }
+    ]
+  },
+  "section_9_performance": {
+    "title": "Performance Considerations",
+    "index_benefits": {
+      "query_performance": {
+        "single_field": "5-10ms → 0.1ms (50-100x faster)",
+        "compound_index": "Supports multiple query patterns",
+        "range_queries": "Greatly improved with proper index"
+      }
+    },
+    "write_impact": {
+      "inserts": "Slower (must update all indexes)",
+      "updates": "Slower if indexed fields change",
+      "deletes": "Slower (must update indexes)",
+      "note": "Each index adds ~10-30% write overhead"
+    },
+    "memory_impact": {
+      "single_field_60docs": "~1-2KB per index",
+      "compound_index_60docs": "~2-4KB per index",
+      "large_collection": "Indexes can consume several GB"
+    },
+    "index_size_factors": {
+      "field_type": "String fields larger than numeric",
+      "cardinality": "Unique values increase size",
+      "selectivity": "High selectivity (many unique) = larger"
+    }
+  },
+  "section_10_best_practices": {
+    "practice_1_index_for_filters": {
+      "rule": "Index fields used in find() filters",
+      "good": "Query: find({ major: 'CS' }) → Index: { major: 1 }",
+      "avoid": "No index for frequently filtered fields",
+      "benefit": "Speeds up most common queries"
+    },
+    "practice_2_compound_index_order": {
+      "rule": "Order: equality, range, sort",
+      "query": "find({ major: 'CS', age: { $gt: 25 } }).sort({ gpa: -1 })",
+      "index": "{ major: 1, age: 1, gpa: -1 }",
+      "why": "Most efficient field ordering"
+    },
+    "practice_3_avoid_unnecessary": {
+      "rule": "Index only frequently queried fields",
+      "problem": "Too many indexes slow writes",
+      "solution": "Review slow queries, create targeted indexes"
+    },
+    "practice_4_use_partial_for_subsets": {
+      "rule": "Use partial index for document subsets",
+      "good": "Index { gpa: 1 } only for hasScholarship: true",
+      "benefit": "Smaller index, faster writes"
+    },
+    "practice_5_cover_queries": {
+      "rule": "Create covering index when possible",
+      "example": "Index { major: 1, gpa: 1 } covers find({ major }, { major, gpa })",
+      "benefit": "Zero collection reads"
+    },
+    "practice_6_monitor_indexes": {
+      "rule": "Regularly check index usage",
+      "check": "db.students.aggregate([{ $indexStats: {} }])",
+      "action": "Drop indexes with zero accesses"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_over_indexing": {
+      "mistake": "Creating too many indexes",
+      "problem": "Slow writes, memory bloat",
+      "solution": "Index only frequently queried fields"
+    },
+    "mistake_2_wrong_field_order": {
+      "mistake": "Compound index in wrong order",
+      "wrong": "Query: find({ gpa: 3.8, major: 'CS' }) vs Index: { major: 1, gpa: 1 }",
+      "impact": "Index still works but not optimally",
+      "right": "Match common query patterns"
+    },
+    "mistake_3_indexing_low_selectivity": {
+      "mistake": "Indexing boolean or few-value fields",
+      "problem": "Index returns 90% of collection (inefficient)",
+      "solution": "Combine with other fields in compound index"
+    },
+    "mistake_4_forgetting_id_index": {
+      "note": "_id index always exists and can't be removed",
+      "benefit": "Automatic, essential for primary key lookups"
+    },
+    "mistake_5_unique_without_sparse": {
+      "mistake": "Unique index allowing multiple nulls",
+      "problem": "Can't have two documents with null for optional field",
+      "solution": "Use { unique: true, sparse: true } for optional fields"
+    },
+    "mistake_6_no_index_monitoring": {
+      "mistake": "Never checking index usage",
+      "problem": "Unused indexes slow writes",
+      "solution": "Regularly review with $indexStats"
+    }
+  },
+  "section_12_monitoring": {
+    "title": "Index Monitoring & Maintenance",
+    "monitoring_examples": [
+      {
+        "task": "Check index statistics",
+        "command": "db.students.aggregate([{ $indexStats: {} }])",
+        "shows": "accesses, ops (operations), since (creation time)",
+        "action": "Drop indexes with 0 accesses"
+      },
+      {
+        "task": "Check query execution plan",
+        "command": "db.students.find({ major: 'CS' }).explain('executionStats')",
+        "shows": "indexName, docsScanned, keysScanned",
+        "good": "docsScanned ≈ docsReturned (efficient)"
+      },
+      {
+        "task": "Check index size",
+        "command": "db.students.stats().indexSizes",
+        "shows": "Size of each index in bytes",
+        "action": "Remove large unused indexes"
+      }
+    ]
+  },
+  "section_13_progression": {
+    "beginner": [
+      "Single field index on _id (automatic)",
+      "Create index on frequently queried fields",
+      "View indexes with getIndexes()",
+      "Drop unused indexes"
+    ],
+    "intermediate": [
+      "Compound indexes on multiple fields",
+      "Unique indexes for constraints",
+      "Sparse indexes for optional fields",
+      "Text indexes for search"
+    ],
+    "advanced": [
+      "Partial indexes on subsets",
+      "Covering indexes (no collection scan)",
+      "Index optimization strategies",
+      "Collation for language-specific sorting",
+      "Background index building"
+    ]
+  },
+  "summary": {
+    "index_types": [
+      "Single field - Basic queries",
+      "Compound - Multiple field filters",
+      "Unique - Constraint enforcement",
+      "Sparse - Optional fields",
+      "Text - Full-text search",
+      "TTL - Auto-expiration",
+      "Partial - Conditional indexing",
+      "Covering - Zero collection I/O"
+    ],
+    "key_concepts": [
+      "Indexes speed reads but slow writes",
+      "Index order matters for compound indexes",
+      "Use ESR rule: Equality-Sort-Range",
+      "Partial indexes save space and improve writes",
+      "Covering indexes eliminate collection scans",
+      "Monitor index usage regularly",
+      "Drop unused indexes for performance"
+    ],
+    "best_practice": "Index frequently queried fields, use compound indexes strategically, monitor usage, drop unused indexes",
+    "progression": "Beginner: Single field indexes → Intermediate: Compound, Unique, Text → Advanced: Partial, Covering, Optimization"
+  }
+}

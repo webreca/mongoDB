@@ -1,0 +1,154 @@
+{
+  "title": "MongoDB Geospatial Queries - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on location-based queries, distance calculations, and geospatial indexing",
+  "date": "2024-06-23",
+  "geospatial_overview": {
+    "definition": "Query documents based on geographic location (latitude/longitude coordinates)",
+    "concept": "Find nearby locations, within areas, and distance-based searches",
+    "purpose": [
+      "Find nearby locations (restaurants, stores, ATMs)",
+      "Query within geographic boundaries (city, region)",
+      "Calculate distances between points",
+      "Location-based recommendations",
+      "Geo-fencing applications",
+      "Map-based searches"
+    ],
+    "coordinate_systems": [
+      "GeoJSON (recommended) - standard format",
+      "Legacy coordinate pairs - deprecated"
+    ],
+    "key_operators": [
+      "$near - Find closest points within distance",
+      "$geoWithin - Find points inside polygon/sphere",
+      "$geoIntersects - Find intersecting geometries",
+      "$nearSphere - Nearest on sphere (Earth)"
+    ]
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Geospatial Fundamentals",
+    "concepts": [
+      {
+        "concept": "GeoJSON",
+        "description": "Standard geographic JSON format",
+        "point_format": "{ type: 'Point', coordinates: [longitude, latitude] }",
+        "note": "Longitude first, then latitude (opposite of common convention)"
+      },
+      {
+        "concept": "Coordinate System",
+        "description": "Geographic coordinate system (WGS84)",
+        "range": "Longitude: -180 to 180, Latitude: -90 to 90"
+      },
+      {
+        "concept": "2dsphere Index",
+        "description": "Index for geospatial queries on sphere",
+        "use": "For queries across Earth (realistic distance calculations)"
+      },
+      {
+        "concept": "2d Index",
+        "description": "Index for planar (flat) coordinates",
+        "use": "For flat grid-based systems (less common)"
+      }
+    ]
+  },
+  "section_2_beginner_geojson": {
+    "title": "BEGINNER: GeoJSON Format",
+    "types": [
+      {
+        "type": "Point",
+        "format": "{ type: 'Point', coordinates: [lon, lat] }",
+        "example": "{ type: 'Point', coordinates: [-122.419, 37.775] }",
+        "use": "Single location"
+      },
+      {
+        "type": "LineString",
+        "format": "{ type: 'LineString', coordinates: [[lon, lat], [lon, lat], ...] }",
+        "use": "Route or path"
+      },
+      {
+        "type": "Polygon",
+        "format": "{ type: 'Polygon', coordinates: [[[lon, lat], ..., [lon, lat]]] }",
+        "use": "Bounded area"
+      }
+    ]
+  },
+  "section_3_beginner_simple_queries": {
+    "title": "BEGINNER: Simple Geospatial Queries",
+    "beginner_examples": [
+      {
+        "title": "Find restaurants near location",
+        "setup": "db.restaurants.createIndex({ location: '2dsphere' })",
+        "query": "db.restaurants.find({\n  location: {\n    $near: {\n      $geometry: { type: 'Point', coordinates: [-122.419, 37.775] },\n      $maxDistance: 5000\n    }\n  }\n})",
+        "result": "Restaurants within 5km of coordinates",
+        "use_case": "Find nearby restaurants"
+      },
+      {
+        "title": "Find locations within area",
+        "query": "db.students.find({\n  location: {\n    $geoWithin: {\n      $geometry: {\n        type: 'Polygon',\n        coordinates: [[\n          [-122.45, 37.7],\n          [-122.45, 37.8],\n          [-122.4, 37.8],\n          [-122.4, 37.7],\n          [-122.45, 37.7]\n        ]]\n      }\n    }\n  }\n})",
+        "result": "Students within polygon area",
+        "use_case": "Find students in specific region"
+      }
+    ]
+  },
+  "section_4_intermediate_distances": {
+    "title": "INTERMEDIATE: Distance Calculations",
+    "intermediate_examples": [
+      {
+        "title": "Sort by distance",
+        "query": "db.restaurants.find({\n  location: {\n    $near: {\n      $geometry: { type: 'Point', coordinates: [-122.419, 37.775] }\n    }\n  }\n}).limit(10)",
+        "result": "10 closest restaurants (automatic distance sort)"
+      },
+      {
+        "title": "Calculate distance in aggregation",
+        "query": "db.restaurants.aggregate([\n  { $geoNear: {\n      near: { type: 'Point', coordinates: [-122.419, 37.775] },\n      distanceField: 'distance',\n      maxDistance: 10000,\n      spherical: true\n    }\n  },\n  { $limit: 5 }\n])"
+      }
+    ]
+  },
+  "section_5_advanced_complex": {
+    "title": "ADVANCED: Complex Geospatial Queries",
+    "advanced_examples": [
+      {
+        "title": "Multi-location search",
+        "description": "Find restaurants near multiple locations with aggregation"
+      },
+      {
+        "title": "Geofencing",
+        "description": "Detect when location enters/exits area using $geoIntersects"
+      }
+    ]
+  },
+  "section_6_best_practices": {
+    "practices": [
+      {
+        "practice": "Always use 2dsphere index",
+        "why": "Realistic Earth distance calculations"
+      },
+      {
+        "practice": "Remember coordinate order",
+        "why": "Longitude first, then latitude [lon, lat]"
+      },
+      {
+        "practice": "Specify maxDistance to limit results",
+        "why": "Prevents scanning entire collection"
+      }
+    ]
+  },
+  "section_7_common_mistakes": {
+    "mistakes": [
+      {
+        "mistake": "Latitude first, longitude second",
+        "problem": "Queries return wrong locations",
+        "fix": "Use [longitude, latitude]"
+      },
+      {
+        "mistake": "Missing 2dsphere index",
+        "problem": "Queries slow or error",
+        "fix": "createIndex({ location: '2dsphere' })"
+      },
+      {
+        "mistake": "No maxDistance specified",
+        "problem": "Slow queries scanning entire collection",
+        "fix": "Always include $maxDistance"
+      }
+    ]
+  }
+}

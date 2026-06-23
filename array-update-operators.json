@@ -1,0 +1,493 @@
+{
+  "title": "MongoDB Array Update Operators - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on $push, $pop, $pull, $addToSet operators for array manipulation",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "array_update_overview": {
+    "definition": "Array update operators modify array fields by adding, removing, or managing array elements",
+    "purpose": [
+      "Add elements to array",
+      "Remove elements from array",
+      "Remove first or last element",
+      "Add unique elements only",
+      "Manage nested array values",
+      "Control array duplication"
+    ],
+    "operators_covered": [
+      "$push - Add element to array",
+      "$pop - Remove first/last element",
+      "$pull - Remove matching elements",
+      "$addToSet - Add unique elements only"
+    ]
+  },
+  "section_1_beginner_push": {
+    "title": "BEGINNER: $PUSH Operator",
+    "definition": "$push adds one or more elements to array field",
+    "syntax": "{ $push: { arrayField: value } }",
+    "meaning": "Appends value to end of array; creates array if doesn't exist",
+    "beginner_examples": [
+      {
+        "title": "Add skill to skills array",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $push: { skills: 'Python' } })",
+        "before": "skills: ['JavaScript', 'MongoDB']",
+        "after": "skills: ['JavaScript', 'MongoDB', 'Python']",
+        "use_case": "Add new skill to student"
+      },
+      {
+        "title": "Add course to completed courses",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $push: { completedCourses: 'Data Structures' } })",
+        "before": "completedCourses: ['Algorithms', 'Databases']",
+        "after": "completedCourses: ['Algorithms', 'Databases', 'Data Structures']",
+        "use_case": "Track course completion"
+      },
+      {
+        "title": "Add to array that doesn't exist",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $push: { certifications: 'AWS' } })",
+        "before": "Field doesn't exist",
+        "after": "certifications: ['AWS']",
+        "use_case": "Create new array field"
+      },
+      {
+        "title": "Push multiple values",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $push: { skills: { $each: ['Java', 'C++', 'Go'] } } })",
+        "before": "skills: ['JavaScript']",
+        "after": "skills: ['JavaScript', 'Java', 'C++', 'Go']",
+        "use_case": "Add multiple skills at once"
+      }
+    ],
+    "important_note": "Creates array if field doesn't exist; always appends to end"
+  },
+  "section_2_beginner_pop": {
+    "title": "BEGINNER: $POP Operator",
+    "definition": "$pop removes first or last element from array",
+    "syntax": "{ $pop: { arrayField: 1 or -1 } }",
+    "meaning": "1 = remove last element; -1 = remove first element",
+    "beginner_examples": [
+      {
+        "title": "Remove last skill",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $pop: { skills: 1 } })",
+        "before": "skills: ['JavaScript', 'MongoDB', 'Python']",
+        "after": "skills: ['JavaScript', 'MongoDB']",
+        "use_case": "Remove recently added skill"
+      },
+      {
+        "title": "Remove first course",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $pop: { completedCourses: -1 } })",
+        "before": "completedCourses: ['Algorithms', 'Databases', 'Structures']",
+        "after": "completedCourses: ['Databases', 'Structures']",
+        "use_case": "Remove oldest course"
+      },
+      {
+        "title": "Pop from single-element array",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $pop: { certifications: 1 } })",
+        "before": "certifications: ['AWS']",
+        "after": "certifications: []",
+        "use_case": "Remove only element"
+      }
+    ],
+    "important_note": "Only removes one element; array becomes empty if single element"
+  },
+  "section_3_beginner_pull": {
+    "title": "BEGINNER: $PULL Operator",
+    "definition": "$pull removes ALL elements matching condition from array",
+    "syntax": "{ $pull: { arrayField: value } }",
+    "meaning": "Removes all occurrences of value from array",
+    "beginner_examples": [
+      {
+        "title": "Remove specific skill",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $pull: { skills: 'Python' } })",
+        "before": "skills: ['JavaScript', 'Python', 'MongoDB', 'Python']",
+        "after": "skills: ['JavaScript', 'MongoDB']",
+        "use_case": "Remove skill (removes all occurrences)"
+      },
+      {
+        "title": "Remove low score",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $pull: { testScores: 45 } })",
+        "before": "testScores: [85, 45, 92, 45, 88]",
+        "after": "testScores: [85, 92, 88]",
+        "use_case": "Clean up failed scores"
+      },
+      {
+        "title": "Remove with condition",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $pull: { testScores: { $lt: 50 } } })",
+        "before": "testScores: [85, 45, 92, 48, 88]",
+        "after": "testScores: [85, 92, 88]",
+        "use_case": "Remove all failing scores"
+      }
+    ],
+    "important_note": "Removes ALL matching elements, not just first one"
+  },
+  "section_4_beginner_addtoset": {
+    "title": "BEGINNER: $ADDTOSET Operator",
+    "definition": "$addToSet adds element to array only if it doesn't already exist",
+    "syntax": "{ $addToSet: { arrayField: value } }",
+    "meaning": "Prevents duplicates; element added only if unique",
+    "beginner_examples": [
+      {
+        "title": "Add unique skill",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $addToSet: { skills: 'Python' } })",
+        "before": "skills: ['JavaScript', 'Python']",
+        "after": "skills: ['JavaScript', 'Python'] (no change, already exists)",
+        "use_case": "Add skill only if new"
+      },
+      {
+        "title": "Add new skill when not present",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $addToSet: { skills: 'Rust' } })",
+        "before": "skills: ['JavaScript', 'Python']",
+        "after": "skills: ['JavaScript', 'Python', 'Rust']",
+        "use_case": "Add new skill without duplicates"
+      },
+      {
+        "title": "Add multiple unique elements",
+        "query": "db.students.updateOne({ studentId: '20260001' }, { $addToSet: { skills: { $each: ['Go', 'TypeScript', 'Go'] } } })",
+        "before": "skills: ['JavaScript']",
+        "after": "skills: ['JavaScript', 'Go', 'TypeScript'] (Go appears once)",
+        "use_case": "Add multiple with deduplication"
+      }
+    ],
+    "important_note": "Element must be completely unique; no duplicates allowed"
+  },
+  "section_5_intermediate_nested_arrays": {
+    "title": "INTERMEDIATE: Update Nested Array Elements",
+    "definition": "Updating array elements with conditions or nested documents",
+    "syntax": "{ $push: { 'arrayField.$[identifier].nested': value } }",
+    "intermediate_examples": [
+      {
+        "title": "Push to nested array with positional operator",
+        "query": "db.students.updateOne(\n  { studentId: '20260001', 'courses._id': ObjectId('abc') },\n  { $push: { 'courses.$.grades': 92 } }\n)",
+        "before": "courses: [{ _id: ObjectId('abc'), grades: [85, 88] }]",
+        "after": "courses: [{ _id: ObjectId('abc'), grades: [85, 88, 92] }]",
+        "use_case": "Add grade to specific course"
+      },
+      {
+        "title": "Pull from nested array element",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $pull: { 'courses.$[].tags': 'outdated' } }\n)",
+        "before": "courses: [{ tags: ['outdated', 'beginner'] }, { tags: ['advanced'] }]",
+        "after": "courses: [{ tags: ['beginner'] }, { tags: ['advanced'] }]",
+        "use_case": "Remove tag from all courses"
+      },
+      {
+        "title": "Pop from nested document array",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $pop: { 'attemptHistory.$.scores': 1 } }\n)",
+        "before": "attemptHistory: [{ scores: [45, 50, 55] }]",
+        "after": "attemptHistory: [{ scores: [45, 50] }]",
+        "use_case": "Remove latest attempt score"
+      }
+    ]
+  },
+  "section_6_intermediate_with_condition": {
+    "title": "INTERMEDIATE: Array Updates with Conditions",
+    "intermediate_examples": [
+      {
+        "title": "Push with sort limit",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $push: { scores: { $each: [92], $sort: -1, $slice: -5 } } }\n)",
+        "behavior": "Adds 92, keeps only top 5 scores (sorted descending)",
+        "use_case": "Maintain top 5 scores only"
+      },
+      {
+        "title": "Pull multiple types",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $pull: { completedCourses: { status: 'dropped' } } }\n)",
+        "before": "completedCourses: [{ name: 'Math', status: 'passed' }, { name: 'Physics', status: 'dropped' }]",
+        "after": "completedCourses: [{ name: 'Math', status: 'passed' }]",
+        "use_case": "Remove dropped courses"
+      },
+      {
+        "title": "AddToSet with complex object",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $addToSet: { certificates: { name: 'AWS', year: 2024 } } }\n)",
+        "behavior": "Adds certificate only if exact match doesn't exist",
+        "use_case": "Prevent duplicate certifications"
+      }
+    ]
+  },
+  "section_7_advanced_bulk_arrays": {
+    "title": "ADVANCED: Bulk Array Operations",
+    "advanced_examples": [
+      {
+        "title": "Update many with array push",
+        "query": "db.students.updateMany(\n  { major: 'Data Science' },\n  { $addToSet: { tags: 'DataScienceMajor' } }\n)",
+        "behavior": "Adds tag to all Data Science students (prevents duplicate)",
+        "use_case": "Bulk tagging of students"
+      },
+      {
+        "title": "Remove and add simultaneously",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $pull: { skills: 'Python 2' }, $addToSet: { skills: 'Python 3' } }\n)",
+        "before": "skills: ['JavaScript', 'Python 2', 'Go']",
+        "after": "skills: ['JavaScript', 'Go', 'Python 3']",
+        "use_case": "Migrate skill versions"
+      },
+      {
+        "title": "Complex multi-operator update",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $push: { activityLog: { action: 'login', date: new Date() } }, $pop: { oldEvents: -1 } }\n)",
+        "use_case": "Log activity and clean old events"
+      }
+    ]
+  },
+  "section_8_advanced_filtered_updates": {
+    "title": "ADVANCED: Filtered Array Element Updates",
+    "advanced_examples": [
+      {
+        "title": "Update array element by filter",
+        "query": "db.students.updateOne(\n  { studentId: '20260001', 'enrollments.courseId': 'CS101' },\n  { $push: { 'enrollments.$.grades': 95 } }\n)",
+        "use_case": "Add grade to specific course enrollment"
+      },
+      {
+        "title": "Array element update with array filters",
+        "query": "db.students.updateOne(\n  { studentId: '20260001' },\n  { $pull: { 'grades.$[elem]': { $lt: 60 } } },\n  { arrayFilters: [{ 'elem': { $lt: 60 } }] }\n)",
+        "use_case": "Remove failing grades from array"
+      },
+      {
+        "title": "Push to multiple matching array elements",
+        "query": "db.students.updateMany(\n  { 'projects.status': 'active' },\n  { $push: { 'projects.$[elem].updates': { status: 'in progress', date: new Date() } } },\n  { arrayFilters: [{ 'elem.status': 'active' }] }\n)",
+        "use_case": "Add update to all active projects"
+      }
+    ]
+  },
+  "section_9_use_cases": {
+    "beginner": [
+      {
+        "operator": "$push",
+        "use_case": "Add skill to portfolio",
+        "query": "{ $push: { skills: 'Python' } }",
+        "example": "Learning new programming language"
+      },
+      {
+        "operator": "$pop",
+        "use_case": "Remove last attempt",
+        "query": "{ $pop: { attempts: 1 } }",
+        "example": "Undo recent action"
+      },
+      {
+        "operator": "$pull",
+        "use_case": "Remove failed test score",
+        "query": "{ $pull: { scores: 35 } }",
+        "example": "Clean up low scores"
+      },
+      {
+        "operator": "$addToSet",
+        "use_case": "Add course (no duplicates)",
+        "query": "{ $addToSet: { courses: 'Math101' } }",
+        "example": "Enroll in course"
+      }
+    ],
+    "intermediate": [
+      {
+        "operator": "$push + $each",
+        "use_case": "Add multiple values",
+        "query": "{ $push: { skills: { $each: ['Java', 'Kotlin'] } } }",
+        "example": "Add multiple skills simultaneously"
+      },
+      {
+        "operator": "$pull + condition",
+        "use_case": "Remove by condition",
+        "query": "{ $pull: { scores: { $lt: 50 } } }",
+        "example": "Remove all failing scores"
+      },
+      {
+        "operator": "$addToSet + $each",
+        "use_case": "Add multiple unique values",
+        "query": "{ $addToSet: { tags: { $each: ['new', 'trending'] } } }",
+        "example": "Add multiple tags without duplication"
+      },
+      {
+        "operator": "Nested array update",
+        "use_case": "Modify nested array element",
+        "query": "{ $push: { 'courses.$.grades': 92 } }",
+        "example": "Add grade to specific course"
+      }
+    ],
+    "advanced": [
+      {
+        "operator": "Complex filtered pull",
+        "use_case": "Remove matching objects",
+        "query": "{ $pull: { courses: { status: 'dropped' } } }",
+        "example": "Remove all dropped courses"
+      },
+      {
+        "operator": "$push + $sort + $slice",
+        "use_case": "Maintain top N values",
+        "query": "{ $push: { scores: { $each: [95], $sort: -1, $slice: -3 } } }",
+        "example": "Keep only top 3 scores"
+      },
+      {
+        "operator": "Array filters update",
+        "use_case": "Update multiple array elements by condition",
+        "query": "db.collection.updateOne({...}, {...}, { arrayFilters: [{...}] })",
+        "example": "Update all active items in array"
+      },
+      {
+        "operator": "Bulk array operations",
+        "use_case": "Update arrays across many documents",
+        "query": "db.collection.updateMany({ filter }, { $push: {...} })",
+        "example": "Add tag to all matching students"
+      }
+    ]
+  },
+  "section_10_performance": {
+    "title": "Performance Considerations",
+    "push_performance": {
+      "description": "$push is very efficient",
+      "note": "Appends to array end, minimal overhead",
+      "use": "Preferred for logging, activity tracking"
+    },
+    "pop_performance": {
+      "description": "$pop is very fast",
+      "note": "Only removes first/last, no search needed",
+      "use": "Good for LIFO/FIFO patterns"
+    },
+    "pull_performance": {
+      "description": "$pull requires full array scan",
+      "note": "Slower with large arrays or complex conditions",
+      "use": "Use indexed conditions when possible"
+    },
+    "addtoset_performance": {
+      "description": "$addToSet slower than $push",
+      "note": "Requires checking all elements for uniqueness",
+      "use": "Necessary for preventing duplicates"
+    },
+    "array_size_impact": {
+      "tip": "Large arrays impact performance",
+      "solution": "Use $slice to limit array size",
+      "example": "$push with $slice keeps N most recent items"
+    },
+    "bulk_operations": {
+      "tip": "Use updateMany for multiple documents",
+      "benefit": "Single network request vs multiple"
+    }
+  },
+  "section_11_best_practices": {
+    "practice_1_choose_operator": {
+      "rule": "Use correct operator for intent",
+      "push": "Adding items - { $push: { field: value } }",
+      "addToSet": "Adding unique items - { $addToSet: { field: value } }",
+      "pull": "Removing by value - { $pull: { field: value } }",
+      "pop": "Removing first/last - { $pop: { field: 1 } }"
+    },
+    "practice_2_array_size": {
+      "rule": "Limit array size with $slice",
+      "good": "{ $push: { scores: { $each: [95], $slice: -10 } } }",
+      "why": "Prevents unbounded array growth",
+      "example": "Keep only 10 latest scores"
+    },
+    "practice_3_use_addtoset": {
+      "rule": "Use $addToSet for preventing duplicates",
+      "good": "{ $addToSet: { tags: 'important' } }",
+      "avoid": "{ $push: { tags: 'important' } } (could duplicate)",
+      "why": "Guarantees no duplicate entries"
+    },
+    "practice_4_nested_updates": {
+      "rule": "Use positional operator $ for nested array updates",
+      "good": "{ $push: { 'courses.$.grades': 92 } }",
+      "why": "Targets specific array element"
+    },
+    "practice_5_bulk_operations": {
+      "rule": "Use updateMany for bulk array updates",
+      "good": "db.collection.updateMany({ filter }, { $push: {...} })",
+      "avoid": "Loop with updateOne",
+      "why": "Single operation vs multiple round-trips"
+    }
+  },
+  "section_12_common_mistakes": {
+    "mistake_1_push_vs_addtoset": {
+      "mistake": "Using $push when should use $addToSet",
+      "problem": "Creates duplicate values in array",
+      "solution": "Use $addToSet if duplicates unwanted"
+    },
+    "mistake_2_pop_multiple": {
+      "mistake": "Trying to pop multiple elements",
+      "wrong": "{ $pop: { array: 5 } }",
+      "right": "$pop only removes 1 element, loop for multiple",
+      "solution": "Use $slice in $push to limit size"
+    },
+    "mistake_3_pull_doesnt_exist": {
+      "mistake": "Pulling value that doesn't exist",
+      "problem": "No error, but no elements removed",
+      "solution": "Verify array contents before pull"
+    },
+    "mistake_4_nested_syntax": {
+      "mistake": "Wrong syntax for nested array updates",
+      "wrong": "{ $push: { courses[0].grades: 92 } }",
+      "right": "{ $push: { 'courses.$.grades': 92 } }",
+      "solution": "Use dot notation and $"
+    },
+    "mistake_5_unbounded_growth": {
+      "mistake": "Array grows infinitely with $push",
+      "problem": "Document size increases, performance degrades",
+      "solution": "Use $slice to cap array size"
+    },
+    "mistake_6_addtoset_objects": {
+      "mistake": "AddToSet with object references",
+      "problem": "Objects compared by value, not reference",
+      "solution": "Ensure complete object match for deduplication"
+    }
+  },
+  "section_13_comparison_operators": {
+    "comparison": [
+      {
+        "operator": "$push",
+        "adds": "Element to array",
+        "allows_duplicates": true,
+        "speed": "Very fast",
+        "use_when": "Adding items (duplicates OK)"
+      },
+      {
+        "operator": "$addToSet",
+        "adds": "Unique element to array",
+        "allows_duplicates": false,
+        "speed": "Slower (checks uniqueness)",
+        "use_when": "Preventing duplicates"
+      },
+      {
+        "operator": "$pull",
+        "removes": "All matching elements",
+        "matches": "By value or condition",
+        "speed": "Slow (full scan)",
+        "use_when": "Removing by value"
+      },
+      {
+        "operator": "$pop",
+        "removes": "First or last element",
+        "matches": "Position only (-1 or 1)",
+        "speed": "Very fast",
+        "use_when": "FIFO/LIFO patterns"
+      }
+    ]
+  },
+  "section_14_progression": {
+    "beginner": [
+      "$push to add elements",
+      "$pop to remove first/last",
+      "$pull to remove specific value",
+      "$addToSet to prevent duplicates"
+    ],
+    "intermediate": [
+      "$push with $each for multiple additions",
+      "$pull with conditions",
+      "$addToSet with $each",
+      "Nested array element updates with $"
+    ],
+    "advanced": [
+      "$push with $sort and $slice",
+      "Complex $pull conditions",
+      "Array filters for filtered updates",
+      "Bulk operations across documents"
+    ]
+  },
+  "summary": {
+    "operators": [
+      "$push - Add element to array",
+      "$pop - Remove first/last element",
+      "$pull - Remove matching elements",
+      "$addToSet - Add unique element only"
+    ],
+    "key_concepts": [
+      "$push appends to array; allows duplicates",
+      "$pop removes position-based (first/last)",
+      "$pull removes all matching by value/condition",
+      "$addToSet adds only if unique",
+      "Use $ for positional updates in nested arrays",
+      "Use $slice to limit array size"
+    ],
+    "best_practice": "Use $addToSet for unique values, $push for ordered data, $pull for conditional removal, $pop for LIFO patterns",
+    "progression": "Beginner: $push/$pop/$pull/$addToSet → Intermediate: with conditions and nesting → Advanced: bulk operations and array filters"
+  }
+}

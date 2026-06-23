@@ -1,0 +1,453 @@
+{
+  "title": "MongoDB $project Operator - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on $project for field selection, transformation, and computation",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "project_overview": {
+    "definition": "$project reshapes documents by selecting, renaming, hiding, and computing fields",
+    "concept": "Transform documents at any stage in aggregation pipeline",
+    "purpose": [
+      "Select specific fields (reduce output size)",
+      "Hide sensitive fields",
+      "Rename fields",
+      "Compute new fields",
+      "Transform values",
+      "Combine multiple fields",
+      "Conditional field inclusion"
+    ],
+    "use_in_pipeline": "Most common aggregation stage after $match",
+    "project_types": [
+      "Simple field selection (1/0)",
+      "Field renaming (alias: '$field')",
+      "Computed fields (expressions)",
+      "Array transformations",
+      "Conditional fields ($cond, $if-then-else)"
+    ]
+  },
+  "section_1_beginner_concept": {
+    "title": "BEGINNER: Understanding $project",
+    "definition": "$project shapes output by specifying which fields to include/exclude and how to transform them",
+    "syntax": "{ $project: { field1: 1, field2: 0, newField: expression, renamedField: '$oldField' } }",
+    "values": [
+      "1 = INCLUDE field",
+      "0 = EXCLUDE field",
+      "expression = computed/transformed value",
+      "'$fieldName' = reference to existing field"
+    ],
+    "behavior": [
+      "_id is included by default (unless explicitly excluded)",
+      "Fields with 1 are included; fields with 0 are excluded",
+      "Expressions create computed fields",
+      "Can't mix inclusion (1) and exclusion (0) except for _id"
+    ]
+  },
+  "section_2_beginner_selection": {
+    "title": "BEGINNER: Field Selection (Include/Exclude)",
+    "beginner_examples": [
+      {
+        "title": "Include specific fields",
+        "query": "db.students.aggregate([\n  { $project: { name: 1, gpa: 1, major: 1 } }\n])",
+        "input": "{ _id, studentId, name, age, gpa, major, skills, ... }",
+        "output": "{ _id, name, gpa, major }",
+        "note": "_id included by default",
+        "use_case": "Show only needed fields"
+      },
+      {
+        "title": "Exclude sensitive fields",
+        "query": "db.students.aggregate([\n  { $project: { enrollmentDetails: 0, contactInfo: 0, ssn: 0 } }\n])",
+        "result": "All fields except enrollmentDetails, contactInfo, ssn",
+        "use_case": "Hide private information"
+      },
+      {
+        "title": "Exclude _id",
+        "query": "db.students.aggregate([\n  { $project: { _id: 0, name: 1, gpa: 1 } }\n])",
+        "result": "Only name and gpa (no _id)",
+        "use_case": "Clean API response"
+      },
+      {
+        "title": "Include all except one",
+        "query": "db.students.aggregate([\n  { $project: { enrollmentDetails: 0 } }\n])",
+        "result": "All fields EXCEPT enrollmentDetails",
+        "note": "When excluding, _id still included unless explicitly 0",
+        "use_case": "Remove large field"
+      }
+    ],
+    "important_note": "Can't mix inclusion (1) and exclusion (0) except for _id"
+  },
+  "section_3_beginner_renaming": {
+    "title": "BEGINNER: Renaming Fields",
+    "definition": "Change field name in output without changing data",
+    "syntax": "{ $project: { newName: '$oldField' } }",
+    "beginner_examples": [
+      {
+        "title": "Rename single field",
+        "query": "db.students.aggregate([\n  { $project: { studentName: '$name', gradePointAverage: '$gpa' } }\n])",
+        "before": "{ name: 'Alice', gpa: 3.85 }",
+        "after": "{ studentName: 'Alice', gradePointAverage: 3.85 }",
+        "use_case": "API response naming conventions"
+      },
+      {
+        "title": "Rename nested field",
+        "query": "db.students.aggregate([\n  { $project: { 'contact.phone': '$phone', 'contact.email': '$email' } }\n])",
+        "note": "Creates nested structure in output",
+        "use_case": "Restructure document"
+      },
+      {
+        "title": "Rename with selection",
+        "query": "db.students.aggregate([\n  { $project: { id: '$studentId', fullName: '$name', academicGPA: '$gpa' } }\n])",
+        "result": "Selected fields with new names",
+        "use_case": "Transform schema for output"
+      }
+    ]
+  },
+  "section_4_intermediate_computed": {
+    "title": "INTERMEDIATE: Computed Fields",
+    "definition": "Create new fields using expressions and calculations",
+    "syntax": "{ $project: { newField: expression } }",
+    "intermediate_examples": [
+      {
+        "title": "Simple arithmetic",
+        "query": "db.students.aggregate([\n  { $project: { name: 1, gpa: 1, gpaPercent: { $multiply: ['$gpa', 100] } } }\n])",
+        "output": "{ name: 'Alice', gpa: 3.85, gpaPercent: 385 }",
+        "use_case": "Convert to percentage"
+      },
+      {
+        "title": "String concatenation",
+        "query": "db.students.aggregate([\n  { $project: {\n      fullInfo: { $concat: ['$name', ' - ', '$major'] },\n      age: 1\n    }\n  }\n])",
+        "output": "{ fullInfo: 'Alice - Computer Science', age: 22 }",
+        "use_case": "Combine fields for display"
+      },
+      {
+        "title": "String operations",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      nameUpper: { $toUpper: '$name' },\n      nameLower: { $toLower: '$name' },\n      nameLength: { $strLenCP: '$name' }\n    }\n  }\n])",
+        "use_case": "String transformations"
+      },
+      {
+        "title": "Math operations",
+        "query": "db.students.aggregate([\n  { $project: {\n      gpa: 1,\n      scaled: { $add: [{ $multiply: ['$gpa', 10] }, 5] },\n      divided: { $divide: ['$gpa', 4.0] },\n      rounded: { $round: ['$gpa', 1] }\n    }\n  }\n])",
+        "use_case": "Numeric calculations"
+      }
+    ]
+  },
+  "section_5_intermediate_conditional": {
+    "title": "INTERMEDIATE: Conditional Fields",
+    "definition": "Include fields or compute values based on conditions",
+    "syntax": "{ $project: { field: { $cond: [condition, trueValue, falseValue] } } }",
+    "intermediate_examples": [
+      {
+        "title": "Conditional field inclusion",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      gpa: 1,\n      performance: { $cond: [{ $gte: ['$gpa', 3.8] }, 'Excellent', { $cond: [{ $gte: ['$gpa', 3.5] }, 'Good', 'Fair'] }] }\n    }\n  }\n])",
+        "output": "{ name: 'Alice', gpa: 3.85, performance: 'Excellent' }",
+        "use_case": "Grade categorization"
+      },
+      {
+        "title": "Conditional with $gte, $lt",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      ageGroup: { $cond: [{ $lt: ['$age', 25] }, 'Young', 'Mature'] }\n    }\n  }\n])",
+        "use_case": "Categorization logic"
+      },
+      {
+        "title": "Include field conditionally",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      gpa: 1,\n      scholarship: { $cond: [{ $exists: ['$scholarshipDetails.amount'] }, '$scholarshipDetails.amount', null] }\n    }\n  }\n])",
+        "use_case": "Optional field display"
+      }
+    ]
+  },
+  "section_6_intermediate_arrays": {
+    "title": "INTERMEDIATE: Array Transformations",
+    "definition": "Project and transform array fields",
+    "intermediate_examples": [
+      {
+        "title": "Project array elements",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      skills: 1,\n      skillCount: { $size: '$skills' },\n      firstSkill: { $arrayElemAt: ['$skills', 0] }\n    }\n  }\n])",
+        "use_case": "Array operations"
+      },
+      {
+        "title": "Filter array",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      skills: { $filter: { input: '$skills', as: 'skill', cond: { $eq: ['$$skill', 'Python'] } } }\n    }\n  }\n])",
+        "use_case": "Select specific array elements"
+      },
+      {
+        "title": "Map array elements",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      skills: { $map: { input: '$skills', as: 'skill', in: { $toUpper: '$$skill' } } }\n    }\n  }\n])",
+        "use_case": "Transform all array elements"
+      }
+    ]
+  },
+  "section_7_advanced_complex": {
+    "title": "ADVANCED: Complex Projections",
+    "advanced_examples": [
+      {
+        "title": "Nested object creation",
+        "query": "db.students.aggregate([\n  { $project: {\n      contact: {\n        name: '$name',\n        phone: '$phone',\n        email: '$email'\n      },\n      academic: {\n        gpa: '$gpa',\n        major: '$major',\n        performance: { $cond: [{ $gte: ['$gpa', 3.8] }, 'top', 'regular'] }\n      }\n    }\n  }\n])",
+        "result": "Nested object structure",
+        "use_case": "Restructure document hierarchy"
+      },
+      {
+        "title": "Complex conditional logic",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      category: {\n        $switch: {\n          branches: [\n            { case: { $gte: ['$gpa', 3.8] }, then: 'Honors' },\n            { case: { $gte: ['$gpa', 3.5] }, then: 'Dean' },\n            { case: { $gte: ['$gpa', 3.0] }, then: 'Good' }\n          ],\n          default: 'Standard'\n        }\n      }\n    }\n  }\n])",
+        "use_case": "Multi-condition branching"
+      },
+      {
+        "title": "Type conversion",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      gpa: { $toString: '$gpa' },\n      age: { $toInt: '$age' },\n      enrollmentDate: { $toDate: '$enrollmentDate' }\n    }\n  }\n])",
+        "use_case": "Data type conversion"
+      },
+      {
+        "title": "Date operations",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      enrollmentYear: { $year: '$enrollmentDate' },\n      enrollmentMonth: { $month: '$enrollmentDate' },\n      yearsEnrolled: { $divide: [{ $subtract: [new Date(), '$enrollmentDate'] }, 1000 * 60 * 60 * 24 * 365] }\n    }\n  }\n])",
+        "use_case": "Date extraction and calculations"
+      }
+    ]
+  },
+  "section_8_advanced_multilevel": {
+    "title": "ADVANCED: Multi-level Nesting & Dynamic Fields",
+    "advanced_examples": [
+      {
+        "title": "Deep nested restructuring",
+        "query": "db.students.aggregate([\n  { $project: {\n      profile: {\n        personal: {\n          name: '$name',\n          age: '$age',\n          major: '$major'\n        },\n        academic: {\n          gpa: '$gpa',\n          enrollment: { $cond: [{ $gt: [{ $size: '$enrollments' }, 0] }, true, false] }\n        }\n      }\n    }\n  }\n])",
+        "result": "Multi-level nested structure",
+        "use_case": "Complex object restructuring"
+      },
+      {
+        "title": "Array of objects from fields",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      summary: [\n        { key: 'gpa', value: '$gpa' },\n        { key: 'major', value: '$major' },\n        { key: 'age', value: '$age' }\n      ]\n    }\n  }\n])",
+        "result": "Array of key-value pairs",
+        "use_case": "Flexible data representation"
+      }
+    ]
+  },
+  "section_9_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Select specific fields",
+        "example": "Show only name, gpa, major",
+        "pattern": "{ $project: { name: 1, gpa: 1, major: 1 } }"
+      },
+      {
+        "use_case": "Hide sensitive data",
+        "example": "Exclude ssn, contactInfo",
+        "pattern": "{ $project: { ssn: 0, contactInfo: 0 } }"
+      },
+      {
+        "use_case": "Rename field",
+        "example": "name → studentName",
+        "pattern": "{ $project: { studentName: '$name' } }"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Compute new field",
+        "example": "GPA percentage: gpa * 100",
+        "pattern": "{ $project: { gpaPercent: { $multiply: ['$gpa', 100] } } }"
+      },
+      {
+        "use_case": "Concatenate strings",
+        "example": "Combine name and major",
+        "pattern": "{ $project: { info: { $concat: ['$name', ' - ', '$major'] } } }"
+      },
+      {
+        "use_case": "Conditional field",
+        "example": "Grade: A (3.8+), B (3.5+), C (other)",
+        "pattern": "{ $project: { grade: { $cond: [...] } } }"
+      },
+      {
+        "use_case": "Array operations",
+        "example": "Count skills, get first skill",
+        "pattern": "{ $project: { skillCount: { $size: '$skills' } } }"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Nested object creation",
+        "example": "Group fields into contact, academic objects",
+        "pattern": "{ $project: { contact: { name: '$name', phone: '$phone' } } }"
+      },
+      {
+        "use_case": "Complex conditions",
+        "example": "Multi-branch categorization (switch/cond)",
+        "pattern": "{ $project: { category: { $switch: { branches: [...] } } } }"
+      },
+      {
+        "use_case": "Type conversion",
+        "example": "String to number, date operations",
+        "pattern": "{ $project: { num: { $toInt: '$str' } } }"
+      },
+      {
+        "use_case": "Multi-stage transformation",
+        "example": "Restructure entire document",
+        "pattern": "{ $project: { profile: { personal: {...}, academic: {...} } } }"
+      }
+    ]
+  },
+  "section_10_performance": {
+    "title": "Performance Considerations",
+    "field_selection": {
+      "benefit": "Early projection reduces data through pipeline",
+      "when": "Place after $match to reduce bytes",
+      "impact": "Faster processing for subsequent stages"
+    },
+    "computed_fields": {
+      "cost": "Expression evaluation has overhead",
+      "simple": "Basic operations like $multiply are very fast",
+      "complex": "Nested conditions and multiple operations slower",
+      "recommendation": "Move complex logic close to end if possible"
+    },
+    "array_operations": {
+      "note": "$filter, $map must iterate array",
+      "large_arrays": "Can be slow with large arrays",
+      "alternative": "Consider $unwind if array processing intensive"
+    }
+  },
+  "section_11_best_practices": {
+    "practice_1_early_selection": {
+      "rule": "Project early to remove unwanted fields",
+      "good": "[$match, $project, $group]",
+      "avoid": "[$match, $group, $project]",
+      "why": "Fewer fields through pipeline = faster"
+    },
+    "practice_2_include_id_strategically": {
+      "rule": "Exclude _id when not needed",
+      "good": "{ $project: { _id: 0, name: 1 } }",
+      "why": "Smaller output, cleaner API"
+    },
+    "practice_3_meaningful_names": {
+      "rule": "Rename for clarity and consistency",
+      "good": "{ studentName: '$name' }",
+      "why": "Clear intent, better for APIs"
+    },
+    "practice_4_avoid_unnecessary_computation": {
+      "rule": "Only compute needed fields",
+      "avoid": "{ $project: { allFields: 1, computed1: {...}, computed2: {...}, ...20 more... } }",
+      "solution": "Compute only required fields"
+    },
+    "practice_5_clear_structure": {
+      "rule": "Use nested objects for logical grouping",
+      "good": "{ contact: { name, phone }, academic: { gpa, major } }",
+      "why": "Organized, hierarchical output"
+    }
+  },
+  "section_12_common_mistakes": {
+    "mistake_1_mixing_include_exclude": {
+      "mistake": "Mix 1 and 0 (except for _id)",
+      "wrong": "{ name: 1, age: 0, gpa: 1 }",
+      "right": "{ name: 1, gpa: 1 } or { age: 0, phone: 0 }",
+      "impact": "Error or unexpected behavior"
+    },
+    "mistake_2_forgetting_dollar": {
+      "mistake": "Reference field without $",
+      "wrong": "{ studentName: name }",
+      "right": "{ studentName: '$name' }",
+      "impact": "Uses literal string instead of field value"
+    },
+    "mistake_3_wrong_operators": {
+      "mistake": "Using query operators instead of aggregation operators",
+      "wrong": "{ $gt: ['$gpa', 3.8] } in $project",
+      "right": "Use { $gte: ['$gpa', 3.8] } or similar aggregation operators"
+    },
+    "mistake_4_nested_syntax": {
+      "mistake": "Wrong nested object syntax",
+      "wrong": "{ contact.name: '$name' }",
+      "right": "{ contact: { name: '$name' } }",
+      "impact": "Creates dot-notation field instead of nested object"
+    },
+    "mistake_5_array_operations": {
+      "mistake": "Using wrong array operator",
+      "wrong": "{ $size: '$skills' } outside of project context",
+      "right": "{ skillCount: { $size: '$skills' } }",
+      "impact": "Syntax error"
+    },
+    "mistake_6_performance": {
+      "mistake": "Heavy computation on large arrays",
+      "problem": "$filter/$map on 1000-element arrays",
+      "solution": "Use $unwind first, or filter earlier in pipeline"
+    }
+  },
+  "section_13_operators_reference": {
+    "title": "Common $project Operators",
+    "string_operators": [
+      "$concat - Concatenate strings",
+      "$toUpper - Convert to uppercase",
+      "$toLower - Convert to lowercase",
+      "$substr - Extract substring",
+      "$strLenCP - String length",
+      "$split - Split string into array"
+    ],
+    "math_operators": [
+      "$add - Addition",
+      "$subtract - Subtraction",
+      "$multiply - Multiplication",
+      "$divide - Division",
+      "$round - Round to decimal places",
+      "$ceil - Round up",
+      "$floor - Round down"
+    ],
+    "date_operators": [
+      "$year - Extract year",
+      "$month - Extract month",
+      "$dayOfMonth - Extract day",
+      "$hour - Extract hour",
+      "$dateToString - Format date as string"
+    ],
+    "array_operators": [
+      "$size - Array length",
+      "$arrayElemAt - Get element at index",
+      "$filter - Filter array elements",
+      "$map - Transform array elements",
+      "$concat - Join arrays"
+    ],
+    "conditional_operators": [
+      "$cond - If-then-else",
+      "$switch - Multi-branch conditional",
+      "$ifNull - Handle null values"
+    ],
+    "type_operators": [
+      "$type - Get field type",
+      "$toString - Convert to string",
+      "$toInt - Convert to integer",
+      "$toDouble - Convert to double",
+      "$toDate - Convert to date"
+    ]
+  },
+  "section_14_progression": {
+    "beginner": [
+      "Include/exclude fields (1/0)",
+      "Rename fields with $fieldName",
+      "Hide _id",
+      "Basic field selection"
+    ],
+    "intermediate": [
+      "Computed fields with expressions",
+      "String operations ($concat, $toUpper)",
+      "Math operations ($multiply, $divide)",
+      "Conditional fields ($cond)",
+      "Array operations ($size, $arrayElemAt)"
+    ],
+    "advanced": [
+      "Nested object creation",
+      "Complex conditionals ($switch)",
+      "Type conversions",
+      "Date operations",
+      "Deep nesting and restructuring"
+    ]
+  },
+  "summary": {
+    "core_concept": "$project selects, renames, hides, and transforms fields in aggregation",
+    "basic_syntax": "{ $project: { field1: 1, field2: 0, newField: expression, renamed: '$oldField' } }",
+    "key_features": [
+      "1 = include, 0 = exclude",
+      "$fieldName = reference field value",
+      "expression = compute new value",
+      "_id included by default"
+    ],
+    "key_concepts": [
+      "$project shapes output document",
+      "Can't mix include/exclude (except _id)",
+      "$ prefix required for field references",
+      "Expressions enable transformations",
+      "Place early to reduce pipeline size",
+      "Nested objects possible"
+    ],
+    "best_practice": "Project early after $match, exclude unneeded fields, use for data transformation",
+    "progression": "Beginner: Field selection/exclusion → Intermediate: Renaming, computed fields → Advanced: Nested objects, complex expressions, type conversion"
+  }
+}

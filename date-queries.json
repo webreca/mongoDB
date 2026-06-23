@@ -1,0 +1,445 @@
+{
+  "title": "MongoDB Date Queries - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on date operations, time-based filtering, and temporal queries",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "date_queries_overview": {
+    "definition": "Query and manipulate date/time fields in MongoDB for temporal filtering and analysis",
+    "concept": "Use date operators and comparison operators to filter by time ranges",
+    "purpose": [
+      "Filter documents by date ranges",
+      "Find documents created/modified in timeframe",
+      "Calculate age or duration",
+      "Analyze trends over time",
+      "Schedule-based queries (upcoming events)",
+      "Report generation by date"
+    ],
+    "date_formats": [
+      "ISODate (ISO 8601 standard - recommended)",
+      "Unix timestamp (milliseconds since epoch)",
+      "String dates (must convert for queries)"
+    ],
+    "key_operators": [
+      "$eq, $ne, $gt, $gte, $lt, $lte - date comparison",
+      "$between - range queries",
+      "$year, $month, $day - date extraction",
+      "$dateAdd, $dateSubtract - date arithmetic",
+      "$daysInMonth, $daysInYear - duration"
+    ]
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Date Fundamentals",
+    "definitions": [
+      {
+        "term": "ISODate",
+        "definition": "MongoDB's date type (ISO 8601 standard)",
+        "format": "2024-06-23T12:30:45.000Z",
+        "precision": "Milliseconds"
+      },
+      {
+        "term": "Unix Timestamp",
+        "definition": "Milliseconds since January 1, 1970 UTC",
+        "example": "1719079845000"
+      },
+      {
+        "term": "UTC",
+        "definition": "Coordinated Universal Time (standard for MongoDB)",
+        "use": "All dates stored in UTC"
+      },
+      {
+        "term": "Date Range",
+        "definition": "Query between two dates",
+        "example": "From enrollment date to 30 days later"
+      }
+    ]
+  },
+  "section_2_beginner_simple_queries": {
+    "title": "BEGINNER: Simple Date Queries",
+    "beginner_examples": [
+      {
+        "title": "Query documents after specific date",
+        "query": "db.students.find({ enrollmentDate: { $gt: new Date('2024-01-01') } })",
+        "result": "Students enrolled after January 1, 2024",
+        "use_case": "Recent registrations"
+      },
+      {
+        "title": "Query documents before specific date",
+        "query": "db.students.find({ enrollmentDate: { $lt: new Date('2024-06-01') } })",
+        "result": "Students enrolled before June 1, 2024",
+        "use_case": "Early registrations"
+      },
+      {
+        "title": "Query exact date",
+        "query": "db.students.find({ enrollmentDate: { $eq: new Date('2024-03-15') } })",
+        "result": "Students enrolled on March 15, 2024",
+        "use_case": "Anniversary or milestone queries"
+      },
+      {
+        "title": "Query by month/year",
+        "query": "db.students.find({\n  enrollmentDate: {\n    $gte: new Date('2024-03-01'),\n    $lt: new Date('2024-04-01')\n  }\n})",
+        "result": "Students enrolled in March 2024",
+        "use_case": "Monthly reports"
+      }
+    ]
+  },
+  "section_3_beginner_date_formats": {
+    "title": "BEGINNER: Date Format Best Practices",
+    "formats": [
+      {
+        "name": "ISODate (RECOMMENDED)",
+        "example": "new Date('2024-06-23T12:30:45Z')",
+        "pros": "Standard, timezone aware, easy to use",
+        "cons": "None"
+      },
+      {
+        "name": "Unix Timestamp",
+        "example": "1719079845000",
+        "pros": "Compact, no timezone issues",
+        "cons": "Less readable"
+      },
+      {
+        "name": "String (NOT RECOMMENDED)",
+        "example": "'2024-06-23'",
+        "pros": "Readable",
+        "cons": "Must convert for range queries, string comparison doesn't work"
+      }
+    ],
+    "beginner_examples": [
+      {
+        "title": "Create ISODate",
+        "query": "db.students.insertOne({ name: 'Alice', enrollmentDate: new Date('2024-06-23') })"
+      },
+      {
+        "title": "Current date/time",
+        "query": "db.students.insertOne({ name: 'Bob', enrollmentDate: new Date() })"
+      },
+      {
+        "title": "Unix timestamp conversion",
+        "query": "db.students.find({ enrollmentDate: { $gt: new Date(1719000000000) } })"
+      }
+    ]
+  },
+  "section_4_intermediate_date_ranges": {
+    "title": "INTERMEDIATE: Complex Date Ranges",
+    "intermediate_examples": [
+      {
+        "title": "Last 30 days",
+        "query": "db.students.find({\n  enrollmentDate: {\n    $gte: new Date(new Date().getTime() - 30*24*60*60*1000)\n  }\n})",
+        "use_case": "Recent activity"
+      },
+      {
+        "title": "This month",
+        "query": "const now = new Date()\nconst monthStart = new Date(now.getFullYear(), now.getMonth(), 1)\nconst monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)\n\ndb.students.find({\n  enrollmentDate: { $gte: monthStart, $lt: monthEnd }\n})",
+        "use_case": "Monthly metrics"
+      },
+      {
+        "title": "This year",
+        "query": "const now = new Date()\nconst yearStart = new Date(now.getFullYear(), 0, 1)\nconst yearEnd = new Date(now.getFullYear() + 1, 0, 1)\n\ndb.students.find({\n  enrollmentDate: { $gte: yearStart, $lt: yearEnd }\n})",
+        "use_case": "Annual reports"
+      },
+      {
+        "title": "Birthday month",
+        "query": "db.aggregation([\n  { $project: { name: 1, birthMonth: { $month: '$dateOfBirth' } } },\n  { $match: { birthMonth: 6 } }\n])",
+        "use_case": "June birthdays"
+      }
+    ]
+  },
+  "section_5_intermediate_date_extraction": {
+    "title": "INTERMEDIATE: Date Field Extraction",
+    "definition": "Extract components from dates for filtering and analysis",
+    "operators": [
+      "$year - Extract year",
+      "$month - Extract month (1-12)",
+      "$dayOfMonth - Day of month (1-31)",
+      "$dayOfWeek - Day of week (1-7, Sunday=1)",
+      "$hour, $minute, $second - Time components"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Students born in summer",
+        "query": "db.students.aggregate([\n  { $addFields: { birthMonth: { $month: '$dateOfBirth' } } },\n  { $match: { birthMonth: { $in: [6, 7, 8] } } }\n])",
+        "use_case": "Summer birthday analysis"
+      },
+      {
+        "title": "Students enrolled on weekends",
+        "query": "db.students.aggregate([\n  { $addFields: { dayOfWeek: { $dayOfWeek: '$enrollmentDate' } } },\n  { $match: { dayOfWeek: { $in: [1, 7] } } }\n])",
+        "use_case": "Weekend enrollment patterns"
+      },
+      {
+        "title": "Group by enrollment year",
+        "query": "db.students.aggregate([\n  { $group: { _id: { $year: '$enrollmentDate' }, count: { $sum: 1 } } },\n  { $sort: { _id: 1 } }\n])",
+        "use_case": "Year-over-year comparison"
+      }
+    ]
+  },
+  "section_6_intermediate_date_arithmetic": {
+    "title": "INTERMEDIATE: Date Arithmetic",
+    "definition": "Add/subtract from dates for calculations",
+    "operators": [
+      "$dateAdd - Add time to date",
+      "$dateSubtract - Subtract time from date",
+      "$dateDiff - Calculate difference between dates"
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Add 30 days to date",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      enrollmentDate: 1,\n      thirtyDaysLater: { $dateAdd: { startDate: '$enrollmentDate', unit: 'day', amount: 30 } }\n    }\n  }\n])",
+        "use_case": "Expiration dates, trial periods"
+      },
+      {
+        "title": "Days since enrollment",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      enrollmentDate: 1,\n      daysSinceEnrollment: {\n        $dateDiff: {\n          startDate: '$enrollmentDate',\n          endDate: new Date(),\n          unit: 'day'\n        }\n      }\n    }\n  }\n])",
+        "use_case": "Tenure calculation"
+      },
+      {
+        "title": "Student age from birthdate",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      dateOfBirth: 1,\n      age: {\n        $floor: {\n          $divide: [\n            { $dateDiff: { startDate: '$dateOfBirth', endDate: new Date(), unit: 'day' } },\n            365.25\n          ]\n        }\n      }\n    }\n  }\n])",
+        "use_case": "Age-based filtering"
+      }
+    ]
+  },
+  "section_7_advanced_timezone_handling": {
+    "title": "ADVANCED: Timezone Handling",
+    "definition": "MongoDB stores dates in UTC, but convert for local display/queries",
+    "advanced_examples": [
+      {
+        "title": "Convert UTC to different timezone",
+        "query": "db.students.aggregate([\n  { $project: {\n      name: 1,\n      enrollmentDate: 1,\n      enrollmentDatePST: {\n        $dateToString: {\n          date: '$enrollmentDate',\n          timezone: 'America/Los_Angeles',\n          format: '%Y-%m-%d %H:%M:%S'\n        }\n      }\n    }\n  }\n])",
+        "use_case": "Display dates in user's timezone"
+      },
+      {
+        "title": "Query by local date",
+        "query": "// Query for all enrollments on June 23, 2024 in PST\nconst date = new Date('2024-06-23')\nconst startUTC = new Date(date.getTime() + 7*60*60*1000) // Add PST offset\nconst endUTC = new Date(startUTC.getTime() + 24*60*60*1000)\n\ndb.students.find({ enrollmentDate: { $gte: startUTC, $lt: endUTC } })",
+        "use_case": "Timezone-aware filtering"
+      }
+    ]
+  },
+  "section_8_advanced_complex_patterns": {
+    "title": "ADVANCED: Complex Date Patterns",
+    "advanced_examples": [
+      {
+        "title": "Students by enrollment cohort",
+        "query": "db.students.aggregate([\n  { $group: {\n      _id: {\n        year: { $year: '$enrollmentDate' },\n        month: { $month: '$enrollmentDate' }\n      },\n      count: { $sum: 1 },\n      names: { $push: '$name' }\n    }\n  },\n  { $sort: { '_id.year': -1, '_id.month': -1 } }\n])",
+        "use_case": "Cohort-based analysis"
+      },
+      {
+        "title": "Students active in date range",
+        "query": "db.students.aggregate([\n  { $match: {\n      enrollmentDate: { $lte: new Date('2024-06-23') },\n      lastActivityDate: { $gte: new Date(new Date().getTime() - 7*24*60*60*1000) }\n    }\n  }\n])",
+        "use_case": "Active user analysis"
+      },
+      {
+        "title": "Upcoming expiration alerts",
+        "query": "const thirtyDaysFromNow = new Date(new Date().getTime() + 30*24*60*60*1000)\n\ndb.students.find({\n  subscriptionExpireDate: {\n    $gte: new Date(),\n    $lte: thirtyDaysFromNow\n  }\n})",
+        "use_case": "Renewal reminders"
+      }
+    ]
+  },
+  "section_9_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Find recent students",
+        "example": "Last 30 days",
+        "query": "enrollmentDate >= 30 days ago"
+      },
+      {
+        "use_case": "Find students by birth month",
+        "example": "June birthdays",
+        "query": "Extract month from dateOfBirth"
+      },
+      {
+        "use_case": "Query by date range",
+        "example": "March 2024 enrollments",
+        "query": "enrollmentDate between two dates"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Monthly cohort analysis",
+        "example": "Group by month/year",
+        "query": "Group and count by enrollment month"
+      },
+      {
+        "use_case": "Age-based filtering",
+        "example": "Students over 21",
+        "query": "Calculate age from birthdate"
+      },
+      {
+        "use_case": "Days since event",
+        "example": "Tenure calculation",
+        "query": "Date difference in days"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Timezone-aware reporting",
+        "example": "Convert to user timezone",
+        "query": "Format dates in timezone"
+      },
+      {
+        "use_case": "Cohort retention analysis",
+        "example": "Track cohort over time",
+        "query": "Complex grouping and filtering"
+      },
+      {
+        "use_case": "Predictive queries",
+        "example": "Expiration alerts",
+        "query": "Find items expiring soon"
+      }
+    ]
+  },
+  "section_10_best_practices": {
+    "practice_1_always_use_isodate": {
+      "rule": "Store dates as ISODate, not strings",
+      "good": "new Date('2024-06-23')",
+      "avoid": "'2024-06-23' (string)",
+      "why": "Range queries don't work on strings"
+    },
+    "practice_2_store_utc": {
+      "rule": "Store all dates in UTC",
+      "good": "new Date() (UTC)",
+      "avoid": "Storing local time",
+      "why": "Consistent across timezones"
+    },
+    "practice_3_index_date_fields": {
+      "rule": "Index frequently queried date fields",
+      "example": "db.students.createIndex({ enrollmentDate: 1 })",
+      "why": "Range queries are much faster"
+    },
+    "practice_4_use_date_arithmetic": {
+      "rule": "Use $dateAdd/$dateSubtract instead of manual math",
+      "good": "{ $dateAdd: { startDate: '$date', unit: 'day', amount: 30 } }",
+      "avoid": "New Date(date.getTime() + 30*24*60*60*1000)",
+      "why": "Handles edge cases, more readable"
+    },
+    "practice_5_precision_awareness": {
+      "rule": "Be aware of date precision (milliseconds)",
+      "note": "Dates stored to millisecond precision",
+      "impact": "Exact equality rare, use ranges instead"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_string_dates": {
+      "mistake": "Query on string dates",
+      "wrong": "db.students.find({ date: { $gt: '2024-06-23' } })",
+      "right": "db.students.find({ date: { $gt: new Date('2024-06-23') } })",
+      "impact": "String comparison doesn't work for dates"
+    },
+    "mistake_2_ignoring_utc": {
+      "mistake": "Forget to convert from local time",
+      "problem": "Queries off by timezone offset",
+      "solution": "All dates in UTC, convert on display"
+    },
+    "mistake_3_no_index": {
+      "mistake": "Query dates without index",
+      "problem": "Full collection scan (slow)",
+      "solution": "createIndex({ dateField: 1 })"
+    },
+    "mistake_4_exact_equality": {
+      "mistake": "Use $eq for date matching",
+      "problem": "Unlikely exact match (to millisecond)",
+      "solution": "Use range with $gte and $lt"
+    },
+    "mistake_5_timezone_confusion": {
+      "mistake": "Assume stored date is in local time",
+      "problem": "Wrong results from timezone-aware queries",
+      "solution": "Remember: MongoDB stores UTC"
+    },
+    "mistake_6_inefficient_arithmetic": {
+      "mistake": "Manual date math in application",
+      "wrong": "new Date(date.getTime() + days*24*60*60*1000)",
+      "right": "{ $dateAdd: { startDate: '$date', unit: 'day', amount: days } }",
+      "why": "MongoDB handles DST, precision better"
+    }
+  },
+  "section_12_date_operations": {
+    "title": "Date Operation Reference",
+    "query_operators": [
+      {
+        "operator": "$gt",
+        "use": "After date",
+        "example": "enrollmentDate: { $gt: date }"
+      },
+      {
+        "operator": "$gte",
+        "use": "On or after date",
+        "example": "enrollmentDate: { $gte: date }"
+      },
+      {
+        "operator": "$lt",
+        "use": "Before date",
+        "example": "enrollmentDate: { $lt: date }"
+      },
+      {
+        "operator": "$lte",
+        "use": "On or before date",
+        "example": "enrollmentDate: { $lte: date }"
+      }
+    ],
+    "aggregation_operators": [
+      {
+        "operator": "$year",
+        "use": "Extract year",
+        "example": "{ $year: '$dateField' }"
+      },
+      {
+        "operator": "$month",
+        "use": "Extract month",
+        "example": "{ $month: '$dateField' }"
+      },
+      {
+        "operator": "$dayOfMonth",
+        "use": "Extract day",
+        "example": "{ $dayOfMonth: '$dateField' }"
+      },
+      {
+        "operator": "$dayOfWeek",
+        "use": "Day of week (1-7)",
+        "example": "{ $dayOfWeek: '$dateField' }"
+      },
+      {
+        "operator": "$dateAdd",
+        "use": "Add to date",
+        "example": "{ $dateAdd: { startDate, unit, amount } }"
+      },
+      {
+        "operator": "$dateSubtract",
+        "use": "Subtract from date",
+        "example": "{ $dateSubtract: { startDate, unit, amount } }"
+      },
+      {
+        "operator": "$dateDiff",
+        "use": "Difference between dates",
+        "example": "{ $dateDiff: { startDate, endDate, unit } }"
+      }
+    ]
+  },
+  "section_13_progression": {
+    "beginner": [
+      "Date data type and formats",
+      "Simple comparison queries ($gt, $lt)",
+      "Date ranges",
+      "Current date queries"
+    ],
+    "intermediate": [
+      "Date extraction ($year, $month)",
+      "Date arithmetic ($dateAdd, $dateSubtract)",
+      "Relative date queries (last 30 days)",
+      "Monthly/yearly grouping"
+    ],
+    "advanced": [
+      "Timezone handling",
+      "Complex date patterns",
+      "Cohort analysis",
+      "Predictive queries (upcoming events)"
+    ]
+  },
+  "summary": {
+    "core_concept": "Query and analyze documents based on dates and time ranges",
+    "key_operators": "$gt, $lt, $gte, $lte for comparison; $year, $month for extraction",
+    "best_practice": "Use ISODate, store UTC, index date fields, use ranges not exact equality",
+    "common_pattern": "{ dateField: { $gte: startDate, $lt: endDate } }",
+    "performance": "Index date fields for faster range queries",
+    "timezone_note": "Store all dates in UTC, convert on display",
+    "progression": "Beginner: Simple ranges → Intermediate: Extraction and arithmetic → Advanced: Timezone handling and complex patterns"
+  }
+}

@@ -1,0 +1,725 @@
+================================================================================
+                      MONGODB CAPPED COLLECTIONS - COMPLETE GUIDE
+              (Beginner to Advanced Level - Fixed-Size, Circular Buffer)
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Capped collections for bounded, auto-deleting document storage
+EXAMPLES: Using 60 Student Records from data.json
+LEVEL: Beginner → Intermediate → Advanced
+
+CAPPED COLLECTION = Fixed-size collection with automatic oldest-document removal
+
+
+================================================================================
+PART 1: BEGINNER LEVEL
+================================================================================
+
+SECTION 1.1: WHAT IS A CAPPED COLLECTION?
+================================================================================
+
+DEFINITION:
+  Fixed-size collection that automatically deletes oldest documents
+  when size or count limit is exceeded
+
+CONCEPT:
+  Circular buffer - when full, newest data overwrites oldest
+
+PURPOSE:
+  ✓ Automatic data retention limits
+  ✓ Bounded memory/storage usage
+  ✓ Keep recent data only
+  ✓ No cleanup code needed
+  ✓ Very fast inserts (preallocated space)
+
+KEY CHARACTERISTICS:
+  ✓ Fixed size (cannot grow beyond limit)
+  ✓ FIFO deletion (first-in-first-out, oldest deleted)
+  ✓ Automatic insertion order preservation
+  ✓ Very fast inserts (no reallocation)
+  ✗ Cannot update documents
+  ✗ Cannot add/remove indexes after creation
+  ✗ Cannot be sharded
+
+WHEN TO USE:
+  ✓ Application logging
+  ✓ Activity feeds
+  ✓ Chat messages
+  ✓ Real-time metrics
+  ✓ Event streams
+  ✓ Temporary data
+
+WHEN NOT TO USE:
+  ✗ Data must be permanent
+  ✗ Need to update documents
+  ✗ Need flexible indexing
+  ✗ Data grows unbounded
+
+
+================================================================================
+SECTION 1.2: BEGINNER - CREATING CAPPED COLLECTIONS
+================================================================================
+
+DEFINITION:
+  Capped collections must be explicitly created with capped option
+  (Cannot convert regular → capped)
+
+SYNTAX:
+  db.createCollection('collectionName', {
+    capped: true,
+    size: bytesLimit,
+    max: documentCount  // optional
+  })
+
+PARAMETERS:
+  capped:   true (required, indicates capped collection)
+  size:     Maximum size in bytes (required unless max only)
+  max:      Maximum document count (optional)
+
+IMPORTANT:
+  At least one of size or max required
+  Both can be specified together
+
+
+BEGINNER EXAMPLE #1: Create activity log (size + count)
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.createCollection('studentActivity', {
+    capped: true,
+    size: 1048576,
+    max: 1000
+  })
+
+Parameters:
+  size: 1048576 bytes = 1 MB
+  max:  1000 documents
+
+Behavior:
+  - Collection limited to 1 MB OR 1000 documents (whichever limit hit first)
+  - When 1001st document inserted, oldest document deleted
+  - Always keeps most recent documents up to limit
+
+Use Case:
+  Keep last 1000 activities in 1 MB
+
+
+BEGINNER EXAMPLE #2: Size-only capped collection
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.createCollection('appLogs', {
+    capped: true,
+    size: 5242880
+  })
+
+Parameters:
+  size: 5242880 bytes = 5 MB
+
+Behavior:
+  - Collection limited to 5 MB maximum
+  - Document count varies based on document size
+  - When 5 MB exceeded, oldest documents deleted
+
+Use Case:
+  Keep application logs up to 5 MB
+
+
+BEGINNER EXAMPLE #3: Count-only capped collection
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.createCollection('recentEvents', {
+    capped: true,
+    max: 500
+  })
+
+Parameters:
+  max: 500 documents
+
+Note:
+  When using max only, size not preallocated
+  Collection grows naturally up to max
+
+Use Case:
+  Keep exactly 500 events
+
+
+SIZE REFERENCE:
+  1 KB = 1024 bytes
+  1 MB = 1048576 bytes
+  10 MB = 10485760 bytes
+  100 MB = 104857600 bytes
+
+
+================================================================================
+SECTION 1.3: BEGINNER - CAPPED COLLECTION BEHAVIOR
+================================================================================
+
+BEGINNER EXAMPLE #1: Automatic deletion (FIFO)
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Collection max: 3 documents
+
+Step 1: Insert doc1
+  Collection: [doc1]
+
+Step 2: Insert doc2
+  Collection: [doc1, doc2]
+
+Step 3: Insert doc3
+  Collection: [doc1, doc2, doc3]  ← At capacity
+
+Step 4: Insert doc4
+  Collection: [doc2, doc3, doc4]  ← doc1 auto-deleted!
+
+Key Point:
+  Oldest (doc1) automatically deleted when new doc added
+
+Use Case:
+  Auto-cleanup without code
+
+
+BEGINNER EXAMPLE #2: Insertion order preserved
+────────────────────────────────────────────────────────────────────────────
+
+Documents returned in insertion order by default:
+
+Query:
+  db.studentActivity.find().sort({ $natural: 1 })
+
+Result:
+  Returns documents oldest to newest (insertion order)
+
+Query:
+  db.studentActivity.find().sort({ $natural: -1 })
+
+Result:
+  Returns documents newest to oldest (reverse order)
+
+Use Case:
+  Chronological access without timestamp
+
+
+BEGINNER EXAMPLE #3: Size-based deletion
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Collection size: 1 MB
+  Average document: ~10 KB
+
+Capacity:
+  ~100 documents fit in 1 MB
+
+Insertion:
+  When 101st document inserted
+  Oldest document automatically deleted
+  New document inserted
+
+Use Case:
+  Keep collection under memory/disk limit
+
+
+================================================================================
+PART 2: INTERMEDIATE LEVEL
+================================================================================
+
+SECTION 2.1: INTERMEDIATE - OPERATIONS ON CAPPED
+================================================================================
+
+WHAT'S ALLOWED:
+  ✓ Insert documents
+  ✓ Delete all documents (collection stays capped)
+  ✓ Query/find
+  ✓ Aggregate
+  ✓ Read operations
+
+WHAT'S NOT ALLOWED:
+  ✗ Update documents
+  ✗ Delete specific documents
+  ✗ Add/remove indexes
+  ✗ Shard collection
+
+
+INTERMEDIATE EXAMPLE #1: Bulk insert
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.studentActivity.insertMany([
+    { studentId: '1', action: 'login', timestamp: new Date() },
+    { studentId: '2', action: 'logout', timestamp: new Date() },
+    { studentId: '3', action: 'view', timestamp: new Date() }
+  ])
+
+Behavior:
+  All documents inserted
+  If limit exceeded, oldest documents deleted automatically
+
+Use Case:
+  Batch insert activities
+
+
+INTERMEDIATE EXAMPLE #2: Query recent documents
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.studentActivity.find().limit(10)
+
+Result:
+  Last 10 documents inserted (most recent)
+
+Query:
+  db.studentActivity.find().sort({ $natural: -1 }).limit(5)
+
+Result:
+  5 most recent documents (newest first)
+
+Use Case:
+  Recent activity feed
+
+
+INTERMEDIATE EXAMPLE #3: Aggregation on capped
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.studentActivity.aggregate([
+    { $match: { action: 'login' } },
+    { $group: { _id: '$studentId', count: { $sum: 1 } } }
+  ])
+
+Behavior:
+  Can use full aggregation pipeline
+
+Use Case:
+  Analyze activity patterns
+
+
+INTERMEDIATE EXAMPLE #4: Clear collection
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.studentActivity.deleteMany({})
+
+Effect:
+  Deletes all documents
+  Collection remains capped
+  Space freed but reserved
+
+Use Case:
+  Reset activity log
+
+
+================================================================================
+SECTION 2.2: INTERMEDIATE - CAPPED vs TTL INDEXES
+================================================================================
+
+TWO WAYS TO AUTO-DELETE:
+
+CAPPED COLLECTIONS:
+  Deletion based on: Size or document count
+  When deleted: When limit exceeded
+  Order: FIFO (oldest first)
+  Can update: NO
+  Can add after: NO (must create at start)
+
+TTL INDEXES:
+  Deletion based on: Expiration time
+  When deleted: After specified seconds
+  Order: By expiration time
+  Can update: YES
+  Can add after: YES (to existing collection)
+
+
+INTERMEDIATE EXAMPLE #1: Capped for activity log
+────────────────────────────────────────────────────────────────────────────
+
+Use case: Keep last 100 activities
+
+Create:
+  db.createCollection('activities', {
+    capped: true,
+    size: 10485760,
+    max: 100
+  })
+
+Behavior:
+  Keeps most recent 100 activities
+  Oldest deleted when 101st added
+
+Advantage:
+  Exactly N documents always
+
+Disadvantage:
+  Cannot update, must specify at creation
+
+
+INTERMEDIATE EXAMPLE #2: TTL for session expiration
+────────────────────────────────────────────────────────────────────────────
+
+Use case: Keep sessions for 1 hour
+
+Create:
+  db.createCollection('sessions')
+
+Add TTL:
+  db.sessions.createIndex(
+    { createdAt: 1 },
+    { expireAfterSeconds: 3600 }
+  )
+
+Behavior:
+  Sessions deleted 1 hour after creation
+
+Advantage:
+  Time-based expiration, can update documents
+  Can add to existing collection
+
+Disadvantage:
+  Must have timestamp field
+
+
+CHOOSE:
+  Capped:    "Keep last N items"
+  TTL:       "Keep items for X hours"
+
+
+================================================================================
+SECTION 2.3: INTERMEDIATE - STORAGE & ALLOCATION
+================================================================================
+
+INTERMEDIATE EXAMPLE #1: Calculate required size
+────────────────────────────────────────────────────────────────────────────
+
+Formula:
+  size >= (avgDocSize × expectedDocCount × 1.2)
+
+Example:
+  Average document: 200 bytes
+  Expected documents: 1000
+  Calculation: 200 × 1000 × 1.2 = 240,000 bytes (240 KB)
+  Recommended: size: 524288 (512 KB)
+
+Why 1.2 multiplier:
+  Accounts for overhead and padding
+
+Use Case:
+  Plan size parameter
+
+
+INTERMEDIATE EXAMPLE #2: Preallocated space
+────────────────────────────────────────────────────────────────────────────
+
+Benefit:
+  Space preallocated on disk
+  Very fast inserts (no growth/reallocation)
+
+Cost:
+  Space reserved even if not full
+  May waste space if underutilized
+
+Use Case:
+  Trade storage for insertion speed
+
+
+INTERMEDIATE EXAMPLE #3: Check collection stats
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.studentActivity.stats()
+
+Shows:
+  ns: Collection name
+  count: Current document count
+  avgObjSize: Average document size
+  storageSize: Allocated space
+  capped: true (confirms capped)
+
+Use Case:
+  Monitor collection
+
+
+================================================================================
+PART 3: ADVANCED LEVEL
+================================================================================
+
+SECTION 3.1: ADVANCED - PERFORMANCE OPTIMIZATION
+================================================================================
+
+ADVANCED EXAMPLE #1: Optimize for insertion speed
+────────────────────────────────────────────────────────────────────────────
+
+Strategy:
+  Preallocate sufficient space upfront
+
+Command:
+  db.createCollection('highFreqLog', {
+    capped: true,
+    size: 104857600,      // 100 MB
+    max: 1000000          // 1 million docs
+  })
+
+Benefit:
+  No reallocation needed
+  Very fast inserts (O(1))
+  Preallocation cost paid once
+
+Use Case:
+  High-frequency logging
+
+
+ADVANCED EXAMPLE #2: Optimize for query performance
+────────────────────────────────────────────────────────────────────────────
+
+Limitation:
+  Cannot add indexes after creation
+
+Workaround:
+  1. Plan queries before creating
+  2. Create with needed indexes initially
+  3. Use _id and $natural sort if needed
+
+Example:
+  If need to query by studentId frequently:
+  - NOT POSSIBLE (cannot add index)
+  - Must plan during creation
+
+Use Case:
+  Careful design before creation
+
+
+ADVANCED EXAMPLE #3: Replication with capped
+────────────────────────────────────────────────────────────────────────────
+
+Behavior:
+  Capped collections replicate automatically
+  Each replica maintains separate capped collection
+  MongoDB oplog uses capped collection internally
+
+Note:
+  Retention window may differ between replicas
+  Document deleted on primary deleted on secondaries
+
+Use Case:
+  Maintain activity logs across replicas
+
+
+================================================================================
+SECTION 3.2: ADVANCED - REAL-WORLD USE CASES
+================================================================================
+
+ADVANCED EXAMPLE #1: Application event stream
+────────────────────────────────────────────────────────────────────────────
+
+Use case:
+  Keep 1 hour of application events
+
+Setup:
+  Size: ~50MB per hour worth of data
+  Max: Not limited
+  Cleanup: Automatic when size exceeded
+
+Implementation:
+  db.createCollection('eventStream', {
+    capped: true,
+    size: 52428800  // 50 MB
+  })
+
+Query recent:
+  db.eventStream.find().sort({ $natural: -1 }).limit(100)
+
+Analyze:
+  db.eventStream.aggregate([
+    { $match: { type: 'error' } },
+    { $group: { _id: '$errorCode', count: { $sum: 1 } } }
+  ])
+
+Use Case:
+  Real-time error tracking
+
+
+ADVANCED EXAMPLE #2: High-frequency metrics
+────────────────────────────────────────────────────────────────────────────
+
+Use case:
+  Server metrics every second from 100 servers
+
+Expected:
+  100 × 60 × 60 = 360,000 documents per hour
+  ~10 KB per document = 3.6 GB per hour
+
+Setup:
+  Size: 10485760000 (10 GB)
+  Max: Not limited
+  Result: ~2.8 hours of metrics
+
+Implementation:
+  db.createCollection('metrics', {
+    capped: true,
+    size: 10485760000
+  })
+
+Analyze:
+  db.metrics.aggregate([
+    { $match: { timestamp: { $gte: oneHourAgo } } },
+    { $group: { _id: '$server', avgCPU: { $avg: '$cpu' } } }
+  ])
+
+Use Case:
+  Bounded time-series data
+
+
+================================================================================
+SECTION 3.3: BEST PRACTICES & COMMON MISTAKES
+================================================================================
+
+BEST PRACTICES:
+
+1. SIZE CALCULATION
+   Formula: size >= (avgDocSize × count × 1.2)
+   Example: 200 × 1000 × 1.2 = 240 KB
+   Benefit: Prevents unexpected deletions
+
+2. USE BOTH SIZE AND MAX
+   Good: { capped: true, size: 10MB, max: 5000 }
+   Why: Double safety - whichever limit hit first
+
+3. PLAN BEFORE CREATION
+   Indexes cannot be changed after creation
+   Plan queries, design schema first
+   If need indexes, add before capping
+
+4. MONITOR COLLECTION
+   Query: db.collection.stats()
+   Watch: count, avgObjSize, storageSize
+   Frequency: Regular monitoring
+
+5. USE TTL FOR TIME-BASED
+   Capped: For "keep last N items"
+   TTL: For "keep X hours worth"
+   Choose based on retention policy
+
+
+COMMON MISTAKES:
+
+❌ Cannot convert regular → capped
+   Problem: MongoDB doesn't support conversion
+   Solution: Create new, copy data, delete old
+
+❌ Size too small
+   Problem: Documents deleted faster than expected
+   Solution: Use formula with 1.2 buffer
+
+❌ Trying to update document
+   Problem: Error - cannot update in capped
+   Solution: Delete and re-insert
+
+❌ Adding index after creation
+   Problem: Cannot modify indexes
+   Solution: Plan before creating, recreate if needed
+
+❌ Using for permanent data
+   Problem: Data lost when limit exceeded
+   Solution: Use only for temporary/log data
+
+❌ No monitoring
+   Problem: May not know collection is churning
+   Solution: Regular stats checks
+
+
+================================================================================
+SECTION 3.4: WHEN TO USE CAPPED VS REGULAR
+================================================================================
+
+CAPPED COLLECTION:
+  ✓ Keep last N items
+  ✓ Automatic cleanup needed
+  ✓ Bounded memory usage critical
+  ✓ Very fast inserts needed
+  ✓ No updates required
+  ✗ Cannot update documents
+  ✗ Cannot add indexes
+
+REGULAR COLLECTION:
+  ✓ Data is permanent
+  ✓ Need to update documents
+  ✓ Flexible indexing needed
+  ✓ Unbounded growth OK
+  ✓ Complex queries on many fields
+  ✗ Manual cleanup needed
+  ✗ No automatic retention
+
+
+CHOOSE CAPPED:
+  - Application logs
+  - Activity feeds
+  - Chat messages
+  - Real-time streams
+  - Metrics (recent only)
+
+CHOOSE REGULAR:
+  - User data
+  - Product catalog
+  - Orders
+  - Anything permanent
+  - Anything needing updates
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Creation Syntax:
+────────────────────────────────────────────────────────────────────────────
+db.createCollection('collectionName', {
+  capped: true,
+  size: 1048576,      // 1 MB (required)
+  max: 1000           // optional document count
+})
+
+Common Sizes:
+────────────────────────────────────────────────────────────────────────────
+1 MB      = 1048576
+5 MB      = 5242880
+10 MB     = 10485760
+50 MB     = 52428800
+100 MB    = 104857600
+
+Operations:
+────────────────────────────────────────────────────────────────────────────
+Insert:    db.collection.insertOne({...})
+Insert:    db.collection.insertMany([...])
+Query:     db.collection.find()
+Recent:    db.collection.find().sort({ $natural: -1 })
+Aggregate: db.collection.aggregate([...])
+Stats:     db.collection.stats()
+Clear:     db.collection.deleteMany({})
+
+What Works / What Doesn't:
+────────────────────────────────────────────────────────────────────────────
+✓ Insert
+✓ Find
+✓ Aggregation
+✓ Delete all
+✓ Bulk operations
+✗ Update documents
+✗ Delete specific docs
+✗ Add indexes
+✗ Shard
+
+Remember progression:
+  Beginner: Concepts, creation, basic insertion
+  Intermediate: Operations, deletion behavior, vs TTL
+  Advanced: Performance, large-scale, monitoring
+
+KEY PRINCIPLES:
+  • Fixed size (cannot grow)
+  • FIFO deletion (oldest first)
+  • Automatic cleanup (no code needed)
+  • Cannot update (immutable once inserted)
+  • Very fast inserts (preallocated space)
+  • Plan before creating (cannot change indexes)
+
+================================================================================

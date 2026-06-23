@@ -1,0 +1,34 @@
+{
+  "title": "MongoDB Connection & URI Strings - Complete Guide",
+  "description": "Connection strings and connection pooling configuration",
+  "date": "2024-06-23",
+  "overview": {
+    "definition": "Connection strings specify how to connect to MongoDB",
+    "purpose": [
+      "Connect to MongoDB instances",
+      "Configure connection options",
+      "Handle authentication",
+      "Connection pooling",
+      "SSL/TLS connections",
+      "Multiple hosts",
+      "Environment-specific configs"
+    ]
+  },
+  "section_1_basic": {
+    "title": "BEGINNER: Connection String Basics",
+    "examples": [
+      {
+        "title": "Local connection",
+        "uri": "mongodb://localhost:27017/mydb"
+      },
+      {
+        "title": "Connection with auth",
+        "uri": "mongodb://username:password@host:27017/mydb"
+      },
+      {
+        "title": "Atlas connection",
+        "uri": "mongodb+srv://username:password@cluster.mongodb.net/mydb"
+      }
+    ]
+  }
+}

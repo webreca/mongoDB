@@ -1,0 +1,706 @@
+{
+  "title": "MongoDB Data Types - Complete Guide",
+  "description": "Comprehensive guide on MongoDB data types with practical examples and use cases",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "data_types_overview": {
+    "definition": "MongoDB stores data in JSON-like documents with various data types for different needs",
+    "purpose": [
+      "Type safety and validation",
+      "Efficient storage and querying",
+      "Support for complex data structures",
+      "Cross-language compatibility",
+      "Specialized handling for dates, coordinates, and IDs"
+    ],
+    "categories": [
+      "Primitive types (String, Number, Boolean, Null)",
+      "Special types (ObjectId, Date)",
+      "Complex types (Array, Document/Object)",
+      "Geospatial types (Point, Polygon)",
+      "Binary types (BinData)"
+    ]
+  },
+  "section_1_string_type": {
+    "type": "String",
+    "description": "UTF-8 text data, most common type in MongoDB",
+    "syntax": "\"string value\"",
+    "use_cases": [
+      "Student names and IDs",
+      "Email addresses and majors",
+      "Locations and descriptions",
+      "Enum-like values (status, type)"
+    ],
+    "examples": [
+      {
+        "field": "studentId",
+        "value": "20260001",
+        "type": "String",
+        "query": "db.students.find({ studentId: '20260001' })",
+        "use_case": "Unique identifier for student"
+      },
+      {
+        "field": "major",
+        "value": "Data Science",
+        "type": "String",
+        "query": "db.students.find({ major: 'Data Science' })",
+        "use_case": "Filter students by field of study"
+      },
+      {
+        "field": "name.first",
+        "value": "Daksh",
+        "type": "String",
+        "query": "db.students.find({ 'name.first': 'Daksh' })",
+        "use_case": "Search by first name"
+      },
+      {
+        "field": "name.last",
+        "value": "Chauhan",
+        "type": "String",
+        "query": "db.students.find({ 'name.last': 'Chauhan' })",
+        "use_case": "Search by last name"
+      }
+    ],
+    "storage": "UTF-8 encoded, no size limit per string",
+    "performance": "Indexed strings provide fast lookups",
+    "best_practices": [
+      "Use lowercase for case-insensitive searches",
+      "Index frequently searched strings",
+      "Validate format (email, phone) at application level",
+      "Use enums for fixed options"
+    ]
+  },
+  "section_2_number_type": {
+    "type": "Number (Integer and Double)",
+    "description": "Numeric data - both integers and floating-point numbers",
+    "subtypes": [
+      "Int32 (32-bit integer)",
+      "Int64 (64-bit integer)",
+      "Double (64-bit floating-point)"
+    ],
+    "use_cases": [
+      "Age and grade levels",
+      "GPA and scores",
+      "Counts and statistics",
+      "Prices and amounts"
+    ],
+    "examples": [
+      {
+        "field": "age",
+        "value": 20,
+        "type": "Int32",
+        "query": "db.students.find({ age: 20 })",
+        "use_case": "Filter students by age"
+      },
+      {
+        "field": "gpa",
+        "value": 3.85,
+        "type": "Double",
+        "query": "db.students.find({ gpa: { $gte: 3.5 } })",
+        "use_case": "Find honor students (GPA >= 3.5)"
+      },
+      {
+        "field": "scholarshipDetails.amount",
+        "value": 15000,
+        "type": "Int32",
+        "query": "db.students.find({ 'scholarshipDetails.amount': { $gte: 10000 } })",
+        "use_case": "Find students with high scholarships"
+      }
+    ],
+    "storage": "Int32: 4 bytes, Int64: 8 bytes, Double: 8 bytes",
+    "performance": "Numeric comparisons and sorts are very fast",
+    "best_practices": [
+      "Use Int32 for values -2.1B to +2.1B",
+      "Use Int64 for larger values",
+      "Use Double for decimals (GPA, percentages)",
+      "Index numeric fields for range queries"
+    ]
+  },
+  "section_3_boolean_type": {
+    "type": "Boolean",
+    "description": "True/false values for flags and conditions",
+    "values": [
+      "true",
+      "false"
+    ],
+    "use_cases": [
+      "Feature flags (active, verified)",
+      "Student status (international, on scholarship)",
+      "Preferences and settings"
+    ],
+    "examples": [
+      {
+        "field": "isInternational",
+        "value": false,
+        "type": "Boolean",
+        "query": "db.students.find({ isInternational: true })",
+        "use_case": "Find international students (30 total)"
+      },
+      {
+        "field": "scholarshipDetails.awarded",
+        "value": true,
+        "type": "Boolean",
+        "query": "db.students.find({ 'scholarshipDetails.awarded': true })",
+        "use_case": "Find students with scholarships"
+      },
+      {
+        "field": "deleted",
+        "value": false,
+        "type": "Boolean",
+        "query": "db.students.find({ deleted: false })",
+        "use_case": "Soft delete - find active records"
+      }
+    ],
+    "storage": "1 byte (actually bit-packed in documents)",
+    "performance": "Very fast boolean checks",
+    "best_practices": [
+      "Use for simple true/false states",
+      "Index boolean fields for quick filtering",
+      "Use for soft deletes instead of actual deletion",
+      "Name fields as isActive, hasScholarship, etc."
+    ]
+  },
+  "section_4_null_type": {
+    "type": "Null",
+    "description": "Represents missing or undefined data",
+    "syntax": "null",
+    "use_cases": [
+      "Optional fields",
+      "Default values",
+      "Distinguishing from zero/false"
+    ],
+    "examples": [
+      {
+        "field": "scholarshipDetails.notes",
+        "value": null,
+        "type": "Null",
+        "scenario": "Student has no scholarship notes",
+        "query": "db.students.find({ 'scholarshipDetails.notes': null })",
+        "use_case": "Find students without scholarship notes"
+      },
+      {
+        "field": "middleName",
+        "value": null,
+        "type": "Null",
+        "scenario": "Student has no middle name",
+        "query": "db.students.find({ middleName: { $exists: false } })",
+        "use_case": "Find students without middle name field"
+      }
+    ],
+    "storage": "No storage (field may be omitted entirely)",
+    "querying": [
+      "{ field: null } finds null or missing field",
+      "{ field: { $exists: false } } finds missing field",
+      "{ field: { $exists: true } } finds fields with any value"
+    ],
+    "best_practices": [
+      "Omit field entirely instead of using null when possible",
+      "Use null for optional fields that may not exist",
+      "Distinguish null from empty string or zero"
+    ]
+  },
+  "section_5_objectid_type": {
+    "type": "ObjectId",
+    "description": "Unique 12-byte identifier automatically generated for each document",
+    "structure": "4-byte timestamp | 3-byte machine ID | 2-byte process ID | 3-byte counter",
+    "properties": [
+      "Unique across all documents",
+      "Sortable by creation time",
+      "Automatically generated if not provided",
+      "Can be manually specified",
+      "Lighter than UUID"
+    ],
+    "use_cases": [
+      "Document unique identifier (_id field)",
+      "References between documents",
+      "Distributed system identifiers"
+    ],
+    "examples": [
+      {
+        "field": "_id",
+        "value": "ObjectId('507f1f77bcf86cd799439011')",
+        "type": "ObjectId",
+        "query": "db.students.findOne({ _id: ObjectId('507f1f77bcf86cd799439011') })",
+        "use_case": "Get document by unique ID"
+      },
+      {
+        "scenario": "Auto-generated on insert",
+        "code": "db.students.insertOne({ name: 'Daksh Chauhan' })",
+        "result": "MongoDB auto-generates _id if not provided",
+        "use_case": "Default unique identification"
+      }
+    ],
+    "generation": [
+      "Automatic: MongoDB generates on insert if _id missing",
+      "Manual: Provide custom _id value",
+      "Note: Each replica set member has unique machine ID"
+    ],
+    "performance": "Indexed by default, extremely fast lookups",
+    "best_practices": [
+      "Let MongoDB auto-generate ObjectId for most cases",
+      "Use natural keys (studentId) if more meaningful",
+      "Index _id field (automatic)",
+      "Don't rely on timestamp portion for exact timing"
+    ]
+  },
+  "section_6_date_type": {
+    "type": "Date",
+    "description": "Date and time values stored as milliseconds since Unix epoch",
+    "range": "1970-01-01 to 2262-04-11",
+    "accuracy": "Millisecond precision",
+    "use_cases": [
+      "Enrollment dates",
+      "Last login times",
+      "Expiration dates",
+      "Event timestamps"
+    ],
+    "examples": [
+      {
+        "field": "enrollmentDate",
+        "value": "ISODate('2023-08-15T10:30:00Z')",
+        "type": "Date",
+        "query": "db.students.find({ enrollmentDate: { $gte: ISODate('2023-01-01') } })",
+        "use_case": "Find students enrolled after date"
+      },
+      {
+        "field": "lastLogin",
+        "value": "ISODate('2024-06-20T14:25:30Z')",
+        "type": "Date",
+        "query": "db.students.find({ lastLogin: { $lte: ISODate('2024-06-15') } })",
+        "use_case": "Find inactive students"
+      }
+    ],
+    "insert_methods": [
+      "db.students.insertOne({ enrollmentDate: new Date() })",
+      "db.students.insertOne({ enrollmentDate: ISODate('2023-08-15') })",
+      "db.students.insertOne({ enrollmentDate: Date.parse('2023-08-15') })"
+    ],
+    "query_operators": [
+      "{ enrollmentDate: { $gte: ISODate('2023-01-01') } } - after date",
+      "{ enrollmentDate: { $lte: ISODate('2023-12-31') } } - before date",
+      "{ enrollmentDate: { $between: [start, end] } } - date range"
+    ],
+    "storage": "8 bytes (milliseconds since epoch)",
+    "performance": "Date range queries are indexed efficiently",
+    "best_practices": [
+      "Always store in UTC (Zulu time)",
+      "Use ISO 8601 format (YYYY-MM-DDThh:mm:ssZ)",
+      "Create index on date fields for range queries",
+      "Use ISODate() in queries for consistency"
+    ]
+  },
+  "section_7_array_type": {
+    "type": "Array",
+    "description": "Ordered list of values (any type), powerful MongoDB feature",
+    "max_size": "No hard limit per array",
+    "use_cases": [
+      "Student skills (Python, SQL, TensorFlow)",
+      "Enrolled courses list",
+      "Tags and categories",
+      "History of events"
+    ],
+    "examples": [
+      {
+        "field": "skills",
+        "value": [
+          "Python",
+          "SQL",
+          "TensorFlow",
+          "MongoDB"
+        ],
+        "type": "Array of Strings",
+        "query": "db.students.find({ skills: 'Python' })",
+        "use_case": "Find students with Python skill"
+      },
+      {
+        "field": "courses",
+        "value": [
+          "CS101",
+          "MATH201",
+          "DB301"
+        ],
+        "type": "Array of Strings",
+        "query": "db.students.find({ courses: { $in: ['CS101', 'CS102'] } })",
+        "use_case": "Find students in specific courses"
+      }
+    ],
+    "querying": [
+      {
+        "operation": "Find by array element",
+        "query": "db.students.find({ skills: 'Python' })",
+        "result": "Finds document if 'Python' in skills array"
+      },
+      {
+        "operation": "Find by multiple elements",
+        "query": "db.students.find({ skills: { $in: ['Python', 'Java'] } })",
+        "result": "Finds if has Python OR Java"
+      },
+      {
+        "operation": "Find by array size",
+        "query": "db.students.find({ skills: { $size: 4 } })",
+        "result": "Finds if skills array has exactly 4 elements"
+      },
+      {
+        "operation": "Find all matching multiple",
+        "query": "db.students.find({ skills: { $all: ['Python', 'SQL'] } })",
+        "result": "Finds if has BOTH Python AND SQL"
+      }
+    ],
+    "array_updates": [
+      {
+        "operation": "Add element",
+        "code": "db.students.updateOne({ studentId: '20260001' }, { $push: { skills: 'JavaScript' } })"
+      },
+      {
+        "operation": "Remove element",
+        "code": "db.students.updateOne({ studentId: '20260001' }, { $pull: { skills: 'Python' } })"
+      },
+      {
+        "operation": "Add multiple",
+        "code": "db.students.updateOne({ studentId: '20260001' }, { $push: { skills: { $each: ['Go', 'Rust'] } } })"
+      }
+    ],
+    "storage": "Varies by content (4 bytes per string element average)",
+    "performance": [
+      "Array queries are indexed if index on field",
+      "Large arrays may slow queries",
+      "Unbounded array growth can be problem"
+    ],
+    "best_practices": [
+      "Use arrays for related values",
+      "Don't use for one-to-many relationships (>1000 items)",
+      "Consider separate collection for large arrays",
+      "Index array fields for searches",
+      "Limit array size (e.g., keep last 100 skills)"
+    ]
+  },
+  "section_8_embedded_document_type": {
+    "type": "Embedded Document (Object)",
+    "description": "Nested document structure for related fields",
+    "max_depth": "100 levels nesting",
+    "max_size": "16 MB per document total",
+    "use_cases": [
+      "Student name (first, last)",
+      "Scholarship details (amount, awarded, notes)",
+      "Contact info (email, phone)",
+      "Address (street, city, country)"
+    ],
+    "examples": [
+      {
+        "field": "name",
+        "value": {
+          "first": "Daksh",
+          "last": "Chauhan"
+        },
+        "type": "Embedded Document",
+        "query": "db.students.find({ 'name.first': 'Daksh' })",
+        "use_case": "Store related name fields together"
+      },
+      {
+        "field": "scholarshipDetails",
+        "value": {
+          "amount": 15000,
+          "awarded": true,
+          "notes": "Merit-based scholarship"
+        },
+        "type": "Embedded Document",
+        "query": "db.students.find({ 'scholarshipDetails.amount': { $gte: 10000 } })",
+        "use_case": "Store related scholarship info"
+      }
+    ],
+    "advantages": [
+      "Logical grouping of related data",
+      "Single query for related fields",
+      "Automatic validation together",
+      "No join needed",
+      "Better performance than separate collection"
+    ],
+    "vs_references": [
+      "Embed: Small related data, accessed together",
+      "Reference: Large data, reused elsewhere, or too many items"
+    ],
+    "querying_nested": [
+      {
+        "operation": "Query nested field",
+        "code": "db.students.find({ 'name.first': 'Daksh' })",
+        "use_case": "Find by embedded field"
+      },
+      {
+        "operation": "Query entire nested document",
+        "code": "db.students.find({ name: { first: 'Daksh', last: 'Chauhan' } })",
+        "use_case": "Match entire object exactly"
+      },
+      {
+        "operation": "Multiple nested conditions",
+        "code": "db.students.find({ 'scholarshipDetails.amount': { $gte: 10000 }, 'scholarshipDetails.awarded': true })",
+        "use_case": "Multi-field nested query"
+      }
+    ],
+    "storage": "Efficient - no duplication, no join overhead",
+    "performance": "No join required, single-document lookups very fast",
+    "best_practices": [
+      "Embed small, related data",
+      "Don't embed large or frequently updated data",
+      "Keep nesting shallow (<3 levels recommended)",
+      "Use for 1-to-few relationships",
+      "Index nested fields for searches"
+    ]
+  },
+  "section_9_geospatial_type": {
+    "type": "Geospatial (GeoJSON)",
+    "description": "Geographic data for location-based queries",
+    "formats": [
+      "Point: Single location [longitude, latitude]",
+      "LineString: Path between locations",
+      "Polygon: Enclosed area",
+      "MultiPoint, MultiLineString, MultiPolygon"
+    ],
+    "use_cases": [
+      "Campus locations (map display)",
+      "Proximity searches (find nearby)",
+      "Geographic filtering (within region)",
+      "Delivery route tracking"
+    ],
+    "examples": [
+      {
+        "field": "campusLocation",
+        "value": {
+          "type": "Point",
+          "coordinates": [
+            77.2095,
+            28.6144
+          ]
+        },
+        "type": "GeoJSON Point",
+        "note": "[longitude, latitude] order",
+        "query": "db.students.find({ campusLocation: { $near: { $geometry: { type: 'Point', coordinates: [77.2, 28.6] }, $maxDistance: 5000 } } })",
+        "use_case": "Find students within 5km"
+      }
+    ],
+    "coordinate_format": {
+      "note": "GeoJSON uses [longitude, latitude] NOT [latitude, longitude]",
+      "example": "[77.2095, 28.6144]",
+      "meaning": "77.2095°E, 28.6144°N"
+    },
+    "geospatial_queries": [
+      {
+        "operation": "Near query (proximity search)",
+        "code": "db.students.find({ location: { $near: { $geometry: { type: 'Point', coordinates: [77.2, 28.6] }, $maxDistance: 5000 } } })",
+        "use_case": "Find students within 5000 meters"
+      },
+      {
+        "operation": "Within polygon",
+        "code": "db.students.find({ location: { $geoWithin: { $geometry: { type: 'Polygon', coordinates: [...] } } } })",
+        "use_case": "Find students in region"
+      },
+      {
+        "operation": "Intersects (overlaps)",
+        "code": "db.students.find({ location: { $geoIntersects: { $geometry: { type: 'Point', coordinates: [77.2, 28.6] } } } })",
+        "use_case": "Find features overlapping point"
+      }
+    ],
+    "index_requirement": "Must create geospatial index for queries",
+    "index_creation": "db.students.createIndex({ campusLocation: '2dsphere' })",
+    "storage": "Efficient GeoJSON encoding",
+    "performance": "Geospatial index enables fast proximity searches",
+    "best_practices": [
+      "Always use [longitude, latitude] order",
+      "Create '2dsphere' index for GeoJSON",
+      "Use $maxDistance in meters for earth",
+      "Validate coordinates before insert",
+      "Use for real geographic data only"
+    ]
+  },
+  "section_10_binary_type": {
+    "type": "Binary Data",
+    "description": "Raw binary data (images, files, encrypted data)",
+    "size": "Up to 16 MB per document",
+    "use_cases": [
+      "Student photo (profile picture)",
+      "Document scans (degree, ID)",
+      "Encrypted data",
+      "File storage"
+    ],
+    "examples": [
+      {
+        "field": "profilePhoto",
+        "type": "BinData",
+        "scenario": "Store JPEG image as binary",
+        "note": "Usually better to store in separate service (S3, Azure)",
+        "alternative": "Store URL reference instead"
+      }
+    ],
+    "insertion": [
+      {
+        "method": "Node.js Buffer",
+        "code": "const buffer = Buffer.from('...');",
+        "use": "Convert file to buffer"
+      },
+      {
+        "method": "Binary type",
+        "code": "db.students.insertOne({ photo: Binary(buffer) })"
+      }
+    ],
+    "retrieval": [
+      {
+        "method": "Return as binary",
+        "code": "const doc = db.students.findOne({ _id: ... });",
+        "result": "Returns binary data"
+      }
+    ],
+    "storage": "No compression, exact byte size",
+    "performance": "Slow queries with large binary data",
+    "best_practices": [
+      "Avoid storing large files in MongoDB (>5MB)",
+      "Use GridFS for files >16MB",
+      "Store URLs/references instead of actual files",
+      "Consider S3, Azure Blob Storage for production",
+      "Compress binary data before storing"
+    ]
+  },
+  "section_11_type_conversion": {
+    "title": "Type Conversion and Coercion",
+    "description": "How MongoDB handles type conversions",
+    "scenarios": [
+      {
+        "operation": "String to Number",
+        "example": "String '20' automatically compared with Number 20",
+        "behavior": "May not match - use consistent types"
+      },
+      {
+        "operation": "Null vs Missing",
+        "example": "{ field: null } vs { } (field omitted)",
+        "behavior": "Treated differently in queries"
+      },
+      {
+        "operation": "Array coercion",
+        "example": "Single value promoted to array in some contexts",
+        "behavior": "Depends on operator"
+      }
+    ],
+    "best_practices": [
+      "Always use consistent types for same field",
+      "Don't mix string and number for same field",
+      "Be explicit about type requirements",
+      "Use schema validation for type enforcement"
+    ]
+  },
+  "section_12_type_selection_guide": {
+    "title": "Choosing the Right Data Type",
+    "guide": [
+      {
+        "need": "Name, email, major, status",
+        "type": "String",
+        "reason": "Text data"
+      },
+      {
+        "need": "Age, count, score, price",
+        "type": "Number (Int32 or Double)",
+        "reason": "Numeric comparisons and math"
+      },
+      {
+        "need": "Active/inactive, has scholarship",
+        "type": "Boolean",
+        "reason": "Simple yes/no"
+      },
+      {
+        "need": "Unknown or optional field",
+        "type": "Null (or omit field)",
+        "reason": "Distinguish missing value"
+      },
+      {
+        "need": "Unique document identifier",
+        "type": "ObjectId",
+        "reason": "Auto-generated unique ID"
+      },
+      {
+        "need": "Enrollment date, last login",
+        "type": "Date",
+        "reason": "Date/time with timezone"
+      },
+      {
+        "need": "Multiple skills, courses",
+        "type": "Array",
+        "reason": "Multiple related values"
+      },
+      {
+        "need": "Related fields (name: first + last)",
+        "type": "Embedded Document",
+        "reason": "Logical grouping"
+      },
+      {
+        "need": "Campus location (latitude/longitude)",
+        "type": "GeoJSON Point",
+        "reason": "Geographic queries"
+      },
+      {
+        "need": "Photo or document file",
+        "type": "Binary or Reference (URL)",
+        "reason": "File storage"
+      }
+    ]
+  },
+  "section_13_data_type_examples_from_students": {
+    "title": "Complete Example: Student Document",
+    "student": {
+      "_id": "ObjectId - Unique document ID",
+      "studentId": "20260001 - String identifier",
+      "name": {
+        "_type": "Embedded Document",
+        "first": "Daksh - String",
+        "last": "Chauhan - String"
+      },
+      "age": "20 - Number (Int32)",
+      "gpa": "3.85 - Number (Double)",
+      "isInternational": "false - Boolean",
+      "enrollmentDate": "ISODate('2023-08-15') - Date",
+      "major": "Data Science - String",
+      "skills": "['Python', 'SQL', ...] - Array of Strings",
+      "courses": "['CS101', 'MATH201', ...] - Array of Strings",
+      "campusLocation": {
+        "_type": "Embedded Document with GeoJSON",
+        "type": "Point - String",
+        "coordinates": "[77.2095, 28.6144] - Array of Numbers"
+      },
+      "scholarshipDetails": {
+        "_type": "Embedded Document",
+        "amount": "15000 - Number (Int32)",
+        "awarded": "true - Boolean",
+        "notes": "Merit-based - String or null"
+      },
+      "libraryCardToken": "abc123xyz789 - String"
+    },
+    "type_summary": {
+      "String": 5,
+      "Number": 3,
+      "Boolean": 2,
+      "Date": 1,
+      "Array": 2,
+      "EmbeddedDocument": 3,
+      "ObjectId": 1,
+      "GeoJSON": 1,
+      "total_fields": 18
+    }
+  },
+  "summary": {
+    "data_types": [
+      "String - Text data",
+      "Number (Int32/Int64/Double) - Numeric data",
+      "Boolean - True/false",
+      "Null - Missing value",
+      "ObjectId - Unique ID",
+      "Date - Date and time",
+      "Array - Multiple values",
+      "Embedded Document - Nested structure",
+      "GeoJSON - Geographic data",
+      "Binary - Raw file data"
+    ],
+    "key_concepts": [
+      "Choose type based on data nature",
+      "MongoDB enforces no strict schema (optional validation)",
+      "Same field should use consistent type",
+      "Complex types (Array, Document) reduce joins",
+      "Type selection affects performance and storage"
+    ],
+    "best_practice": "Choose the most specific and appropriate type for your data to ensure efficient storage, querying, and validation"
+  }
+}

@@ -1,0 +1,194 @@
+================================================================================
+MONGODB CONNECTION & URI STRINGS - COMPLETE GUIDE
+================================================================================
+Connection strings and connection pooling configuration
+
+================================================================================
+OVERVIEW
+================================================================================
+
+Connection strings specify how to connect to MongoDB. They include the host,
+port, authentication, and various options.
+
+FORMAT:
+mongodb://[username:password@]host[:port]/[database][?options]
+
+COMMON USE CASES:
+- Local development
+- Authentication
+- Multiple hosts
+- SSL/TLS
+- Connection pooling
+- Atlas connections
+
+================================================================================
+SECTION 1: BASIC CONNECTION STRINGS
+================================================================================
+
+EXAMPLE 1: Local Connection
+---------------------------
+mongodb://localhost:27017/mydb
+
+Components:
+- localhost: Server host
+- 27017: Default MongoDB port
+- mydb: Database name
+
+EXAMPLE 2: Remote Server
+-----------------------
+mongodb://192.168.1.100:27017/mydb
+
+EXAMPLE 3: Authentication
+------------------------
+mongodb://username:password@localhost:27017/mydb
+
+EXAMPLE 4: Multiple Hosts (Replica Set)
+---------------------------------------
+mongodb://host1:27017,host2:27017,host3:27017/mydb
+
+EXAMPLE 5: Atlas Cloud
+---------------------
+mongodb+srv://username:password@cluster.mongodb.net/mydb
+
+================================================================================
+SECTION 2: CONNECTION OPTIONS
+================================================================================
+
+EXAMPLE 1: maxPoolSize
+-----------------------
+mongodb://localhost:27017/mydb?maxPoolSize=10
+
+Controls connection pool size
+
+EXAMPLE 2: Multiple Options
+---------------------------
+mongodb://localhost:27017/mydb?maxPoolSize=10&maxIdleTimeMS=30000
+
+Chain options with &
+
+EXAMPLE 3: Replica Set
+---------------------
+mongodb://host1,host2,host3/mydb?replicaSet=rs0
+
+EXAMPLE 4: Write Concern
+-----------------------
+mongodb://localhost:27017/mydb?w=majority&j=true
+
+w=majority: Write replicated to majority
+j=true: Write journaled
+
+EXAMPLE 5: Read Preference
+--------------------------
+mongodb://localhost:27017/mydb?readPreference=secondaryPreferred
+
+Read from secondary if available
+
+================================================================================
+SECTION 3: AUTHENTICATION
+================================================================================
+
+EXAMPLE 1: SCRAM Authentication
+-------------------------------
+mongodb://user:password@localhost:27017/mydb
+
+Default authentication method
+
+EXAMPLE 2: Database Parameter
+----------------------------
+mongodb://user:password@localhost:27017/?authSource=admin
+
+Authenticate against 'admin' database
+
+EXAMPLE 3: URL Encoding
+---------------------
+mongodb://user:pass%40word@localhost:27017
+
+Special chars in password:
+- @ becomes %40
+- : becomes %3A
+
+================================================================================
+SECTION 4: PRODUCTION BEST PRACTICES
+================================================================================
+
+EXAMPLE 1: Use Environment Variables
+-----------------------------------
+# In .env
+MONGODB_URI=mongodb://user:pass@host:27017/mydb
+
+# In code
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);
+
+EXAMPLE 2: Connection Pooling
+----------------------------
+mongodb://localhost:27017/mydb?maxPoolSize=20
+
+Reuse connections for better performance
+
+EXAMPLE 3: Timeouts
+------------------
+mongodb://localhost:27017/mydb?connectTimeoutMS=5000&serverSelectionTimeoutMS=5000
+
+connectTimeoutMS: 5 seconds
+serverSelectionTimeoutMS: 5 seconds
+
+EXAMPLE 4: SSL/TLS
+-----------------
+mongodb://user:pass@host:27017/mydb?ssl=true&sslValidate=true
+
+Secure connection
+
+EXAMPLE 5: Replica Set
+---------------------
+mongodb://host1,host2,host3/mydb?replicaSet=rs0&w=majority
+
+Connect to replica set
+
+================================================================================
+SECTION 5: COMMON CONNECTION STRINGS
+================================================================================
+
+Local Development:
+mongodb://localhost:27017/myapp
+
+With Authentication:
+mongodb://admin:password@localhost:27017/myapp?authSource=admin
+
+Atlas Cloud:
+mongodb+srv://admin:password@cluster0.abc123.mongodb.net/myapp
+
+Replica Set:
+mongodb://host1:27017,host2:27017,host3:27017/myapp?replicaSet=rs0
+
+With Options:
+mongodb://localhost:27017/myapp?maxPoolSize=10&connectTimeoutMS=5000
+
+================================================================================
+SUMMARY
+================================================================================
+
+Connection strings format:
+mongodb://[auth@]host[:port]/[database][?options]
+
+Key components:
+- host: Server address
+- port: MongoDB port (default 27017)
+- username:password: Authentication
+- options: Configuration parameters
+
+Common options:
+- maxPoolSize: Connection pool size
+- authSource: Auth database
+- replicaSet: Replica set name
+- w: Write concern
+- readPreference: Read preference
+- ssl: Enable SSL/TLS
+
+Best practices:
+- Use environment variables for URIs
+- Include authentication
+- Set connection pool size
+- Use appropriate timeouts
+- Use SSL/TLS in production
+================================================================================

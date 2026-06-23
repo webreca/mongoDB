@@ -1,0 +1,713 @@
+================================================================================
+         MONGODB ARRAY UPDATE OPERATORS - COMPLETE GUIDE
+  (Beginner to Advanced Level - $push, $pop, $pull, $addToSet)
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Array manipulation operators for nested array management
+EXAMPLES: Using 60 Student Records from data.json
+LEVEL: Beginner → Intermediate → Advanced
+
+ARRAY UPDATE OPERATORS = Modify array fields without replacing documents
+
+
+================================================================================
+PART 1: BEGINNER LEVEL
+================================================================================
+
+SECTION 1.1: WHAT ARE ARRAY UPDATE OPERATORS?
+================================================================================
+
+DEFINITION:
+  Operators that modify array elements by adding, removing, or managing items
+
+PURPOSE:
+  ✓ Add elements to array fields
+  ✓ Remove first or last element
+  ✓ Remove specific matching values
+  ✓ Add unique elements only (no duplicates)
+  ✓ Manage nested array structures
+  ✓ Track lists (skills, courses, tags, etc.)
+
+SYNTAX PATTERN:
+  db.collection.updateOne/updateMany(filter, { $operator: {...} })
+
+AVAILABLE OPERATORS:
+  $push - Add element to array
+  $pop - Remove first or last element
+  $pull - Remove all matching elements
+  $addToSet - Add unique element only
+
+
+================================================================================
+SECTION 1.2: BEGINNER - $PUSH OPERATOR
+================================================================================
+
+DEFINITION:
+  Adds one or more elements to the end of array field
+
+SYNTAX:
+  { $push: { arrayField: value } }
+
+BEHAVIOR:
+  Appends value to array end
+  Creates array if field doesn't exist
+  Allows duplicate values
+
+BEGINNER EXAMPLE #1: Add skill to portfolio
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { skills: 'Python' } }
+  )
+
+Before: skills: ['JavaScript', 'MongoDB']
+After:  skills: ['JavaScript', 'MongoDB', 'Python']
+Result: New skill added to end
+
+Use Case:
+  Student learns new programming language
+
+
+BEGINNER EXAMPLE #2: Track completed courses
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { completedCourses: 'Data Structures' } }
+  )
+
+Before: completedCourses: ['Algorithms', 'Databases']
+After:  completedCourses: ['Algorithms', 'Databases', 'Data Structures']
+Result: Course added to completion list
+
+Use Case:
+  Record course completion
+
+
+BEGINNER EXAMPLE #3: Create array if doesn't exist
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { certifications: 'AWS' } }
+  )
+
+Before: certifications field doesn't exist
+After:  certifications: ['AWS']
+Result: Array created automatically
+
+Use Case:
+  First certification added
+
+
+BEGINNER EXAMPLE #4: Push multiple values at once
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { skills: { $each: ['Java', 'C++', 'Go'] } } }
+  )
+
+Before: skills: ['JavaScript']
+After:  skills: ['JavaScript', 'Java', 'C++', 'Go']
+Result: Three skills added in one operation
+
+Use Case:
+  Add multiple skills at once
+
+
+$PUSH BENEFITS:
+  ✓ Simple and intuitive
+  ✓ Fast operation (just append)
+  ✓ Creates array if missing
+  ✓ Good for ordered data (logs, activities)
+
+
+================================================================================
+SECTION 1.3: BEGINNER - $POP OPERATOR
+================================================================================
+
+DEFINITION:
+  Removes first or last element from array
+
+SYNTAX:
+  { $pop: { arrayField: 1 or -1 } }
+
+BEHAVIOR:
+  1 = remove last element (LIFO)
+  -1 = remove first element (FIFO)
+  Only removes ONE element per operation
+
+BEGINNER EXAMPLE #1: Remove last skill added
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pop: { skills: 1 } }
+  )
+
+Before: skills: ['JavaScript', 'MongoDB', 'Python']
+After:  skills: ['JavaScript', 'MongoDB']
+Result: Last element removed
+
+Use Case:
+  Undo recently added skill
+
+
+BEGINNER EXAMPLE #2: Remove first course (oldest)
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pop: { completedCourses: -1 } }
+  )
+
+Before: completedCourses: ['Algorithms', 'Databases', 'Structures']
+After:  completedCourses: ['Databases', 'Structures']
+Result: First element removed
+
+Use Case:
+  Remove oldest course from list
+
+
+BEGINNER EXAMPLE #3: Pop from single-element array
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pop: { certifications: 1 } }
+  )
+
+Before: certifications: ['AWS']
+After:  certifications: []
+Result: Array becomes empty
+
+Use Case:
+  Remove only certification
+
+
+$POP BENEFITS:
+  ✓ Very fast (no search needed)
+  ✓ Position-based removal
+  ✓ Good for FIFO/LIFO patterns
+  ✓ Can only remove one element
+
+
+================================================================================
+SECTION 1.4: BEGINNER - $PULL OPERATOR
+================================================================================
+
+DEFINITION:
+  Removes ALL elements matching a value or condition from array
+
+SYNTAX:
+  { $pull: { arrayField: value } }
+
+BEHAVIOR:
+  Removes all occurrences of value
+  Removes all matching conditions
+  Array becomes shorter (can be empty)
+
+BEGINNER EXAMPLE #1: Remove specific skill (all occurrences)
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { skills: 'Python' } }
+  )
+
+Before: skills: ['JavaScript', 'Python', 'MongoDB', 'Python']
+After:  skills: ['JavaScript', 'MongoDB']
+Result: All 'Python' entries removed
+
+Use Case:
+  Remove skill (even if listed multiple times)
+
+
+BEGINNER EXAMPLE #2: Remove low test score
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { testScores: 45 } }
+  )
+
+Before: testScores: [85, 45, 92, 45, 88]
+After:  testScores: [85, 92, 88]
+Result: All instances of 45 removed
+
+Use Case:
+  Clean up failed attempts
+
+
+BEGINNER EXAMPLE #3: Remove with condition
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { testScores: { $lt: 50 } } }
+  )
+
+Before: testScores: [85, 45, 92, 48, 88]
+After:  testScores: [85, 92, 88]
+Result: All scores below 50 removed
+
+Use Case:
+  Remove all failing scores
+
+
+$PULL BENEFITS:
+  ✓ Removes ALL matching elements
+  ✓ Supports conditions ($gt, $lt, etc.)
+  ✓ Useful for cleanup operations
+  ⚠ Slower with large arrays
+
+
+================================================================================
+SECTION 1.5: BEGINNER - $ADDTOSET OPERATOR
+================================================================================
+
+DEFINITION:
+  Adds element to array ONLY if it doesn't already exist
+
+SYNTAX:
+  { $addToSet: { arrayField: value } }
+
+BEHAVIOR:
+  Element added only if unique
+  Prevents duplicate values
+  Creates array if missing
+
+BEGINNER EXAMPLE #1: Add skill (prevents duplicate)
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $addToSet: { skills: 'Python' } }
+  )
+
+Before: skills: ['JavaScript', 'Python']
+After:  skills: ['JavaScript', 'Python'] (no change!)
+Result: Python already exists, not added again
+
+Use Case:
+  Prevent duplicate skills
+
+
+BEGINNER EXAMPLE #2: Add new skill only
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $addToSet: { skills: 'Rust' } }
+  )
+
+Before: skills: ['JavaScript', 'Python']
+After:  skills: ['JavaScript', 'Python', 'Rust']
+Result: New skill added (not duplicate)
+
+Use Case:
+  Add unique skill
+
+
+BEGINNER EXAMPLE #3: Add multiple unique elements
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $addToSet: { skills: { $each: ['Go', 'TypeScript', 'Go'] } } }
+  )
+
+Before: skills: ['JavaScript']
+After:  skills: ['JavaScript', 'Go', 'TypeScript']
+Result: Go appears once (deduplication within $each)
+
+Use Case:
+  Add multiple skills with built-in dedup
+
+
+$ADDTOSET BENEFITS:
+  ✓ Guarantees no duplicates
+  ✓ Good for sets (tags, categories, tags)
+  ⚠ Slower than $push (checks uniqueness)
+
+
+================================================================================
+PART 2: INTERMEDIATE LEVEL
+================================================================================
+
+SECTION 2.1: INTERMEDIATE - NESTED ARRAY UPDATES
+================================================================================
+
+DEFINITION:
+  Updating array elements inside nested structures
+
+SYNTAX:
+  { $operator: { 'arrayField.$.nestedArray': value } }
+
+BEHAVIOR:
+  $ = positional operator (finds matching array element)
+  Used with filter to target specific nested element
+
+INTERMEDIATE EXAMPLE #1: Add grade to specific course
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001', 'courses._id': ObjectId('abc') },
+    { $push: { 'courses.$.grades': 92 } }
+  )
+
+Before: courses: [{ _id: ObjectId('abc'), grades: [85, 88] }]
+After:  courses: [{ _id: ObjectId('abc'), grades: [85, 88, 92] }]
+Result: Grade added to specific course only
+
+Use Case:
+  Update specific course's grades
+
+
+INTERMEDIATE EXAMPLE #2: Remove tag from all courses
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { 'courses.$[].tags': 'outdated' } }
+  )
+
+Before: courses: [{ tags: ['outdated', 'beginner'] }, { tags: ['advanced'] }]
+After:  courses: [{ tags: ['beginner'] }, { tags: ['advanced'] }]
+Result: 'outdated' tag removed from all courses
+
+Use Case:
+  Update multiple nested array elements
+
+
+INTERMEDIATE EXAMPLE #3: Pop from specific nested array
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001', 'attemptHistory._id': 'attempt1' },
+    { $pop: { 'attemptHistory.$.scores': 1 } }
+  )
+
+Before: attemptHistory: [{ _id: 'attempt1', scores: [45, 50, 55] }]
+After:  attemptHistory: [{ _id: 'attempt1', scores: [45, 50] }]
+Result: Last score removed from specific attempt
+
+Use Case:
+  Remove latest attempt score
+
+
+================================================================================
+SECTION 2.2: INTERMEDIATE - CONDITIONAL ARRAY UPDATES
+================================================================================
+
+INTERMEDIATE EXAMPLE #1: Push with auto-sort and limit
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    {
+      $push: {
+        scores: { $each: [92], $sort: -1, $slice: -5 }
+      }
+    }
+  )
+
+Before: scores: [70, 75, 80, 85]
+After:  scores: [92, 85, 80, 75, 70] (top 5, sorted)
+Result: Added 92, sorted all, kept only top 5
+
+Use Case:
+  Maintain top 5 test scores only
+
+
+INTERMEDIATE EXAMPLE #2: Pull by nested condition
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { completedCourses: { status: 'dropped' } } }
+  )
+
+Before: completedCourses: [
+          { name: 'Math', status: 'passed' },
+          { name: 'Physics', status: 'dropped' }
+        ]
+After:  completedCourses: [{ name: 'Math', status: 'passed' }]
+Result: Dropped courses removed
+
+Use Case:
+  Remove courses by condition
+
+
+INTERMEDIATE EXAMPLE #3: AddToSet with complex object
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $addToSet: { certificates: { name: 'AWS', year: 2024 } } }
+  )
+
+Before: certificates: [{ name: 'Azure', year: 2023 }]
+After:  certificates: [
+          { name: 'Azure', year: 2023 },
+          { name: 'AWS', year: 2024 }
+        ]
+Note: Exact match required; { name: 'AWS', year: 2024 } again won't add
+
+Use Case:
+  Prevent duplicate certifications
+
+
+================================================================================
+PART 3: ADVANCED LEVEL
+================================================================================
+
+SECTION 3.1: ADVANCED - BULK ARRAY OPERATIONS
+================================================================================
+
+ADVANCED EXAMPLE #1: Tag all students in major
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateMany(
+    { major: 'Data Science' },
+    { $addToSet: { tags: 'DataScienceMajor' } }
+  )
+
+Result: All DS students tagged (prevents duplicate)
+
+Use Case:
+  Bulk categorization
+
+
+ADVANCED EXAMPLE #2: Migrate and update simultaneously
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    {
+      $pull: { skills: 'Python 2' },
+      $addToSet: { skills: 'Python 3' }
+    }
+  )
+
+Before: skills: ['JavaScript', 'Python 2', 'Go']
+After:  skills: ['JavaScript', 'Go', 'Python 3']
+Result: Old version removed, new added (no duplicate)
+
+Use Case:
+  Migrate skill versions
+
+
+ADVANCED EXAMPLE #3: Multi-operator array update
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    {
+      $push: { activityLog: { action: 'login', date: new Date() } },
+      $pop: { oldEvents: -1 }
+    }
+  )
+
+Result: New activity logged, old event removed
+
+Use Case:
+  Activity tracking with cleanup
+
+
+================================================================================
+SECTION 3.2: ADVANCED - FILTERED ARRAY ELEMENT UPDATES
+================================================================================
+
+ADVANCED EXAMPLE #1: Update nested array element by filter
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001', 'enrollments.courseId': 'CS101' },
+    { $push: { 'enrollments.$.grades': 95 } }
+  )
+
+Result: Grade added to CS101 enrollment only
+
+Use Case:
+  Update specific course's grades
+
+
+ADVANCED EXAMPLE #2: Array filters for complex conditions
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { 'grades.$[elem]': { $lt: 60 } } },
+    { arrayFilters: [{ 'elem': { $lt: 60 } }] }
+  )
+
+Result: All grades below 60 removed
+
+Use Case:
+  Remove failing grades
+
+
+ADVANCED EXAMPLE #3: Bulk update with array filters
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.updateMany(
+    { 'projects.status': 'active' },
+    {
+      $push: {
+        'projects.$[elem].updates': {
+          status: 'in progress',
+          date: new Date()
+        }
+      }
+    },
+    { arrayFilters: [{ 'elem.status': 'active' }] }
+  )
+
+Result: All active projects get update entry
+
+Use Case:
+  Bulk update active items
+
+
+================================================================================
+SECTION 3.3: OPERATOR COMPARISON
+================================================================================
+
+OPERATOR COMPARISON:
+
+┌──────────┬──────────────────┬───────────────┬────────┬──────────────────┐
+│ Operator │ Operation        │ Duplicates    │ Speed  │ When to Use      │
+├──────────┼──────────────────┼───────────────┼────────┼──────────────────┤
+│ $push    │ Append element   │ Yes (allowed) │ Fast   │ Ordered lists    │
+│ $addToSet│ Add if unique    │ No (prevents) │ Slower │ Sets/categories  │
+│ $pull    │ Remove matching  │ Removes ALL   │ Slow   │ Cleanup/filtering│
+│ $pop     │ Remove first/last│ Position-based│ Fast   │ FIFO/LIFO        │
+└──────────┴──────────────────┴───────────────┴────────┴──────────────────┘
+
+
+================================================================================
+SECTION 3.4: BEST PRACTICES & PERFORMANCE
+================================================================================
+
+BEST PRACTICES:
+
+1. CHOOSE RIGHT OPERATOR FOR INTENT
+   $push:    Adding items (duplicates OK)
+   $addToSet: Preventing duplicates
+   $pull:    Conditional removal
+   $pop:     FIFO/LIFO patterns
+
+2. LIMIT ARRAY SIZE WITH $SLICE
+   ✓ { $push: { scores: { $each: [95], $slice: -10 } } }
+   Why: Prevents unbounded array growth
+
+3. USE $ADDTOSET FOR UNIQUE VALUES
+   ✓ { $addToSet: { tags: 'important' } }
+   Why: Guarantees no duplicates
+
+4. COMBINE OPERATORS ATOMICALLY
+   ✓ Single update: $push and $pull together
+   Why: Consistent state
+
+5. USE POSITIONAL OPERATOR FOR NESTED UPDATES
+   ✓ { $push: { 'courses.$.grades': 92 } }
+   Why: Targets specific nested element
+
+6. BULK OPERATIONS FOR MANY DOCUMENTS
+   ✓ db.students.updateMany({}, { $push: {...} })
+   Why: Single operation vs multiple
+
+
+PERFORMANCE TIPS:
+
+$push:      Very fast (just append)
+$pop:       Very fast (no search)
+$pull:      Slower (full array scan)
+$addToSet:  Slower (uniqueness check)
+$slice:     Prevents unbounded growth
+$each:      Use for multiple additions
+arrayFilters: Precise element targeting
+
+
+COMMON MISTAKES:
+
+❌ Using $push when need $addToSet
+   Problem: Creates duplicates
+   Fix: Use $addToSet if duplicates unwanted
+
+❌ Trying to pop multiple elements
+   Problem: $pop only removes 1
+   Fix: Use $slice to limit array size
+
+❌ Wrong nested array syntax
+   Problem: { $push: { courses[0].grades: 92 } }
+   Right: { $push: { 'courses.$.grades': 92 } }
+
+❌ Unbounded array growth
+   Problem: Document keeps growing
+   Fix: Use $slice to cap size
+
+❌ Complex $pull without testing
+   Problem: Removes more than intended
+   Fix: Test condition on sample data
+
+❌ $addToSet with objects
+   Problem: Must match exactly
+   Fix: Ensure complete match
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Operator   Syntax                           Use
+────────────────────────────────────────────────────────────────────────────
+$push      { $push: { array: value } }      Add element
+$push      { $push: { array: { $each: [...] } } }  Add multiple
+$push      { $push: { array: { $each: [...], $slice: -5 } } }  Add & limit
+$pop       { $pop: { array: 1 } }           Remove last
+$pop       { $pop: { array: -1 } }          Remove first
+$pull      { $pull: { array: value } }      Remove value
+$pull      { $pull: { array: { $lt: 50 } } }  Remove by condition
+$addToSet  { $addToSet: { array: value } }  Add unique
+$addToSet  { $addToSet: { array: { $each: [...] } } }  Add unique multiple
+
+Nested:    { $push: { 'array.$.nested': value } }  Update nested array
+
+Remember progression:
+  Beginner: $push, $pop, $pull, $addToSet
+  Intermediate: with $each, $slice, conditions
+  Advanced: bulk operations, array filters
+
+================================================================================

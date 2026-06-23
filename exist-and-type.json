@@ -1,0 +1,395 @@
+{
+  "title": "MongoDB Exists and Type Operators - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on $exists and $type operators for field existence and type checking",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "operators_overview": {
+    "definition": "Exists and Type operators check field existence and data types in documents",
+    "purpose": [
+      "Check if field exists in document",
+      "Verify field data type",
+      "Handle optional/sparse fields",
+      "Data quality validation",
+      "Schema inconsistency detection",
+      "Type-safe querying"
+    ],
+    "operators_count": 2,
+    "syntax_pattern": "{ field: { $exists: true/false } } or { field: { $type: 'typeName' } }"
+  },
+  "section_1_beginner_exists": {
+    "title": "BEGINNER: $EXISTS Operator",
+    "definition": "$exists checks whether a field exists in a document",
+    "syntax": "{ field: { $exists: true } } or { field: { $exists: false } }",
+    "meaning": [
+      "$exists: true - Field exists (has any value, even null)",
+      "$exists: false - Field missing or null"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Find students with scholarship details",
+        "query": "db.students.find({ 'scholarshipDetails.awarded': { $exists: true } })",
+        "result": "~45 students (have scholarship field)",
+        "use_case": "Find documents with specific field"
+      },
+      {
+        "title": "Find students without scholarship",
+        "query": "db.students.find({ 'scholarshipDetails.awarded': { $exists: false } })",
+        "result": "~15 students (no scholarship field)",
+        "use_case": "Find documents missing field"
+      },
+      {
+        "title": "Find students with enrollment date",
+        "query": "db.students.find({ enrollmentDate: { $exists: true } })",
+        "result": "All 60 students (all have enrollment date)",
+        "use_case": "Verify required field present"
+      },
+      {
+        "title": "Find incomplete student records",
+        "query": "db.students.find({ 'name.middle': { $exists: false } })",
+        "result": "~58 students (no middle name)",
+        "use_case": "Data quality check"
+      }
+    ],
+    "important_note": "$exists: true matches both existing values and null values"
+  },
+  "section_2_beginner_type": {
+    "title": "BEGINNER: $TYPE Operator",
+    "definition": "$type checks the BSON data type of a field",
+    "syntax": "{ field: { $type: 'typeName' } } or { field: { $type: ['type1', 'type2'] } }",
+    "available_types": [
+      "string, int, long, double, decimal, boolean, object, array, binData, objectId, date, null"
+    ],
+    "beginner_examples": [
+      {
+        "title": "Find students with string GPA (data quality issue)",
+        "query": "db.students.find({ gpa: { $type: 'string' } })",
+        "result": "0 students (all have numeric GPA)",
+        "use_case": "Data quality validation"
+      },
+      {
+        "title": "Find students with numeric age",
+        "query": "db.students.find({ age: { $type: 'int' } })",
+        "result": "60 students (all have integer age)",
+        "use_case": "Verify correct type"
+      },
+      {
+        "title": "Find documents with null values",
+        "query": "db.students.find({ middleName: { $type: 'null' } })",
+        "result": "Students with explicit null",
+        "use_case": "Find null values"
+      },
+      {
+        "title": "Find array fields",
+        "query": "db.students.find({ skills: { $type: 'array' } })",
+        "result": "60 students (all have skills array)",
+        "use_case": "Find specific type"
+      },
+      {
+        "title": "Find embedded documents",
+        "query": "db.students.find({ name: { $type: 'object' } })",
+        "result": "60 students (all have name object)",
+        "use_case": "Find nested objects"
+      }
+    ],
+    "type_names": {
+      "string": "Text values",
+      "int": "32-bit integer",
+      "long": "64-bit integer",
+      "double": "Floating-point numbers",
+      "object": "Embedded document",
+      "array": "Array/list",
+      "binData": "Binary data",
+      "objectId": "MongoDB ObjectId",
+      "bool": "Boolean true/false",
+      "date": "Date/timestamp",
+      "null": "Null value"
+    }
+  },
+  "section_3_intermediate_combining": {
+    "title": "INTERMEDIATE: Combining $EXISTS and $TYPE",
+    "examples": [
+      {
+        "title": "Find students with valid scholarship amount",
+        "query": "db.students.find({ 'scholarshipDetails.amount': { $exists: true, $type: 'int' } })",
+        "meaning": "Field exists AND is integer",
+        "result": "Students with valid numeric scholarship"
+      },
+      {
+        "title": "Find data quality issues - string ages",
+        "query": "db.students.find({ age: { $exists: true, $type: 'string' } })",
+        "meaning": "Age field exists but wrong type",
+        "result": "Data quality issues (0 in clean data)"
+      },
+      {
+        "title": "Find students with either string or null GPA",
+        "query": "db.students.find({ gpa: { $exists: true, $type: ['string', 'null'] } })",
+        "meaning": "Field exists but unexpected type",
+        "result": "Invalid GPA values"
+      }
+    ]
+  },
+  "section_4_intermediate_with_logical": {
+    "title": "INTERMEDIATE: Combining with Logical Operators",
+    "examples": [
+      {
+        "title": "Find complete student records",
+        "query": "db.students.find({ $and: [ { 'scholarshipDetails.amount': { $exists: true } }, { age: { $type: 'int' } }, { gpa: { $type: 'double' } } ] })",
+        "result": "Records with all required fields and correct types"
+      },
+      {
+        "title": "Find students missing critical fields",
+        "query": "db.students.find({ $or: [ { age: { $exists: false } }, { major: { $exists: false } }, { gpa: { $exists: false } } ] })",
+        "result": "Incomplete records"
+      },
+      {
+        "title": "Find optional fields or valid types",
+        "query": "db.students.find({ $or: [ { 'scholarshipDetails.notes': { $exists: false } }, { 'scholarshipDetails.notes': { $type: 'string' } } ] })",
+        "result": "Either missing or valid string notes"
+      }
+    ]
+  },
+  "section_5_advanced_data_quality": {
+    "title": "ADVANCED: Data Quality Validation",
+    "example_1_schema_inconsistency": {
+      "title": "Find schema inconsistencies",
+      "description": "Find documents where gpa is not a number",
+      "query": "db.students.find({ gpa: { $exists: true, $not: { $type: ['int', 'long', 'double', 'decimal'] } } })",
+      "result": "Data quality issues (should be numeric)"
+    },
+    "example_2_incomplete_records": {
+      "title": "Find incomplete scholarship records",
+      "description": "Scholarship awarded but no amount",
+      "query": "db.students.find({ 'scholarshipDetails.awarded': true, 'scholarshipDetails.amount': { $exists: false } })",
+      "result": "Inconsistent scholarship data"
+    },
+    "example_3_migration_validation": {
+      "title": "Validate data migration",
+      "description": "Check old vs new field formats",
+      "query": "db.students.find({ newPhoneField: { $exists: false }, oldPhoneField: { $exists: true, $type: 'string' } })",
+      "result": "Records not yet migrated"
+    }
+  },
+  "section_6_advanced_sparse_data": {
+    "title": "ADVANCED: Handling Sparse/Optional Data",
+    "example_1_optional_scholarship": {
+      "title": "Query with optional scholarship",
+      "description": "Find students, include scholarship if exists",
+      "note": "Use $exists to handle optional nested fields",
+      "query": "db.students.find({ $and: [ { age: { $gte: 18 } }, { $or: [ { 'scholarshipDetails.amount': { $exists: false } }, { 'scholarshipDetails.amount': { $type: 'int' } } ] } ] })"
+    },
+    "example_2_polymorphic_documents": {
+      "title": "Handle different document shapes",
+      "description": "Documents with different field types based on category",
+      "query": "db.records.find({ $or: [ { type: 'type1', metadata: { $type: 'string' } }, { type: 'type2', metadata: { $type: 'object' } } ] })",
+      "result": "Handle polymorph schema"
+    },
+    "example_3_legacy_compatibility": {
+      "title": "Support legacy and modern formats",
+      "description": "Query works with old and new field names",
+      "query": "db.students.find({ $or: [ { modernField: { $exists: true, $type: 'string' } }, { legacyField: { $exists: true, $type: 'string' } } ] })",
+      "result": "Works with both old and new data"
+    }
+  },
+  "section_7_advanced_aggregation": {
+    "title": "ADVANCED: Type and Exists in Aggregation",
+    "example_1_field_analysis": {
+      "title": "Analyze field existence across collection",
+      "description": "Count documents by field existence",
+      "query": "db.students.aggregate([\n  { $group: { _id: { hasScholarship: { $cond: [{ $eq: [{ $type: '$scholarshipDetails.awarded' }, 'bool'] }, 'yes', 'no'] }, count: { $sum: 1 } } } }\n])",
+      "result": "Statistics on field existence"
+    },
+    "example_2_type_distribution": {
+      "title": "Analyze type distribution",
+      "description": "Check data type consistency",
+      "query": "db.students.aggregate([\n  { $group: { _id: { gpType: { $type: '$gpa' } }, count: { $sum: 1 } } }\n])",
+      "result": "See if GPA has mixed types"
+    },
+    "example_3_data_quality_report": {
+      "title": "Data quality health check",
+      "description": "Report on missing/invalid fields",
+      "pipeline": [
+        "{ $group: { _id: null, total: { $sum: 1 }, missingAge: { $sum: { $cond: [{ $eq: [{ $type: '$age' }, 'missing'] }, 1, 0] } }, invalidGpa: { $sum: { $cond: [{ $not: [{ $in: [{ $type: '$gpa' }, ['int', 'double']] }] }, 1, 0] } } } }"
+      ]
+    }
+  },
+  "section_8_real_world_use_cases": {
+    "usecase_1_data_import_validation": {
+      "title": "Validate imported data",
+      "requirement": "Check data types after CSV import",
+      "query": "db.students.find({ $or: [ { age: { $type: 'string' } }, { gpa: { $type: 'string' } }, { studentId: { $not: { $type: 'string' } } } ] })",
+      "result": "Find records with type mismatches"
+    },
+    "usecase_2_optional_field_handling": {
+      "title": "Query with optional fields",
+      "requirement": "Scholarship can be present or absent",
+      "query": "db.students.find({ $or: [ { 'scholarshipDetails.awarded': { $exists: false } }, { 'scholarshipDetails.awarded': { $type: 'bool' } } ] })",
+      "result": "Works whether field exists or not"
+    },
+    "usecase_3_schema_migration": {
+      "title": "Migrate field format",
+      "requirement": "Handle old and new phone formats during migration",
+      "query": "db.students.find({ $or: [ { phone: { $type: 'string' } }, { contact.phone: { $type: 'string' } } ] })",
+      "result": "Find all phone numbers regardless of location"
+    },
+    "usecase_4_partial_updates": {
+      "title": "Apply partial updates",
+      "requirement": "Update only records missing field",
+      "query": "db.students.updateMany({ 'lastUpdated': { $exists: false } }, { $set: { lastUpdated: new Date() } })",
+      "result": "Add missing timestamp field"
+    },
+    "usecase_5_anomaly_detection": {
+      "title": "Find data anomalies",
+      "requirement": "Detect type inconsistencies indicating corrupted data",
+      "query": "db.students.find({ gpa: { $exists: true, $type: { $ne: 'double' } } })",
+      "result": "Non-numeric GPA values (anomalies)"
+    },
+    "usecase_6_feature_usage_analysis": {
+      "title": "Analyze feature adoption",
+      "requirement": "See which students use scholarship feature",
+      "query": "db.students.find({ 'scholarshipDetails.awarded': { $exists: true, $type: 'bool' } })",
+      "result": "Students who have scholarship data"
+    }
+  },
+  "section_9_performance": {
+    "title": "Performance Considerations",
+    "exists_performance": {
+      "description": "$exists: true can use index",
+      "performance": "Fast with sparse index",
+      "note": "Sparse index only contains documents with field"
+    },
+    "type_performance": {
+      "description": "$type requires examining field values",
+      "performance": "Slower, may need full scan",
+      "note": "Cannot use standard index efficiently"
+    },
+    "optimization": [
+      "Create sparse index for $exists queries",
+      "Combine $exists with other conditions",
+      "Test performance with large collections"
+    ],
+    "sparse_index_example": {
+      "command": "db.students.createIndex({ 'scholarshipDetails.amount': 1 }, { sparse: true })",
+      "benefit": "Fast $exists queries on scholarship amounts"
+    }
+  },
+  "section_10_best_practices": {
+    "practice_1_use_exists_for_optional": {
+      "rule": "Use $exists to handle optional fields",
+      "good": "{ field: { $exists: true } }",
+      "not": "Assume field always present"
+    },
+    "practice_2_combine_exists_and_type": {
+      "rule": "Combine both for complete validation",
+      "good": "{ field: { $exists: true, $type: 'string' } }",
+      "benefit": "Both presence and correctness"
+    },
+    "practice_3_sparse_indexes": {
+      "rule": "Use sparse indexes for optional fields",
+      "command": "db.collection.createIndex({ field: 1 }, { sparse: true })",
+      "benefit": "Faster $exists queries"
+    },
+    "practice_4_data_quality_queries": {
+      "rule": "Use both operators for data validation",
+      "example": "Check type consistency across collection",
+      "tool": "Regular data quality checks"
+    },
+    "practice_5_handle_null": {
+      "rule": "Understand null vs missing",
+      "note": "$exists: true matches null values",
+      "solution": "Use $ne: null to exclude nulls"
+    }
+  },
+  "section_11_common_mistakes": {
+    "mistake_1_exists_vs_type": {
+      "mistake": "Using $exists when should use $type",
+      "wrong": "{ field: { $exists: true } } for type check",
+      "right": "{ field: { $type: 'string' } } to verify type"
+    },
+    "mistake_2_null_inclusion": {
+      "mistake": "Forgetting $exists: true includes null",
+      "problem": "Query returns null values unexpectedly",
+      "solution": "Use { $exists: true, $ne: null } to exclude nulls"
+    },
+    "mistake_3_sparse_index": {
+      "mistake": "Creating regular index on optional field",
+      "problem": "Index less effective, more memory",
+      "solution": "Use sparse: true for optional fields"
+    },
+    "mistake_4_type_string_confusion": {
+      "mistake": "Using 'string' vs 'bool' inconsistently",
+      "problem": "Type names are case-sensitive",
+      "solution": "Use exact type names: bool, int, double, etc."
+    },
+    "mistake_5_missing_fields": {
+      "mistake": "Not handling missing fields in queries",
+      "problem": "Queries fail when field absent",
+      "solution": "Use $exists to check for field presence"
+    }
+  },
+  "section_12_decision_guide": {
+    "need_to_check": "What do you need to check?",
+    "scenarios": [
+      {
+        "scenario": "Field exists or missing",
+        "use": "$exists operator",
+        "example": "{ field: { $exists: true } }"
+      },
+      {
+        "scenario": "Field data type",
+        "use": "$type operator",
+        "example": "{ field: { $type: 'string' } }"
+      },
+      {
+        "scenario": "Both existence and type",
+        "use": "Combine $exists and $type",
+        "example": "{ field: { $exists: true, $type: 'int' } }"
+      },
+      {
+        "scenario": "Optional field with correct type",
+        "use": "$exists: true or $type check",
+        "example": "{ $or: [ { field: { $exists: false } }, { field: { $type: 'string' } } ] }"
+      },
+      {
+        "scenario": "Data quality validation",
+        "use": "Combine with logical operators",
+        "example": "Use $and, $or, $nor with both operators"
+      }
+    ]
+  },
+  "section_13_progression": {
+    "beginner_skills": [
+      "Understand $exists: true/false",
+      "Understand basic $type names",
+      "Simple field existence checks",
+      "Simple type checks"
+    ],
+    "intermediate_skills": [
+      "Combine $exists with $type",
+      "Use with logical operators ($and, $or)",
+      "Data quality validation",
+      "Handle optional fields"
+    ],
+    "advanced_skills": [
+      "Sparse data handling",
+      "Schema migration queries",
+      "Aggregation pipeline with both operators",
+      "Performance optimization",
+      "Data quality reporting"
+    ]
+  },
+  "summary": {
+    "definition": "Check field existence and data types in documents",
+    "operators": [
+      "$exists - Field exists (true) or missing (false)",
+      "$type - Field is specific BSON data type"
+    ],
+    "key_concepts": [
+      "$exists: true includes null values",
+      "$type checks actual BSON type",
+      "Combine both for complete validation",
+      "Use sparse indexes for optional fields"
+    ],
+    "best_practice": "Use $exists for presence checks, $type for type validation, combine for robust queries",
+    "progression": "Beginner: Basic checks → Intermediate: Combined queries → Advanced: Data quality and migration"
+  }
+}

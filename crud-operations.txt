@@ -1,0 +1,1005 @@
+================================================================================
+                 MONGODB CRUD OPERATIONS - BRIEF GUIDE
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Create, Read, Update, Delete Operations
+EXAMPLES: Using 60 Student Records from data.json
+
+CRUD = CREATE, READ, UPDATE, DELETE
+
+================================================================================
+SECTION 1: CREATE OPERATIONS (INSERT)
+================================================================================
+
+CREATE = Adding new documents to collection
+
+OPERATION #1: INSERT SINGLE STUDENT (insertOne)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.insertOne(document)
+
+Example:
+  db.students.insertOne({
+    studentId: 20260001,
+    name: { first: "Daksh", last: "Chauhan" },
+    age: 20,
+    major: "Data Science",
+    gpa: 3.85,
+    isInternational: false,
+    skills: ["Python", "SQL", "TensorFlow"],
+    courses: [{ courseCode: "DS-401", credits: 4, grade: "A" }]
+  })
+
+Result:
+  Acknowledged, inserted 1 document with _id: ObjectId(...)
+  Returns: { acknowledged: true, insertedId: ObjectId(...) }
+
+Use Case:
+  Add single new student to database
+
+
+OPERATION #2: INSERT MULTIPLE STUDENTS (insertMany)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.insertMany([doc1, doc2, doc3, ...])
+
+Example:
+  db.students.insertMany([
+    { studentId: 20260001, name: { first: "Daksh", last: "Chauhan" }, ... },
+    { studentId: 20260002, name: { first: "Anaya", last: "Sharma" }, ... },
+    { studentId: 20260003, name: { first: "Arpit", last: "Kataria" }, ... },
+    ... (all 60 students) ...
+  ])
+
+Result:
+  Acknowledged, inserted 60 documents
+  Returns: { acknowledged: true, insertedIds: [...60 ObjectIds...] }
+
+Use Case:
+  Bulk import of all 60 student records
+  Most efficient way to load initial data
+
+
+OPERATION #3: INSERT MULTIPLE WITH ERROR HANDLING (ordered)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.insertMany([docs], { ordered: true/false })
+
+Example (ordered: true - STOP ON ERROR):
+  db.students.insertMany([docs], { ordered: true })
+  If doc 2 has error, docs 3+ are not inserted
+
+Example (ordered: false - CONTINUE ON ERROR):
+  db.students.insertMany([docs], { ordered: false })
+  If doc 2 has error, docs 3+ are still inserted
+
+Use Case:
+  Continue inserting valid records even if some have errors
+
+
+OPERATION #4: INSERT OR UPDATE (UPSERT)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.updateOne(filter, update, { upsert: true })
+
+Example:
+  db.students.updateOne(
+    { studentId: 20260099 },
+    { $set: { name: { first: "New", last: "Student" }, age: 21 } },
+    { upsert: true }
+  )
+
+Result:
+  If studentId 20260099 doesn't exist → Creates new document
+  If studentId 20260099 exists → Updates it
+
+Use Case:
+  Insert if doesn't exist, update if does exist
+
+
+================================================================================
+SECTION 2: READ OPERATIONS (QUERY)
+================================================================================
+
+READ = Retrieving and finding documents
+
+OPERATION #1: FIND ALL DOCUMENTS
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find()
+
+Example:
+  db.students.find()
+
+Result:
+  Returns cursor to all 60 student documents
+  Can iterate through results
+
+Use Case:
+  Get entire collection
+  View all student records
+
+
+OPERATION #2: FIND SINGLE DOCUMENT (findOne)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.findOne(filter)
+
+Example:
+  db.students.findOne({ studentId: 20260001 })
+
+Result:
+  Returns: {
+    _id: ObjectId(...),
+    studentId: 20260001,
+    name: { first: "Daksh", last: "Chauhan" },
+    age: 20,
+    major: "Data Science",
+    gpa: 3.85,
+    ...
+  }
+
+Use Case:
+  Get specific student by ID
+  Quick lookup of one record
+
+
+OPERATION #3: FIND WITH FILTER CONDITION
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find({ field: value })
+
+Example #1 - Find by Major:
+  db.students.find({ major: "Data Science" })
+  Result: Returns 1 student (Daksh Chauhan)
+
+Example #2 - Find by Status:
+  db.students.find({ isInternational: true })
+  Result: Returns 30 international students
+
+Example #3 - Find by GPA Threshold:
+  db.students.find({ gpa: { $gte: 3.9 } })
+  Result: Returns 17 honor students with GPA >= 3.9
+  Includes: Anaya Sharma (3.92), Kavya Mishra (3.91), Neha Gupta (3.98), etc.
+
+Example #4 - Find by Age Range:
+  db.students.find({ age: { $gte: 20, $lte: 25 } })
+  Result: Returns students aged 20-25
+
+Use Case:
+  Filter students by various criteria
+
+
+OPERATION #4: FIND DOCUMENTS WITH ARRAY MATCH
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find({ arrayField: value })
+
+Example:
+  db.students.find({ skills: "Python" })
+
+Result:
+  Returns all students who have Python in their skills array
+  Many students match (Python is common skill)
+
+Use Case:
+  Find students by skill
+  Search array values
+
+
+OPERATION #5: FIND NESTED FIELD
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find({ "nestedObject.field": value })
+
+Example #1:
+  db.students.find({ "name.first": "Daksh" })
+  Result: Returns Daksh Chauhan
+
+Example #2:
+  db.students.find({ "courses.grade": "A" })
+  Result: Returns students with A grade in any course
+
+Example #3:
+  db.students.find({ "scholarshipDetails.renewable": true })
+  Result: Returns students with renewable scholarships (15 students)
+
+Use Case:
+  Query nested/embedded fields
+  Find by specific course details
+
+
+OPERATION #6: FIND WITH MULTIPLE CONDITIONS (AND)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find({ condition1, condition2, ... })
+
+Example:
+  db.students.find({
+    major: "Data Science",
+    gpa: { $gte: 3.8 }
+  })
+
+Result:
+  Returns Data Science students with GPA >= 3.8
+  All conditions must be true (AND)
+
+Use Case:
+  Complex filtering with multiple criteria
+
+
+OPERATION #7: FIND WITH OR CONDITION
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find({ $or: [condition1, condition2] })
+
+Example:
+  db.students.find({
+    $or: [
+      { major: "Data Science" },
+      { major: "Machine Learning" }
+    ]
+  })
+
+Result:
+  Returns students in either major (2 students)
+  At least one condition must be true (OR)
+
+Use Case:
+  Find documents matching any of multiple criteria
+
+
+OPERATION #8: FIND WITH PROJECTION (SELECT FIELDS)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find(filter, { field1: 1, field2: 0 })
+  1 = include, 0 = exclude
+
+Example #1 - Include Specific Fields:
+  db.students.find(
+    { major: "Data Science" },
+    { name: 1, gpa: 1, major: 1 }
+  )
+  Result: Returns only name, gpa, major (not skills, courses, etc.)
+
+Example #2 - Exclude Sensitive Data:
+  db.students.find(
+    {},
+    { libraryCardToken: 0 }
+  )
+  Result: Returns all fields except libraryCardToken
+
+Use Case:
+  Reduce network traffic
+  Improve performance by fetching only needed data
+  Hide sensitive information
+
+
+OPERATION #9: FIND WITH SORTING
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find().sort({ field: 1/-1 })
+  1 = ascending, -1 = descending
+
+Example #1 - Top Students by GPA:
+  db.students.find().sort({ gpa: -1 }).limit(10)
+  Result: Top 10 students by GPA (highest first)
+  1. Neha Gupta (3.98)
+  2. Esha Chatterjee (3.95)
+  3. Maya Kapoor (3.94)
+  ...
+
+Example #2 - Sort by Name Alphabetically:
+  db.students.find().sort({ "name.last": 1 })
+  Result: Students sorted A-Z by last name
+
+Example #3 - Sort by Age Descending:
+  db.students.find().sort({ age: -1 })
+  Result: Oldest students first
+
+Use Case:
+  Rank students by performance
+  Alphabetical listing
+  Age-based grouping
+
+
+OPERATION #10: PAGINATION (LIMIT & SKIP)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.find().skip(n).limit(m)
+
+Example - Page 2 (10 items per page):
+  db.students.find().sort({ _id: 1 }).skip(10).limit(10)
+  Result: Returns students 11-20
+
+How It Works:
+  skip(10) = Skip first 10 documents
+  limit(10) = Return next 10 documents
+  Page 1: skip(0).limit(10)   → Items 1-10
+  Page 2: skip(10).limit(10)  → Items 11-20
+  Page 3: skip(20).limit(10)  → Items 21-30
+
+Use Case:
+  Display search results in pages
+  Load data in chunks
+
+
+OPERATION #11: COUNT DOCUMENTS
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.countDocuments(filter)
+
+Example #1 - Total Students:
+  db.students.countDocuments()
+  Result: 60
+
+Example #2 - Count International Students:
+  db.students.countDocuments({ isInternational: true })
+  Result: 30
+
+Example #3 - Count Honor Students:
+  db.students.countDocuments({ gpa: { $gte: 3.9 } })
+  Result: 17
+
+Use Case:
+  Get statistics
+  Verify data counts
+
+
+OPERATION #12: DISTINCT VALUES
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.distinct(field)
+
+Example #1 - All Majors:
+  db.students.distinct("major")
+  Result: [60 unique major names]
+
+Example #2 - All Ages:
+  db.students.distinct("age")
+  Result: [20, 25, 26, 27, 28, ..., 53]
+
+Example #3 - All Skills:
+  db.students.distinct("skills")
+  Result: [All unique skills across students]
+
+Use Case:
+  Get unique values for dropdown lists
+  Find all majors offered
+
+
+OPERATION #13: AGGREGATION (COMPLEX ANALYSIS)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.aggregate([stage1, stage2, ...])
+
+Example #1 - Count and Average GPA by Major:
+  db.students.aggregate([
+    {
+      $group: {
+        _id: "$major",
+        count: { $sum: 1 },
+        avgGPA: { $avg: "$gpa" }
+      }
+    }
+  ])
+
+  Result:
+  { _id: "Data Science", count: 1, avgGPA: 3.85 }
+  { _id: "Frontend Engineering", count: 1, avgGPA: 3.92 }
+  ... (60 documents)
+
+Example #2 - International Students by Age:
+  db.students.aggregate([
+    { $match: { isInternational: true } },
+    {
+      $group: {
+        _id: "$age",
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { _id: 1 } }
+  ])
+
+  Result:
+  { _id: 20, count: 2 }
+  { _id: 25, count: 2 }
+  { _id: 26, count: 1 }
+  ...
+
+Example #3 - Top 5 Skills by Frequency:
+  db.students.aggregate([
+    { $unwind: "$skills" },
+    { $group: { _id: "$skills", count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+    { $limit: 5 }
+  ])
+
+  Result:
+  Most common skills used by students
+
+Use Case:
+  Complex data analysis
+  Multi-stage processing
+  Report generation
+
+
+================================================================================
+SECTION 3: UPDATE OPERATIONS (MODIFY)
+================================================================================
+
+UPDATE = Changing existing document data
+
+OPERATION #1: UPDATE SINGLE DOCUMENT (updateOne)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.updateOne(filter, update)
+
+Example - Update Student's GPA:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { gpa: 3.90 } }
+  )
+
+Result:
+  Daksh Chauhan's GPA updated from 3.85 to 3.90
+  Returns: { modifiedCount: 1, matchedCount: 1 }
+
+Use Case:
+  Update single student record
+  Modify one field
+
+
+OPERATION #2: UPDATE MULTIPLE DOCUMENTS (updateMany)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.updateMany(filter, update)
+
+Example - Update All International Students:
+  db.students.updateMany(
+    { isInternational: true },
+    { $set: { visaStatus: "F-1" } }
+  )
+
+Result:
+  30 documents updated
+  Returns: { modifiedCount: 30, matchedCount: 30 }
+
+Use Case:
+  Bulk update multiple records
+  Update all documents matching criteria
+
+
+OPERATION #3: $SET OPERATOR (Set Field Value)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { $set: { field: value } }
+
+Example #1 - Update Simple Field:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { age: 21 } }
+  )
+
+Example #2 - Update Nested Field:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { "scholarshipDetails.amount": 20000 } }
+  )
+
+Example #3 - Update Multiple Fields:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $set: { age: 21, gpa: 3.95, "name.first": "Daksh Kumar" } }
+  )
+
+Use Case:
+  Set or modify field values
+  Works for new fields (creates if doesn't exist)
+
+
+OPERATION #4: $INC OPERATOR (Increment Value)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { $inc: { field: number } }
+
+Example #1 - Increment Age:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $inc: { age: 1 } }
+  )
+  Result: age changes from 20 to 21
+
+Example #2 - Decrement (use negative):
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $inc: { enrolledCourses: -1 } }
+  )
+  Result: enrolledCourses decreases by 1
+
+Use Case:
+  Increment counters
+  Update numeric values
+  Track statistics
+
+
+OPERATION #5: $PUSH OPERATOR (Add to Array)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { $push: { arrayField: value } }
+
+Example #1 - Add Single Skill:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $push: { skills: "Docker" } }
+  )
+  Result: Docker added to skills array
+
+Example #2 - Add Multiple Values:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $push: { skills: { $each: ["Docker", "Kubernetes"] } } }
+  )
+  Result: Both Docker and Kubernetes added
+
+Use Case:
+  Add new skills to student
+  Append items to array
+  Build historical records
+
+
+OPERATION #6: $PULL OPERATOR (Remove from Array)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { $pull: { arrayField: value } }
+
+Example #1 - Remove Skill:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $pull: { skills: "TensorFlow" } }
+  )
+  Result: TensorFlow removed from skills array
+
+Example #2 - Remove by Condition:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $pull: { courses: { grade: "F" } } }
+  )
+  Result: Remove all failing courses
+
+Use Case:
+  Remove skills
+  Remove courses
+  Clean up arrays
+
+
+OPERATION #7: $UNSET OPERATOR (Remove Field)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { $unset: { field: "" } }
+
+Example:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $unset: { scholarshipDetails: "" } }
+  )
+  Result: scholarshipDetails field removed entirely
+
+Use Case:
+  Delete optional fields
+  Clean up documents
+
+
+OPERATION #8: $ADDTOSET OPERATOR (Add If Not Exists)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { $addToSet: { arrayField: value } }
+
+Example:
+  db.students.updateOne(
+    { studentId: 20260001 },
+    { $addToSet: { skills: "Python" } }
+  )
+  Result: Python NOT added (already exists, prevents duplicates)
+
+Use Case:
+  Add unique values to array
+  Prevent duplicate entries
+
+
+OPERATION #9: REPLACE ENTIRE DOCUMENT (replaceOne)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.replaceOne(filter, newDocument)
+
+Example:
+  db.students.replaceOne(
+    { studentId: 20260001 },
+    {
+      studentId: 20260001,
+      name: { first: "Daksh", last: "Chauhan" },
+      age: 21,
+      major: "Data Science",
+      gpa: 3.95
+    }
+  )
+
+Result:
+  Entire document replaced with new version
+  All previous data lost
+
+Use Case:
+  Complete overwrite of record
+  Migrate document structure
+
+
+OPERATION #10: FIND AND UPDATE (findOneAndUpdate)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.findOneAndUpdate(filter, update, options)
+
+Example:
+  db.students.findOneAndUpdate(
+    { studentId: 20260001 },
+    { $set: { gpa: 3.95 } },
+    { returnNewDocument: true }
+  )
+
+Result:
+  Returns updated document immediately
+  Can access new values right away
+
+Use Case:
+  Update and get result in one operation
+  Atomic operation
+
+
+================================================================================
+SECTION 4: DELETE OPERATIONS (REMOVE)
+================================================================================
+
+DELETE = Removing documents from collection
+
+OPERATION #1: DELETE SINGLE DOCUMENT (deleteOne)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.deleteOne(filter)
+
+Example:
+  db.students.deleteOne({ studentId: 20260099 })
+
+Result:
+  Deleted 1 document (if it exists)
+  Returns: { deletedCount: 1 }
+
+Use Case:
+  Remove specific student
+  Delete one record
+
+
+OPERATION #2: DELETE MULTIPLE DOCUMENTS (deleteMany)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.deleteMany(filter)
+
+Example #1 - Delete by Criterion:
+  db.students.deleteMany({ age: { $gte: 50 } })
+  Result: Deleted all students aged 50+
+
+Example #2 - Delete without Scholarship:
+  db.students.deleteMany({ scholarshipDetails: null })
+  Result: Deleted 30 students without scholarships
+
+Example #3 - Delete Inactive Students:
+  db.students.deleteMany({ status: "inactive" })
+  Result: Deleted all inactive students
+
+Use Case:
+  Bulk delete
+  Remove by criteria
+
+
+OPERATION #3: DELETE ALL DOCUMENTS (WARNING!)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.deleteMany({})
+
+Example:
+  db.students.deleteMany({})
+
+Result:
+  ALL 60 STUDENTS DELETED
+  Returns: { deletedCount: 60 }
+
+⚠️ WARNING: No filter = delete everything!
+USE WITH EXTREME CAUTION
+
+
+OPERATION #4: FIND AND DELETE (findOneAndDelete)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.findOneAndDelete(filter)
+
+Example:
+  db.students.findOneAndDelete({ studentId: 20260001 })
+
+Result:
+  Returns Daksh Chauhan's document BEFORE deletion
+  Document is deleted after return
+
+Use Case:
+  Delete and archive student record
+  Get last state before deletion
+
+
+OPERATION #5: DELETE WITH SORT
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  db.collection.deleteOne(filter, { sort: { field: 1/-1 } })
+
+Example - Delete Youngest Data Science Student:
+  db.students.deleteOne(
+    { major: "Data Science" },
+    { sort: { age: 1 } }
+  )
+
+Result:
+  Deletes the youngest Data Science student
+
+Use Case:
+  Delete specific record by criteria
+  Selective deletion
+
+
+================================================================================
+SECTION 5: PRACTICAL EXAMPLES
+================================================================================
+
+EXAMPLE #1: COMPLETE WORKFLOW - MANAGING ONE STUDENT
+────────────────────────────────────────────────────────────────────────────
+
+Step 1 - CREATE:
+  db.students.insertOne({
+    studentId: 20260001,
+    name: { first: "Daksh", last: "Chauhan" },
+    age: 20,
+    major: "Data Science",
+    gpa: 3.85,
+    skills: ["Python", "SQL"],
+    isInternational: false
+  })
+
+Step 2 - READ (Verify Creation):
+  db.students.findOne({ studentId: 20260001 })
+  Result: Shows complete student record
+
+Step 3 - UPDATE (Add Skill and Update GPA):
+  db.students.updateOne(
+    { studentId: 20260001 },
+    {
+      $set: { gpa: 3.90 },
+      $push: { skills: "TensorFlow" }
+    }
+  )
+
+Step 4 - READ (Verify Updates):
+  db.students.findOne({ studentId: 20260001 })
+  Result: Shows updated GPA and skills
+
+Step 5 - DELETE:
+  db.students.deleteOne({ studentId: 20260001 })
+  Result: Student removed from database
+
+
+EXAMPLE #2: BATCH OPERATIONS - ALL 60 STUDENTS
+────────────────────────────────────────────────────────────────────────────
+
+CREATE - Load All 60:
+  db.students.insertMany([...60 student documents...])
+
+READ - Various Queries:
+  db.students.find()                      // All students
+  db.students.find({ isInternational: true })  // International
+  db.students.find({ gpa: { $gte: 3.9 } })    // Honor students
+  db.students.countDocuments()            // Total count: 60
+
+UPDATE - Bulk Changes:
+  db.students.updateMany(
+    { isInternational: true },
+    { $set: { visaStatus: "F-1" } }
+  )
+
+DELETE - Remove Inactives:
+  db.students.deleteMany({ status: "inactive" })
+
+
+EXAMPLE #3: CONDITIONAL OPERATIONS
+────────────────────────────────────────────────────────────────────────────
+
+By Major:
+  READ: db.students.find({ major: "Data Science" })
+  UPDATE: db.students.updateMany({ major: "Data Science" }, { $set: { ... } })
+  DELETE: db.students.deleteMany({ major: "Obsolete Major" })
+
+By GPA:
+  READ: db.students.find({ gpa: { $lt: 2.0 } })
+  UPDATE: db.students.updateMany({ gpa: { $lt: 2.0 } }, { $set: { status: "probation" } })
+  DELETE: db.students.deleteMany({ gpa: 0 })
+
+By International Status:
+  READ: db.students.find({ isInternational: true })
+  UPDATE: db.students.updateMany({ isInternational: true }, { $set: { requiresVisa: true } })
+  DELETE: db.students.deleteMany({ isInternational: true, status: "graduated" })
+
+
+================================================================================
+SECTION 6: OPERATORS QUICK REFERENCE
+================================================================================
+
+COMPARISON OPERATORS (for filtering):
+  $eq   = Equal to
+  $ne   = Not equal to
+  $gt   = Greater than
+  $gte  = Greater than or equal
+  $lt   = Less than
+  $lte  = Less than or equal
+  $in   = In array
+  $nin  = Not in array
+
+LOGICAL OPERATORS (combine conditions):
+  $and  = All conditions true
+  $or   = Any condition true
+  $not  = Negate condition
+  $nor  = No conditions true
+
+ARRAY OPERATORS (work with arrays):
+  $all        = All array values match
+  $elemMatch  = Element matches condition
+  $size       = Array size equals
+  $push       = Add to array
+  $pull       = Remove from array
+  $addToSet   = Add if not exists
+
+UPDATE OPERATORS (modify documents):
+  $set    = Set field value
+  $unset  = Remove field
+  $inc    = Increment field
+  $mul    = Multiply field
+  $rename = Rename field
+  $push   = Add to array
+  $pull   = Remove from array
+
+
+================================================================================
+SECTION 7: BEST PRACTICES
+================================================================================
+
+1. ALWAYS USE FILTERS IN UPDATE/DELETE
+   ✓ Good:  db.students.updateOne({ studentId: 20260001 }, { $set: { ... } })
+   ✗ Bad:   db.students.updateOne({}, { $set: { ... } })  // Updates ALL!
+
+2. USE PROJECTIONS TO REDUCE DATA TRANSFER
+   ✓ Good:  db.students.find({}, { name: 1, gpa: 1 })  // Only needed fields
+   ✗ Bad:   db.students.find()                          // All fields
+
+3. CREATE INDEXES ON FREQUENTLY QUERIED FIELDS
+   db.students.createIndex({ "major": 1 })
+   db.students.createIndex({ "gpa": 1 })
+
+4. USE BULK OPERATIONS FOR PERFORMANCE
+   ✓ insertMany for multiple inserts
+   ✓ updateMany for bulk updates
+
+5. VALIDATE DATA BEFORE INSERTION
+   Check data format, required fields, constraints
+
+6. USE TRANSACTIONS FOR CONSISTENCY
+   Multiple operations either all succeed or all fail
+
+7. ARCHIVE OLD DATA INSTEAD OF DELETING
+   Keep historical records for auditing
+
+8. USE findOneAndUpdate FOR ATOMIC OPERATIONS
+   Ensures consistency with single operation
+
+9. LIMIT RESULT SETS FOR LARGE COLLECTIONS
+   Always use .limit() to prevent loading entire collection
+
+10. USE AGGREGATION FOR COMPLEX ANALYSIS
+    Better performance than client-side processing
+
+
+================================================================================
+SECTION 8: SUMMARY TABLE
+================================================================================
+
+Operation        Syntax                          Use Case
+──────────────────────────────────────────────────────────────────────────
+CREATE
+insertOne()      db.col.insertOne(doc)           Insert single document
+insertMany()     db.col.insertMany([docs])       Insert multiple documents
+upsert           db.col.updateOne(f, u, {u:t})  Insert if not exists
+
+READ
+find()           db.col.find()                   Get all documents
+findOne()        db.col.findOne(filter)         Get single document
+count()          db.col.countDocuments(f)       Count matching docs
+distinct()       db.col.distinct(field)         Get unique values
+aggregate()      db.col.aggregate([stages])     Complex analysis
+
+UPDATE
+updateOne()      db.col.updateOne(f, u)         Update one document
+updateMany()     db.col.updateMany(f, u)        Update many documents
+$set             { $set: { field: value } }     Set field value
+$push            { $push: { arr: val } }        Add to array
+$pull            { $pull: { arr: val } }        Remove from array
+replaceOne()     db.col.replaceOne(f, newdoc)  Replace entire document
+
+DELETE
+deleteOne()      db.col.deleteOne(filter)       Delete one document
+deleteMany()     db.col.deleteMany(filter)      Delete multiple documents
+deleteMany({})   db.col.deleteMany({})          Delete ALL (dangerous!)
+
+
+================================================================================
+IMPORTANT REMINDERS
+================================================================================
+
+⚠️ ALWAYS USE FILTERS
+   Never run update/delete without filter, unless intentional
+
+⚠️ TEST BEFORE EXECUTING
+   Always test queries with find() before running update/delete
+
+⚠️ BACKUP BEFORE BULK OPERATIONS
+   Create backup before large updates/deletes
+
+✓ USE PROJECTIONS
+   Reduce network traffic and improve performance
+
+✓ CREATE INDEXES
+   Speed up frequently used queries
+
+✓ VALIDATE DATA
+   Ensure data quality before insertion
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+For more information on MongoDB operations, refer to official documentation:
+https://docs.mongodb.com/manual/crud/

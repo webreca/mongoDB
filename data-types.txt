@@ -1,0 +1,987 @@
+================================================================================
+                      MONGODB DATA TYPES - COMPLETE GUIDE
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: All MongoDB data types with examples and use cases
+EXAMPLES: Using 60 Student Records from data.json
+
+DATA TYPE = Defines the kind of value stored in a field
+
+
+================================================================================
+SECTION 1: OVERVIEW OF MONGODB DATA TYPES
+================================================================================
+
+DEFINITION:
+  MongoDB documents store data using various types for different purposes.
+  Type selection affects storage, performance, querying, and validation.
+
+WHY DATA TYPES MATTER:
+  ✓ Efficient storage (bytes)
+  ✓ Fast querying (indexes, operators)
+  ✓ Type safety and validation
+  ✓ Cross-language compatibility
+  ✓ Specialized behavior (dates, geo, IDs)
+
+MONGODB SUPPORTS:
+  ✓ Primitive types: String, Number, Boolean, Null
+  ✓ Special types: ObjectId, Date
+  ✓ Complex types: Array, Embedded Document
+  ✓ Geospatial types: Point, Polygon, LineString
+  ✓ Binary types: BinData
+
+
+================================================================================
+SECTION 2: STRING TYPE
+================================================================================
+
+DEFINITION:
+  UTF-8 text data, the most common MongoDB data type.
+
+SYNTAX:
+  "text value"
+
+CHARACTERISTICS:
+  ✓ UTF-8 encoded
+  ✓ No practical size limit
+  ✓ Case-sensitive by default
+  ✓ Fast indexed searches
+  ✓ Good for searchability
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: studentId
+Value: "20260001"
+Query: db.students.find({ studentId: '20260001' })
+Use: Unique identifier for each student
+
+Field: major
+Value: "Data Science"
+Query: db.students.find({ major: 'Data Science' })
+Use: Filter students by field of study (60 different majors)
+
+Field: name.first
+Value: "Daksh"
+Query: db.students.find({ 'name.first': 'Daksh' })
+Use: Search by first name
+
+Field: name.last
+Value: "Chauhan"
+Query: db.students.find({ 'name.last': 'Chauhan' })
+Use: Search by last name
+
+
+USE CASES FOR STRING:
+  ✓ Names and identifiers
+  ✓ Email and contact info
+  ✓ Status values (active, pending)
+  ✓ Descriptions and notes
+  ✓ URLs and file paths
+  ✓ Enum-like values
+
+PERFORMANCE:
+  Storage: Variable (characters × bytes per character)
+  Query: Very fast with index
+  Sorting: Lexicographic (alphabetical)
+
+BEST PRACTICES:
+  ✓ Index frequently searched strings
+  ✓ Use lowercase for case-insensitive searches
+  ✓ Validate format at application level
+  ✓ Use specific enums for fixed options
+  ✓ Trim whitespace for consistency
+
+
+================================================================================
+SECTION 3: NUMBER TYPE
+================================================================================
+
+DEFINITION:
+  Numeric data - both integers and floating-point numbers.
+
+SUBTYPES:
+  Int32:  32-bit integer (-2,147,483,648 to 2,147,483,647)
+  Int64:  64-bit integer (very large range)
+  Double: 64-bit floating-point (decimals, like 3.85)
+
+CHARACTERISTICS:
+  ✓ Fast arithmetic operations
+  ✓ Range queries very efficient
+  ✓ Sorting is fast
+  ✓ Aggregation operators available
+  ✓ Type preservation on insert
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: age
+Value: 20 (Int32)
+Query: db.students.find({ age: 20 })
+Use: Filter students by exact age (ages 20-53, pattern: 20,20,25,25,26,26...)
+
+Field: gpa
+Value: 3.85 (Double)
+Query: db.students.find({ gpa: { $gte: 3.5 } })
+Use: Find honor students with GPA >= 3.5 (17 students)
+
+Field: scholarshipDetails.amount
+Value: 15000 (Int32)
+Query: db.students.find({ 'scholarshipDetails.amount': { $gte: 10000 } })
+Use: Find students with high scholarships (30 with scholarships)
+
+
+USE CASES FOR NUMBER:
+  ✓ Age and grade levels
+  ✓ GPA and test scores
+  ✓ Counts and statistics
+  ✓ Prices and amounts
+  ✓ Quantities and inventory
+  ✓ Ratings (1-5 stars)
+
+STORAGE EFFICIENCY:
+  Int32:  4 bytes
+  Int64:  8 bytes
+  Double: 8 bytes (same as Int64)
+
+QUERIES:
+  Exact match:     db.students.find({ age: 20 })
+  Greater than:    db.students.find({ gpa: { $gt: 3.5 } })
+  Range:           db.students.find({ age: { $gte: 20, $lte: 25 } })
+  In set:          db.students.find({ age: { $in: [20, 25, 26] } })
+
+PERFORMANCE:
+  Comparison: Extremely fast
+  Sorting: Numeric order very quick
+  Aggregation: Math operations efficient
+
+BEST PRACTICES:
+  ✓ Use Int32 for typical counts and IDs
+  ✓ Use Double for decimal values (GPA, percentage)
+  ✓ Index numeric fields for range queries
+  ✓ Use consistent type for same field
+  ✓ Don't store as string ("20" not "20")
+
+
+================================================================================
+SECTION 4: BOOLEAN TYPE
+================================================================================
+
+DEFINITION:
+  True/false values for flags and conditions.
+
+VALUES:
+  true  - Yes, on, enabled
+  false - No, off, disabled
+
+CHARACTERISTICS:
+  ✓ Simple yes/no
+  ✓ Very small (1 bit, ~1 byte)
+  ✓ Fast queries
+  ✓ Perfect for flags
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: isInternational
+Value: false (or true)
+Query: db.students.find({ isInternational: true })
+Use: Find international students (30 out of 60)
+
+Field: scholarshipDetails.awarded
+Value: true (or false)
+Query: db.students.find({ 'scholarshipDetails.awarded': true })
+Use: Find students with scholarships (30 out of 60)
+
+
+USE CASES FOR BOOLEAN:
+  ✓ Status flags (active, verified, published)
+  ✓ Student status (international, on scholarship)
+  ✓ Feature flags (hasPhoto, isPremium)
+  ✓ Preferences (reminders enabled)
+  ✓ Soft deletes (deleted: true/false)
+
+SOFT DELETE PATTERN:
+  Instead of: db.students.deleteOne({ studentId: '20260001' })
+  Use:        db.students.updateOne({ studentId: '20260001' },
+                                      { $set: { deleted: true } })
+  Query:      db.students.find({ deleted: false })
+
+  Benefits:
+    ✓ Reversible (set deleted: false to undelete)
+    ✓ Keep audit trail
+    ✓ Recover deleted data
+    ✓ Still fast query
+
+
+PERFORMANCE:
+  Storage: ~1 byte (bit-packed)
+  Query: Extremely fast
+  Index: Worth it for common filters
+
+BEST PRACTICES:
+  ✓ Name fields clearly: isActive, hasScholarship, isPremium
+  ✓ Use for soft deletes (safe)
+  ✓ Index boolean fields for fast filtering
+  ✓ Don't use for three-state (use null or enum string)
+
+
+================================================================================
+SECTION 5: NULL TYPE
+================================================================================
+
+DEFINITION:
+  Represents missing or undefined data.
+
+SYNTAX:
+  null
+
+WHEN TO USE NULL:
+  ✓ Optional fields (not all records have)
+  ✓ Default/empty values
+  ✓ Distinguish from false or 0
+
+EXAMPLE FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: scholarshipDetails.notes
+Value: null (if no notes)
+Query: db.students.find({ 'scholarshipDetails.notes': null })
+Use: Find students without scholarship notes
+
+
+NULL vs MISSING FIELD:
+  Both find same result:
+    db.students.find({ field: null })         // field: null or field missing
+    db.students.find({ field: { $exists: false } })  // field definitely missing
+
+  Difference:
+    { field: null }           - Field explicitly set to null
+    {} (field omitted)        - Field doesn't exist in doc
+
+  Check explicitly:
+    db.students.find({ field: { $exists: true } })   // Field exists
+    db.students.find({ field: { $exists: false } })  // Field missing
+
+
+NULL vs 0 vs FALSE:
+  null:  Data is missing/unknown
+  0:     Actual numeric zero
+  false: Boolean false condition
+
+  They are NOT equivalent!
+
+
+PERFORMANCE:
+  Storage: No storage (field typically omitted)
+  Query: Fast (no data to compare)
+
+BEST PRACTICES:
+  ✓ Prefer omitting field to setting null
+  ✓ Use null for optional fields that may exist
+  ✓ Distinguish null from 0 or false
+  ✓ Use { $exists: false } for missing fields
+  ✓ Use { $exists: true } to verify field present
+
+
+================================================================================
+SECTION 6: OBJECTID TYPE
+================================================================================
+
+DEFINITION:
+  12-byte unique identifier automatically generated for each document.
+
+STRUCTURE:
+  [4-byte timestamp] [3-byte machine ID] [2-byte process ID] [3-byte counter]
+  = 12 bytes total per ObjectId
+
+EXAMPLE:
+  ObjectId('507f1f77bcf86cd799439011')
+
+CHARACTERISTICS:
+  ✓ Unique across all documents
+  ✓ Sortable by creation time
+  ✓ Auto-generated if not provided
+  ✓ Can be manually specified
+  ✓ Lighter than UUID
+  ✓ Default _id field type
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: _id
+Type: ObjectId
+Auto-generated: Yes (unless you provide custom value)
+Query: db.students.findOne({ _id: ObjectId('507f1f77bcf86cd799439011') })
+Use: Uniquely identify document
+
+
+GENERATION:
+  Automatic (Recommended):
+    db.students.insertOne({ name: 'Daksh' })
+    // MongoDB auto-generates _id
+
+  Manual (Custom):
+    db.students.insertOne({ _id: 'CUSTOM-ID-123', name: 'Daksh' })
+    // Must be unique
+
+
+PERFORMANCE:
+  Lookup: Extremely fast (indexed by default)
+  Generation: Very fast
+  Sorting: O(1) lookup by _id
+
+BEST PRACTICES:
+  ✓ Let MongoDB auto-generate ObjectId
+  ✓ Use for most _id fields
+  ✓ Only custom _id if you need meaningful value
+  ✓ _id is indexed by default (don't create again)
+  ✓ Don't rely on timestamp portion for exact timing
+
+
+================================================================================
+SECTION 7: DATE TYPE
+================================================================================
+
+DEFINITION:
+  Date and time stored as milliseconds since Unix epoch (Jan 1, 1970).
+
+RANGE:
+  1970-01-01 to 2262-04-11
+
+PRECISION:
+  Millisecond accuracy (1000 = 1 second)
+
+FORMAT:
+  ISO 8601: ISODate('YYYY-MM-DDThh:mm:ssZ')
+  Example:  ISODate('2023-08-15T10:30:00Z')
+
+CHARACTERISTICS:
+  ✓ Timezone aware (stored as UTC)
+  ✓ Sortable chronologically
+  ✓ Fast range queries
+  ✓ Aggregation operators available
+  ✓ 8 bytes storage
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: enrollmentDate
+Value: ISODate('2023-08-15T10:30:00Z')
+Query: db.students.find({ enrollmentDate: { $gte: ISODate('2023-01-01') } })
+Use: Find students enrolled after specific date
+
+
+DATE QUERIES:
+  After date:     db.students.find({ enrollmentDate: { $gte: ISODate('2023-01-01') } })
+  Before date:    db.students.find({ enrollmentDate: { $lte: ISODate('2023-12-31') } })
+  Range:          db.students.find({ enrollmentDate: { $gte: start, $lte: end } })
+  Today:          db.students.find({ enrollmentDate: { $gte: new Date(2024, 5, 23) } })
+
+
+INSERTION METHODS:
+  Option 1: Current time
+    db.students.insertOne({ enrollmentDate: new Date() })
+
+  Option 2: Specific ISO date
+    db.students.insertOne({ enrollmentDate: ISODate('2023-08-15') })
+
+  Option 3: JavaScript Date
+    db.students.insertOne({ enrollmentDate: new Date('2023-08-15') })
+
+
+TIMEZONE HANDLING:
+  RULE: Always store in UTC (Zulu time - Z suffix)
+
+  Insert:  ISODate('2023-08-15T10:30:00Z')  // UTC
+  Store:   Stored as milliseconds since epoch
+  Retrieve: Convert to local timezone in application
+
+
+PERFORMANCE:
+  Storage: 8 bytes per date
+  Query: Fast with index on date field
+  Range: Date indexes are very efficient
+
+BEST PRACTICES:
+  ✓ Always use ISO 8601 format (YYYY-MM-DDThh:mm:ssZ)
+  ✓ Always store in UTC timezone
+  ✓ Create index on date fields for range queries
+  ✓ Use ISODate() in shell queries
+  ✓ Don't store as string ("2023-08-15")
+  ✓ Handle timezone conversion at app level
+
+
+================================================================================
+SECTION 8: ARRAY TYPE
+================================================================================
+
+DEFINITION:
+  Ordered list of values (any type), one of MongoDB's most powerful features.
+
+CHARACTERISTICS:
+  ✓ Can hold multiple values
+  ✓ Any type (strings, numbers, objects)
+  ✓ Ordered (index 0, 1, 2, ...)
+  ✓ No practical size limit
+  ✓ Fast element queries
+  ✓ Array operators for updates
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: skills
+Value: ["Python", "SQL", "TensorFlow", "MongoDB"]
+Type: Array of Strings
+Query: db.students.find({ skills: 'Python' })
+Use: Find students with Python skill
+
+Field: courses
+Value: ["CS101", "MATH201", "DB301"]
+Type: Array of Strings
+Query: db.students.find({ courses: { $in: ['CS101', 'CS102'] } })
+Use: Find students enrolled in specific courses
+
+
+QUERYING ARRAYS:
+────────────────────────────────────────────────────────────────────────────
+
+Find by array element:
+  Query: db.students.find({ skills: 'Python' })
+  Result: Finds if 'Python' in array (any position)
+
+Find by multiple conditions:
+  Query: db.students.find({ skills: { $in: ['Python', 'Java'] } })
+  Result: Has Python OR Java (or both)
+
+Find all matching multiple:
+  Query: db.students.find({ skills: { $all: ['Python', 'SQL'] } })
+  Result: Has BOTH Python AND SQL
+
+Find by array size:
+  Query: db.students.find({ skills: { $size: 4 } })
+  Result: Skills array has exactly 4 elements
+
+Find by element count:
+  Query: db.students.find({ skills: { $elemMatch: { $eq: 'Python' } } })
+  Result: Has Python (more control than simple query)
+
+
+UPDATING ARRAYS:
+────────────────────────────────────────────────────────────────────────────
+
+Add single element:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { skills: 'JavaScript' } }
+  )
+  Result: 'JavaScript' added to skills array
+
+Remove element:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $pull: { skills: 'Python' } }
+  )
+  Result: 'Python' removed from skills array
+
+Add multiple elements:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { skills: { $each: ['Go', 'Rust'] } } }
+  )
+  Result: Both 'Go' and 'Rust' added
+
+Add only if unique:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $addToSet: { skills: 'JavaScript' } }
+  )
+  Result: Add only if not already present
+
+
+PERFORMANCE:
+  Storage: ~4 bytes per string element (varies)
+  Query: Very fast with index
+  Large arrays: May slow queries
+  Growth: Unbounded growth can become problem
+
+USE CASES FOR ARRAY:
+  ✓ Skills (multiple talents)
+  ✓ Courses (multiple classes taken)
+  ✓ Tags (multiple categories)
+  ✓ History (multiple events)
+  ✓ Contact methods (multiple phones/emails)
+
+LIMITS:
+  Hard limit: 16 MB total document size
+  Practical limit: Keep arrays focused (< 1000 items)
+  Recommendation: Consider separate collection if > 100 items
+
+BEST PRACTICES:
+  ✓ Use for 1-to-few relationships
+  ✓ Keep array size bounded
+  ✓ Index array fields for searches
+  ✓ Don't use for 1-to-many (>100 items)
+  ✓ Consider separate collection for large arrays
+  ✓ Use $push/$pull for updates
+  ✓ Use $size operator carefully (no index support)
+
+
+================================================================================
+SECTION 9: EMBEDDED DOCUMENT TYPE
+================================================================================
+
+DEFINITION:
+  Nested document structure (object) for related fields.
+
+CHARACTERISTICS:
+  ✓ Groups related data logically
+  ✓ No separate join needed
+  ✓ Single query for related fields
+  ✓ Max 100 levels deep
+  ✓ Part of 16MB document limit
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Embedded Document #1: name
+{
+  "first": "Daksh",
+  "last": "Chauhan"
+}
+Query: db.students.find({ 'name.first': 'Daksh' })
+Use: Access related name fields together
+
+Embedded Document #2: scholarshipDetails
+{
+  "amount": 15000,
+  "awarded": true,
+  "notes": "Merit-based scholarship"
+}
+Query: db.students.find({ 'scholarshipDetails.amount': { $gte: 10000 } })
+Use: Related scholarship information in single document
+
+Embedded Document #3: campusLocation (with GeoJSON)
+{
+  "type": "Point",
+  "coordinates": [77.2095, 28.6144]
+}
+Query: db.students.find({ 'campusLocation.coordinates': [77.2095, 28.6144] })
+Use: Geographic point data
+
+
+QUERYING NESTED FIELDS:
+────────────────────────────────────────────────────────────────────────────
+
+Query by nested field:
+  db.students.find({ 'name.first': 'Daksh' })
+  Finds: Students with first name 'Daksh'
+
+Query by entire nested object:
+  db.students.find({ name: { first: 'Daksh', last: 'Chauhan' } })
+  Finds: Exact match on entire name object
+
+Multiple nested conditions:
+  db.students.find({
+    'scholarshipDetails.amount': { $gte: 10000 },
+    'scholarshipDetails.awarded': true
+  })
+  Finds: High scholarships that are awarded
+
+
+ADVANTAGES OF EMBEDDING:
+  ✓ Single document query (no join)
+  ✓ Logical grouping
+  ✓ Automatic consistency
+  ✓ Better performance
+  ✓ Easier to update related fields
+
+EMBED vs REFERENCE:
+  Embed when:
+    - Small related data
+    - Accessed together
+    - Few (< 100) items
+    - Not shared across documents
+
+  Reference when:
+    - Large data
+    - Reused in multiple documents
+    - Many (> 1000) items
+    - Frequently updated separately
+
+PERFORMANCE:
+  Storage: Efficient (no duplication)
+  Query: No join overhead, single lookup
+  Index: Can index nested fields
+
+BEST PRACTICES:
+  ✓ Keep nesting shallow (< 3 levels)
+  ✓ Embed small, related data
+  ✓ Use for 1-to-few relationships
+  ✓ Don't embed large arrays (> 100 items)
+  ✓ Index nested fields you query
+  ✓ Validate nested structure
+
+
+================================================================================
+SECTION 10: GEOSPATIAL TYPE (GeoJSON)
+================================================================================
+
+DEFINITION:
+  Geographic data for location-based queries (latitude, longitude).
+
+FORMATS:
+  Point:               Single location
+  LineString:          Path between locations
+  Polygon:             Enclosed area
+  MultiPoint:          Multiple separate locations
+  MultiLineString:     Multiple paths
+  MultiPolygon:        Multiple areas
+
+CHARACTERISTICS:
+  ✓ Enables proximity searches
+  ✓ Supports region queries
+  ✓ Geographic distance calculations
+  ✓ Requires '2dsphere' index
+  ✓ Uses GeoJSON standard format
+
+CRITICAL: COORDINATE ORDER
+  GeoJSON uses [LONGITUDE, LATITUDE]
+  NOT [latitude, longitude]!
+
+  Example: [77.2095, 28.6144]
+  Meaning: 77.2095°E, 28.6144°N
+  (This is New Delhi area)
+
+EXAMPLES FROM STUDENT DATA:
+────────────────────────────────────────────────────────────────────────────
+
+Field: campusLocation
+Type: GeoJSON Point
+Value:
+{
+  "type": "Point",
+  "coordinates": [77.2095, 28.6144]
+}
+
+Query: Find nearby students (within 5km)
+  db.students.find({
+    campusLocation: {
+      $near: {
+        $geometry: { type: "Point", coordinates: [77.2, 28.6] },
+        $maxDistance: 5000
+      }
+    }
+  })
+
+Use: Find students near specific campus location
+
+
+GEOSPATIAL QUERIES:
+────────────────────────────────────────────────────────────────────────────
+
+Proximity search (nearby):
+  db.students.find({
+    campusLocation: {
+      $near: {
+        $geometry: { type: "Point", coordinates: [77.2, 28.6] },
+        $maxDistance: 5000  // meters
+      }
+    }
+  })
+  Result: Students within 5km
+
+Within polygon (region):
+  db.students.find({
+    campusLocation: {
+      $geoWithin: {
+        $geometry: {
+          type: "Polygon",
+          coordinates: [[[lon1, lat1], [lon2, lat2], ...]]
+        }
+      }
+    }
+  })
+  Result: Students in specific region
+
+Intersects (overlaps):
+  db.students.find({
+    campusLocation: {
+      $geoIntersects: {
+        $geometry: { type: "Point", coordinates: [77.2, 28.6] }
+      }
+    }
+  })
+  Result: Features overlapping with point
+
+
+INDEX REQUIREMENT:
+  MUST create geospatial index before querying:
+
+  db.students.createIndex({ campusLocation: '2dsphere' })
+
+  Index type:
+    '2dsphere'  - For spherical earth (real world)
+    '2d'        - For flat 2D plane (rare)
+
+
+PERFORMANCE:
+  Storage: Efficient GeoJSON encoding
+  Query: Fast with '2dsphere' index
+  Distance: Calculated on-the-fly
+
+USE CASES FOR GEOSPATIAL:
+  ✓ Find nearby students
+  ✓ Campus location mapping
+  ✓ Regional queries
+  ✓ Delivery tracking
+  ✓ Store locator
+
+
+BEST PRACTICES:
+  ✓ Use [longitude, latitude] order (NOT lat, lon)
+  ✓ Always create '2dsphere' index
+  ✓ Validate coordinates before insert
+  ✓ Use real geographic data only
+  ✓ Distance in meters for $maxDistance
+  ✓ Use point type for simple locations
+
+
+================================================================================
+SECTION 11: BINARY TYPE
+================================================================================
+
+DEFINITION:
+  Raw binary data for storing files, images, or encrypted data.
+
+SIZE:
+  Up to 16 MB per document
+
+CHARACTERISTICS:
+  ✓ Stores raw bytes
+  ✓ No compression by default
+  ✓ Can store any file type
+  ✓ Retrieved as binary data
+  ✓ Large files problematic
+
+EXAMPLES:
+  ✓ Student photo (profile picture)
+  ✓ Document scans (degree, ID)
+  ✓ Encrypted sensitive data
+
+CONSIDERATIONS:
+  BETTER ALTERNATIVES:
+    ✗ Don't store large files in MongoDB
+    ✓ Store URL reference instead
+    ✓ Use GridFS for files > 16MB
+    ✓ Use S3, Azure Blob Storage for production
+
+  When files get large (> 5MB):
+    - Performance degrades
+    - Network transfer slow
+    - Document queries slower
+    - Better to store separately
+
+
+INSERTION:
+  Node.js with Buffer:
+    const buffer = Buffer.from('...');
+    db.students.insertOne({ photo: Binary(buffer) });
+
+RETRIEVAL:
+  const doc = db.students.findOne({ _id: ... });
+  // doc.photo contains binary data
+
+
+PERFORMANCE:
+  Storage: No compression, exact byte size
+  Query: Slow with large binary data
+  Transfer: Network bandwidth intensive
+
+BEST PRACTICES:
+  ✓ Avoid storing large files (>5MB) in MongoDB
+  ✓ Use GridFS for files between 5-16MB
+  ✓ Use cloud storage (S3, Azure) for production files
+  ✓ Store URL/reference instead of actual file
+  ✓ Compress before storing if possible
+  ✓ Only store when absolutely necessary
+
+
+================================================================================
+SECTION 12: TYPE SELECTION GUIDE
+================================================================================
+
+CHOOSING THE RIGHT DATA TYPE:
+
+Need: Name, email, major, status
+  → Type: String
+  → Why: Text data, case-sensitive
+
+Need: Age, count, score, price
+  → Type: Number (Int32 or Double)
+  → Why: Numeric comparisons and math
+
+Need: Active/inactive, has scholarship
+  → Type: Boolean
+  → Why: Simple yes/no
+
+Need: Unknown or optional field
+  → Type: Null (or omit field)
+  → Why: Distinguish missing value
+
+Need: Unique document identifier
+  → Type: ObjectId
+  → Why: Auto-generated unique ID
+
+Need: Enrollment date, last login
+  → Type: Date
+  → Why: Date/time with timezone support
+
+Need: Multiple skills, courses
+  → Type: Array
+  → Why: Multiple related values
+
+Need: Related fields (first + last name)
+  → Type: Embedded Document
+  → Why: Logical grouping, no join
+
+Need: Campus location
+  → Type: GeoJSON Point
+  → Why: Geographic queries and distance
+
+Need: Photo or document file
+  → Type: Binary or Reference (URL)
+  → Why: File storage
+
+
+================================================================================
+SECTION 13: COMPLETE STUDENT DOCUMENT EXAMPLE
+================================================================================
+
+FIELD-BY-FIELD TYPE BREAKDOWN:
+
+{
+  "_id": ObjectId                    // Unique document ID
+  "studentId": String                // "20260001"
+  "name": Embedded Document
+    "first": String                  // "Daksh"
+    "last": String                   // "Chauhan"
+  "age": Number (Int32)              // 20
+  "gpa": Number (Double)             // 3.85
+  "isInternational": Boolean         // false
+  "enrollmentDate": Date             // ISODate('2023-08-15T10:30:00Z')
+  "major": String                    // "Data Science"
+  "skills": Array of Strings         // ["Python", "SQL", ...]
+  "courses": Array of Strings        // ["CS101", "MATH201", ...]
+  "campusLocation": Embedded Document with GeoJSON
+    "type": String                   // "Point"
+    "coordinates": Array of Numbers  // [77.2095, 28.6144]
+  "scholarshipDetails": Embedded Document
+    "amount": Number (Int32)         // 15000
+    "awarded": Boolean               // true
+    "notes": String or Null          // "Merit-based" or null
+  "libraryCardToken": String         // "abc123xyz789"
+}
+
+TOTAL FIELDS: 18
+TYPE DISTRIBUTION:
+  String fields:                5
+  Number fields:                3
+  Boolean fields:               2
+  Date fields:                  1
+  Array fields:                 2
+  Embedded Document fields:     3
+  ObjectId fields:              1
+  GeoJSON fields:               1
+
+
+================================================================================
+SECTION 14: TYPE CONVERSION CONSIDERATIONS
+================================================================================
+
+MONGODB TYPE COERCION:
+
+String vs Number:
+  Problem: "20" (string) ≠ 20 (number)
+  Solution: Always use consistent types
+  Example: All ages as Int32, not strings
+
+Null vs Missing Field:
+  { field: null }          → Field exists with null value
+  {} (field omitted)       → Field doesn't exist
+  Query with: { field: { $exists: false } } for missing
+
+Array Coercion:
+  Single value may promoted in some operators
+  Use explicit operators for clarity
+
+BEST PRACTICE:
+  Use consistent types for same field across all documents
+
+
+================================================================================
+SECTION 15: SUMMARY
+================================================================================
+
+MONGODB DATA TYPES:
+
+Primitive Types:
+  String     - Text data (names, majors)
+  Number     - Integers and decimals (age, GPA)
+  Boolean    - True/false (flags, status)
+  Null       - Missing value
+
+Special Types:
+  ObjectId   - Unique document ID
+  Date       - Dates and times (UTC)
+
+Complex Types:
+  Array      - Multiple values
+  Document   - Nested structure
+
+Specialized Types:
+  GeoJSON    - Geographic coordinates
+  Binary     - Raw file data
+
+
+KEY PRINCIPLES:
+  ✓ Choose appropriate type for data
+  ✓ Same field = consistent type
+  ✓ Type affects storage and performance
+  ✓ Complex types reduce joins
+  ✓ Always validate and index strategic fields
+
+
+PERFORMANCE IMPACT:
+  Right type:  Efficient storage, fast queries
+  Wrong type:  Slow comparisons, wasted space, validation issues
+
+
+BEST PRACTICE:
+  Select the most specific and appropriate type for your data
+  to ensure efficient storage, fast querying, and validation.
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE BY COMMON NEEDS:
+
+Field type                          → Data Type
+────────────────────────────────────────────────────────────────────────────
+Name, Email, Major                  → String
+Age, Count, Score, Price            → Number (Int32/Double)
+Boolean Flag (active, verified)     → Boolean
+Optional/Unknown value              → Null (or omit field)
+Unique identifier                   → ObjectId
+Date/Time (enrollment, login)       → Date
+Multiple skills/courses             → Array
+Related fields (first/last name)    → Embedded Document
+Location (latitude, longitude)      → GeoJSON Point
+Photo, Document                     → Binary or URL Reference
+
+Remember: The right type = better performance!
+
+================================================================================

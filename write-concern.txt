@@ -1,0 +1,893 @@
+================================================================================
+                    MONGODB WRITE CONCERN - COMPLETE GUIDE
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Write concern for data durability and replication acknowledgment
+EXAMPLES: Using 60 Student Records from data.json
+
+WRITE CONCERN = How MongoDB acknowledges writes and ensures durability
+
+
+================================================================================
+SECTION 1: WHAT IS WRITE CONCERN?
+================================================================================
+
+DEFINITION:
+  Write Concern controls when MongoDB acknowledges a write operation as
+  successful. It balances safety (data durability) vs speed (latency).
+
+WHY WRITE CONCERN MATTERS:
+  ✓ Determines when write is "done"
+  ✓ Ensures data replication
+  ✓ Prevents data loss
+  ✓ Controls acknowledgment level
+  ✓ Critical for data safety
+
+THE QUESTION:
+  "When do I know my data is safe?"
+
+ANSWERS (Depends on write concern):
+  w: 0    → Never confirmed (fire and forget)
+  w: 1    → Primary acknowledged (default)
+  w: 'majority' → Replicated to majority
+  w: 'all' → All replicas have data
+
+
+THE TRADEOFF:
+  More acknowledgment = Safer data BUT Slower writes
+  Less acknowledgment = Faster writes BUT Risk of data loss
+
+  Spectrum:
+    w: 0 (Unsafe, Fast) ←→ w: 1 (Default) ←→ w: 'majority' (Safe, Slow)
+
+
+WRITE CONCERN vs NO WRITE CONCERN:
+────────────────────────────────────────────────────────────────────────────
+
+Without write concern:
+  db.students.insertOne({ studentId: '20260001', ... })
+  Result: Uses default w: 1 (primary acknowledges)
+
+With explicit write concern:
+  db.students.insertOne({ studentId: '20260001', ... },
+    { writeConcern: { w: 'majority' } })
+  Result: Wait for majority, then acknowledge
+
+
+================================================================================
+SECTION 2: WRITE CONCERN LEVELS
+================================================================================
+
+LEVEL 1: W: 0 (UNACKNOWLEDGED)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { writeConcern: { w: 0 } }
+
+What it means:
+  "Don't wait for any acknowledgment"
+  "Fire and forget"
+  "Send write, return immediately"
+
+Behavior:
+  1. Client sends write to server
+  2. Client returns immediately
+  3. No confirmation write succeeded
+  4. Server processes write in background
+  5. Client never knows if write succeeded
+
+Safety:
+  LOWEST - Write could fail, client never knows
+
+Speed:
+  FASTEST - 0-1ms latency (no waiting)
+
+Advantages:
+  ✓ Extremely fast
+  ✓ No network round-trip wait
+  ✓ Useful for non-critical data
+
+Disadvantages:
+  ✗ No confirmation of success
+  ✗ Write could fail silently
+  ✗ Data could be lost
+  ✗ Risk of data loss high
+
+Use case:
+  Logging, telemetry, analytics (non-critical)
+  Temporary cache data
+  Bulk inserts where some loss OK
+
+Example:
+  db.accessLog.insertOne(
+    { studentId: '20260001', action: 'login', time: new Date() },
+    { writeConcern: { w: 0 } }
+  )
+  Result: Returns immediately, log may or may not be in database
+
+
+LEVEL 2: W: 1 (ACKNOWLEDGED - DEFAULT)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { writeConcern: { w: 1 } }
+  (OR just omit writeConcern - this is default)
+
+What it means:
+  "Wait for primary to acknowledge"
+  "Primary has processed write"
+  "This is the default"
+
+Behavior:
+  1. Client sends write to Primary
+  2. Wait for Primary to process
+  3. Primary writes to its storage
+  4. Primary sends acknowledgment back
+  5. Client returns success
+
+Safety:
+  MEDIUM - Data on primary, but not replicated yet
+
+Speed:
+  FAST - 2-5ms latency (primary processing + network)
+
+Advantages:
+  ✓ Confirmation write succeeded
+  ✓ Good balance of speed/safety
+  ✓ Default, most common
+
+Disadvantages:
+  ✗ If primary crashes before replication → data lost
+  ✗ Data not yet on secondaries
+  ✗ Minority of replicas don't have data
+
+Use case:
+  Normal application data (majority of operations)
+  Student records, enrollment
+  Default for most operations
+
+Example:
+  db.students.insertOne({
+    studentId: '20260001',
+    name: { first: 'Daksh', last: 'Chauhan' },
+    age: 20,
+    major: 'Data Science',
+    gpa: 3.85
+  })
+  // Default w: 1 - wait for primary acknowledgment
+  Result: Returns after primary confirms
+
+
+LEVEL 3: W: 'MAJORITY' (MAJORITY ACKNOWLEDGED)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { writeConcern: { w: 'majority' } }
+
+What it means:
+  "Wait for majority of replica set to acknowledge"
+  "Primary + at least 1 secondary must confirm"
+  "Data replicated to majority"
+
+Behavior:
+  1. Client sends write to Primary
+  2. Primary processes and replicates to secondaries
+  3. Majority of nodes acknowledge (Primary + 1+ secondaries)
+  4. Primary sends success back to client
+  5. Client returns success
+
+Safety:
+  HIGH - Data replicated to majority of nodes
+
+Speed:
+  MODERATE - 10-20ms latency (replication wait)
+
+Advantages:
+  ✓ Data safe on majority nodes
+  ✓ If primary crashes, data exists on secondaries
+  ✓ Prevents data loss
+  ✓ Safest without being slowest
+
+Disadvantages:
+  ✗ Slower than w: 1
+  ✗ Requires replica set (can't use on standalone)
+  ✗ Requires secondaries to be up
+  ✗ May timeout if secondaries down
+
+Use case:
+  Important data (scholarships, grades)
+  Financial transactions
+  Medical records
+  Legal documents
+
+Example:
+  db.students.insertOne({
+    studentId: '20260001',
+    name: { first: 'Daksh', last: 'Chauhan' },
+    scholarshipDetails: { amount: 15000, awarded: true }
+  }, { writeConcern: { w: 'majority' } })
+  Result: Wait for primary + secondary confirmation, then return
+
+
+LEVEL 4: W: 'ALL' (ALL REPLICAS ACKNOWLEDGED)
+────────────────────────────────────────────────────────────────────────────
+
+Syntax:
+  { writeConcern: { w: 'all' } }
+
+What it means:
+  "Wait for ALL replica set members to acknowledge"
+  "Every single node must confirm"
+
+Behavior:
+  1. Send write to all nodes
+  2. Wait for every single node to acknowledge
+  3. Slowest and safest option
+
+Safety:
+  HIGHEST - Data on every node
+
+Speed:
+  SLOWEST - 20-50ms latency (wait for all)
+
+Disadvantages:
+  ✗ Very slow
+  ✗ Fails if ANY node is down
+  ✗ Not practical for most use cases
+
+Use case:
+  Mission-critical data only (rarely used)
+  Usually w: 'majority' is sufficient
+
+Note:
+  Generally NOT recommended
+  Prefer w: 'majority' instead
+
+
+================================================================================
+SECTION 3: QUICK COMPARISON TABLE
+================================================================================
+
+Write      Acknowledge   Replicated?   Safety   Speed    Use Case
+Concern    from
+────────────────────────────────────────────────────────────────────────────
+w: 0       None          No            Lowest   Fastest  Logs, telemetry
+w: 1       Primary       Not yet       Medium   Fast     Normal data
+w:'maj'    Majority      Yes, majority High     Moderate Important data
+w: 'all'   All nodes     Yes, all      Highest  Slowest  Mission-critical
+
+
+LATENCY IMPACT:
+
+Operation type        w: 0   w: 1   w: 'majority'
+────────────────────────────────────────────────────────────────────────
+Single insert        0-1ms  2-5ms  10-20ms
+Single update        0-1ms  2-5ms  10-20ms
+Batch 60 inserts     0-1ms  30ms   100-150ms
+────────────────────────────────────────────────────────────────────────
+
+THROUGHPUT:
+
+w: 0           → 10,000+ operations/second
+w: 1           → 5,000-8,000 operations/second
+w: 'majority'  → 1,000-3,000 operations/second
+
+
+================================================================================
+SECTION 4: REPLICA SET CONTEXT
+================================================================================
+
+MONGODB REPLICA SET:
+  Typical setup: Primary + 2 Secondaries = 3 nodes
+
+REPLICATION FLOW:
+
+  Step 1: Client sends write to PRIMARY
+  Step 2: Primary processes write, stores data
+  Step 3: Primary sends oplog entry to SECONDARIES
+  Step 4: Secondaries receive and apply write
+  Step 5: Secondaries acknowledge back to PRIMARY
+  Step 6: PRIMARY sends acknowledgment to CLIENT
+
+WRITE CONCERN BEHAVIOR IN REPLICA SET:
+
+w: 0 (Unacknowledged):
+  → Client returns immediately
+  → No wait for anything
+  → Replication happens async
+
+w: 1 (Primary acknowledged):
+  → Wait for primary acknowledgment (step 2)
+  → Return to client (immediate)
+  → Replication happens async (steps 3-5)
+  → Risk: If primary crashes before replication, data lost
+
+w: 'majority':
+  → Wait for primary acknowledgment (step 2)
+  → Wait for replication to secondaries (steps 3-4)
+  → Wait for majority acks (step 5)
+  → Only then return to client
+  → Safe: Data on majority nodes
+
+
+PRIMARY FAILURE SCENARIO:
+────────────────────────────────────────────────────────────────────────────
+
+Scenario: Primary crashes right after w: 1 write
+
+Timeline:
+  T=0ms:   Write arrives at primary
+  T=2ms:   Primary processes, confirms to client
+  T=5ms:   Primary crashes!
+  T=10ms:  Replication hadn't started yet
+  T=15ms:  Secondary becomes new primary
+  T=20ms:  Old data lost forever
+
+Result:
+  Client thinks write succeeded
+  But data never existed on secondaries
+  Data LOST when failover happened
+
+Prevention:
+  Use w: 'majority' instead
+  Ensures replication before client returns
+
+
+PRIMARY FAILURE WITH MAJORITY:
+────────────────────────────────────────────────────────────────────────────
+
+Timeline:
+  T=0ms:   Write arrives at primary
+  T=2ms:   Primary processes
+  T=5ms:   Primary sends oplog to secondary
+  T=10ms:  Secondary applies write
+  T=12ms:  Primary gets ack from secondary
+  T=14ms:  Client gets success (majority acked)
+  T=20ms:  Primary crashes!
+  T=25ms:  Secondary becomes new primary
+  T=30ms:  Data still exists on new primary
+
+Result:
+  Data safe on majority nodes
+  Even if primary crashes, data persists
+  Data PRESERVED in failover
+
+
+================================================================================
+SECTION 5: DURABILITY OPTIONS (JOURNAL)
+================================================================================
+
+THE J PARAMETER:
+  j: true = Write must be journaled to disk
+
+WHAT IS JOURNAL?
+  MongoDB's write-ahead log
+  Transactions written to disk before applied
+  Survives server restarts
+  Ensures durability
+
+SYNTAX:
+  { writeConcern: { w: 1, j: true } }
+
+BEHAVIOR WITH j: true:
+  1. Write arrives at server
+  2. Server writes to journal (disk)
+  3. Acknowledge to client
+  4. Data is durable on disk
+  5. Even if server crashes, data survives restart
+
+TIME COST:
+  j: true adds 5-10ms (disk I/O)
+
+
+EXAMPLES:
+
+Without journal:
+  db.students.insertOne(..., { writeConcern: { w: 1 } })
+  In memory, fast (~2ms)
+  But lost if server crashes before disk flush
+
+With journal:
+  db.students.insertOne(..., { writeConcern: { w: 1, j: true } })
+  Persisted to disk (~10ms)
+  Survives server crash
+
+
+COMMON PATTERN:
+  { writeConcern: { w: 'majority', j: true } }
+
+  Means:
+    ✓ Replicate to majority
+    ✓ Persist to disk journal
+    ✓ Safe and durable
+    ✓ ~20-30ms latency
+
+
+================================================================================
+SECTION 6: TIMEOUT (wtimeout)
+================================================================================
+
+THE wtimeout PARAMETER:
+  Maximum time to wait for write concern acknowledgment
+
+SYNTAX:
+  { writeConcern: { w: 'majority', wtimeout: 5000 } }
+
+MEANING:
+  "Wait up to 5000 milliseconds (5 seconds)"
+  "If acknowledgment doesn't come, throw error"
+
+WHY NEEDED:
+  Prevents application hanging indefinitely
+  If secondaries down, majority won't ack
+  Without timeout, app hangs forever
+
+BEHAVIOR:
+
+Success scenario:
+  Majority acknowledges within 5 seconds
+  → Application returns success
+  → Data written
+
+Timeout scenario:
+  Secondaries down, majority can't ack
+  → After 5 seconds, timeout error thrown
+  → Application can handle error
+  → Application doesn't hang
+
+RECOMMENDED VALUES:
+  5000ms (5 seconds) - reasonable timeout
+  1000ms (1 second) - aggressive, for fast connections
+  30000ms (30 seconds) - patient, for slow networks
+
+
+EXAMPLES:
+
+With timeout:
+  db.students.insertOne(
+    { studentId: '20260001', ... },
+    { writeConcern: { w: 'majority', wtimeout: 5000 } }
+  )
+  // Waits max 5 seconds for majority ack
+
+Without timeout (not recommended):
+  db.students.insertOne(
+    { studentId: '20260001', ... },
+    { writeConcern: { w: 'majority' } }
+  )
+  // Waits indefinitely - application could hang!
+
+
+BEST PRACTICE:
+  ALWAYS set wtimeout
+  Never use w: 'majority' without wtimeout
+
+
+================================================================================
+SECTION 7: REAL-WORLD STUDENT EXAMPLES
+================================================================================
+
+EXAMPLE #1: NORMAL INSERT (DEFAULT)
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Insert new student record (non-critical)
+
+Command:
+  db.students.insertOne({
+    studentId: '20260001',
+    name: { first: 'Daksh', last: 'Chauhan' },
+    age: 20,
+    major: 'Data Science',
+    gpa: 3.85
+  })
+
+Write concern:
+  w: 1 (default - primary acknowledges)
+
+Latency:
+  ~2-5 milliseconds
+
+When returns:
+  After primary confirms write
+
+
+EXAMPLE #2: CRITICAL UPDATE (SCHOLARSHIP)
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Update student scholarship (financial, critical)
+
+Command:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $set: { 'scholarshipDetails.amount': 15000 } },
+    { writeConcern: { w: 'majority' } }
+  )
+
+Write concern:
+  w: 'majority' (replicate to majority)
+
+Latency:
+  ~10-20 milliseconds
+
+When returns:
+  After primary + secondaries confirm
+
+Why majority:
+  Financial data must not be lost
+
+
+EXAMPLE #3: LOG INSERTION (NON-CRITICAL)
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Log student login access (telemetry)
+
+Command:
+  db.accessLog.insertOne(
+    {
+      studentId: '20260001',
+      action: 'login',
+      timestamp: new Date()
+    },
+    { writeConcern: { w: 0 } }
+  )
+
+Write concern:
+  w: 0 (no acknowledgment, fire and forget)
+
+Latency:
+  ~0 milliseconds (immediate return)
+
+When returns:
+  Immediately, no wait
+
+Why w: 0:
+  Log data non-critical
+  Some loss acceptable
+  Need extreme speed
+
+
+EXAMPLE #4: BATCH INSERT WITH TIMEOUT
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Bulk insert 60 students with safety timeout
+
+Command:
+  db.students.insertMany([
+    { studentId: '20260001', ... },
+    { studentId: '20260002', ... },
+    ... (60 total)
+  ], { writeConcern: { w: 'majority', wtimeout: 5000 } })
+
+Write concern:
+  w: 'majority' with 5 second timeout
+
+Latency:
+  ~20-50ms for all 60 (or error if timeout)
+
+When returns:
+  After majority acks within 5 seconds
+  OR error after 5 seconds
+
+Why timeout:
+  Prevents hanging if secondaries down
+
+
+EXAMPLE #5: DELETE WITH DURABILITY
+────────────────────────────────────────────────────────────────────────────
+
+Scenario:
+  Delete student record permanently (ensure on disk)
+
+Command:
+  db.students.deleteOne(
+    { studentId: '20260001' },
+    { writeConcern: { w: 1, j: true } }
+  )
+
+Write concern:
+  w: 1 (primary ack) + j: true (journal to disk)
+
+Latency:
+  ~5-15 milliseconds
+
+When returns:
+  After primary journals to disk
+
+Why journal:
+  Deletion permanent, ensure survives crash
+
+
+================================================================================
+SECTION 8: USE CASES & RECOMMENDATIONS
+================================================================================
+
+USE CASE #1: FINANCIAL DATA
+────────────────────────────────────────────────────────────────────────────
+
+Data: Scholarships, payments, transactions
+
+Requirement: MUST NOT lose data
+
+Write concern: { w: 'majority', j: true, wtimeout: 5000 }
+
+Reasoning:
+  ✓ Replicate to majority (safe from primary crash)
+  ✓ Journal to disk (safe from server crash)
+  ✓ Timeout (prevent hanging)
+
+Acceptable latency: 20-30ms (worth for safety)
+
+Trade-off: Accept slower writes for safety
+
+
+USE CASE #2: NORMAL APPLICATION DATA
+────────────────────────────────────────────────────────────────────────────
+
+Data: Student records, enrollment, grades
+
+Requirement: Should not lose data, but not critical
+
+Write concern: { w: 1 } (default)
+OR: { w: 'majority', wtimeout: 5000 }
+
+Reasoning:
+  ✓ Default is fine for normal data
+  ✓ Can upgrade to majority if critical
+
+Acceptable latency: 2-20ms (good balance)
+
+Trade-off: Good middle ground
+
+
+USE CASE #3: LOGGING & TELEMETRY
+────────────────────────────────────────────────────────────────────────────
+
+Data: Access logs, metrics, analytics
+
+Requirement: Some loss acceptable
+
+Write concern: { w: 0 } (optional)
+OR: { w: 1 } (if want some safety)
+
+Reasoning:
+  ✓ w: 0 for extreme speed
+  ✓ w: 1 for compromise (safe + fast)
+  ✓ Loss of some logs acceptable
+
+Acceptable latency: 0-5ms (speed critical)
+
+Trade-off: Speed over safety
+
+
+USE CASE #4: CACHE DATA
+────────────────────────────────────────────────────────────────────────────
+
+Data: Session tokens, temporary cache
+
+Requirement: Loss acceptable (can be recreated)
+
+Write concern: { w: 0 } or { w: 1 }
+
+Reasoning:
+  ✓ Not critical
+  ✓ Recreatable if lost
+  ✓ Can afford to lose some
+
+Acceptable latency: 0-10ms
+
+Trade-off: Speed important, loss OK
+
+
+USE CASE #5: REAL-TIME UPDATES
+────────────────────────────────────────────────────────────────────────────
+
+Data: Live notifications, dashboard updates
+
+Requirement: Speed critical
+
+Write concern: { w: 0 } or { w: 1 }
+
+Reasoning:
+  ✓ Real-time means < 10ms latency required
+  ✓ Can't wait for majority replication
+  ✓ Better to be fast than safe
+
+Acceptable latency: < 10ms
+
+Trade-off: Speed over durability
+
+
+================================================================================
+SECTION 9: BEST PRACTICES
+================================================================================
+
+PRACTICE #1: DEFAULT IS GOOD
+  Use w: 1 (default) for most cases
+  Good balance of safety and speed
+  Don't change unless specific need
+
+PRACTICE #2: CRITICAL DATA = MAJORITY
+  Use w: 'majority' for important data
+  Financial, medical, legal records
+  Accept 10-20ms latency for safety
+
+PRACTICE #3: ALWAYS ADD TIMEOUT
+  Never omit wtimeout
+  Always set: { w: 'majority', wtimeout: 5000 }
+  Prevents application hanging
+
+PRACTICE #4: ADD JOURNAL FOR CRITICAL
+  Use j: true for disk persistence
+  Ensures survives server restart
+  Adds 5-10ms latency (worth it)
+
+PRACTICE #5: MATCH TO YOUR SLA
+  Different data, different requirements
+  Financial: High durability
+  Logs: High speed
+  Choose accordingly
+
+PRACTICE #6: TEST FAILURE SCENARIOS
+  Test with secondary down
+  Verify timeout works
+  Ensure error handling
+  Don't assume it works
+
+PRACTICE #7: MONITOR LATENCY
+  Track write latency
+  Ensure acceptable
+  May need to adjust
+
+
+================================================================================
+SECTION 10: COMMON MISTAKES
+================================================================================
+
+MISTAKE #1: ALWAYS USING W: 0
+  Problem: Data loss risk high
+  Solution: Use w: 0 ONLY for logs/telemetry
+  Critical data: Use w: 1 minimum
+
+MISTAKE #2: NO TIMEOUT
+  Problem: App hangs if secondaries down
+  Solution: Always set wtimeout
+  Command: { w: 'majority', wtimeout: 5000 }
+
+MISTAKE #3: MAJORITY ON SINGLE SERVER
+  Problem: w: 'majority' needs replica set
+  Doesn't work on standalone MongoDB
+  Solution: Use w: 1 on standalone
+           Use w: 'majority' on replica set
+
+MISTAKE #4: WRONG TRADEOFF
+  Problem: Using w: 0 for financial data
+  Or using w: 'majority' for logs (too slow)
+  Solution: Match write concern to data criticality
+
+MISTAKE #5: IGNORING JOURNAL
+  Problem: Data replicated but not journaled
+  If server crashes, data lost
+  Solution: Add j: true for critical data
+
+MISTAKE #6: REPLICA SET NOT READY
+  Problem: Using w: 'majority' but secondaries offline
+  Times out every time
+  Solution: Verify replica set health first
+           Check: rs.status()
+
+
+================================================================================
+SECTION 11: DECISION TREE
+================================================================================
+
+DECISION TREE: WHICH WRITE CONCERN?
+
+Question 1: Is data loss acceptable?
+  NO (financial, medical) → Go to Critical Data
+  YES (logs, cache) → Go to Non-Critical Data
+
+CRITICAL DATA PATH:
+  Question: Persist to disk required?
+    YES → { w: 'majority', j: true, wtimeout: 5000 }
+    NO  → { w: 'majority', wtimeout: 5000 }
+
+NON-CRITICAL DATA PATH:
+  Question: Speed critical?
+    YES (real-time) → { w: 0 } or { w: 1 }
+    NO  → { w: 1 } (safe default)
+
+ALWAYS ADD:
+  wtimeout: 5000 (5 seconds)
+
+
+================================================================================
+SECTION 12: PERFORMANCE IMPACT
+================================================================================
+
+LATENCY COMPARISON (Single operation):
+
+w: 0              0-1ms     Fire and forget
+w: 1              2-5ms     Primary only
+w: 'majority'     10-20ms   Replication
+w: 'majority'+j   15-30ms   Replication + disk
+
+THROUGHPUT (Operations per second):
+
+w: 0              10,000+
+w: 1              5,000-8,000
+w: 'majority'     1,000-3,000
+w: 'majority'+j   800-2,000
+
+BATCH INSERT (60 students):
+
+w: 0              60-100ms
+w: 1              120-180ms
+w: 'majority'     500-800ms
+w: 'majority'+j   700-1000ms
+
+
+================================================================================
+SECTION 13: SUMMARY
+================================================================================
+
+WHAT IS WRITE CONCERN?
+  Controls when write is acknowledged as successful
+  Balances safety vs speed
+
+KEY LEVELS:
+  w: 0 → No acknowledgment (fastest, unsafe)
+  w: 1 → Primary acknowledges (default, balanced)
+  w: 'majority' → Majority acknowledges (safer)
+  w: 'all' → All replicas acknowledge (slowest)
+
+DURABILITY:
+  j: true → Persist to disk journal
+
+TIMEOUT:
+  wtimeout: 5000 → Max 5 seconds wait
+
+BEST PRACTICES:
+  ✓ Use w: 1 (default) for normal data
+  ✓ Use w: 'majority' for critical data
+  ✓ Always set wtimeout
+  ✓ Add j: true for durability
+  ✓ Match to data criticality
+
+PERFORMANCE:
+  w: 0 = Fastest (0-1ms)
+  w: 1 = Fast (2-5ms)
+  w: 'majority' = Moderate (10-20ms)
+
+REPLICA SET:
+  w: 'majority' requires replica set
+  Use w: 1 on standalone
+  Use w: 'majority' on replicas
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Purpose                          Write Concern
+────────────────────────────────────────────────────────────────────────────
+Logs, telemetry                  { w: 0 }
+Normal data (default)            { w: 1 }
+Important data (financial)       { w: 'majority', wtimeout: 5000 }
+Mission-critical + durable       { w: 'majority', j: true, wtimeout: 5000 }
+
+Remember: The rule is simple:
+  Data-loss acceptable? → w: 0
+  Normal importance? → w: 1 (default)
+  Can't lose it? → w: 'majority'
+  Must survive crash? → Add j: true
+
+Always set wtimeout to prevent hanging!
+
+================================================================================

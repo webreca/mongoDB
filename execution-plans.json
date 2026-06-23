@@ -1,0 +1,43 @@
+{
+  "title": "MongoDB Explain & Execution Plans - Complete Guide",
+  "description": "Query analysis and execution plan inspection",
+  "date": "2024-06-23",
+  "overview": {
+    "definition": "Analyze how MongoDB executes queries",
+    "concept": "View detailed query execution statistics",
+    "purpose": [
+      "Optimize slow queries",
+      "Understand query performance",
+      "Identify missing indexes",
+      "View execution stages",
+      "Analyze query plans",
+      "Debug query issues"
+    ]
+  },
+  "section_1_beginner": {
+    "title": "BEGINNER: Explain Basics",
+    "concepts": [
+      {
+        "concept": "explain()",
+        "description": "Get execution plan for query"
+      },
+      {
+        "concept": "Execution Stats",
+        "description": "Actual query performance metrics"
+      }
+    ]
+  },
+  "section_2_examples": {
+    "title": "BEGINNER: Using explain()",
+    "examples": [
+      {
+        "title": "Basic explain",
+        "query": "db.students.find({ gpa: 3.8 }).explain('executionStats')"
+      },
+      {
+        "title": "Analyze indexes used",
+        "query": "db.students.find({ major: 'CS' }).explain('executionStats')"
+      }
+    ]
+  }
+}

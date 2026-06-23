@@ -1,0 +1,3089 @@
+[
+    {
+        "studentId": {
+            "$numberLong": "20260001"
+        },
+        "name": {
+            "first": "Daksh",
+            "last": "Chauhan"
+        },
+        "age": 20,
+        "enrollmentDate": {
+            "$date": "2022-08-15T09:00:00Z"
+        },
+        "major": "Data Science",
+        "gpa": {
+            "$numberDecimal": "3.85"
+        },
+        "isInternational": false,
+        "skills": [
+            "Python",
+            "SQL",
+            "TensorFlow"
+        ],
+        "courses": [
+            {
+                "courseCode": "DS-401",
+                "credits": 4,
+                "grade": "A"
+            },
+            {
+                "courseCode": "STAT-301",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                77.2095,
+                28.6144
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Merit Excellence",
+            "amount": 15000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwMQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260002"
+        },
+        "name": {
+            "first": "Anaya",
+            "last": "Sharma"
+        },
+        "age": 20,
+        "enrollmentDate": {
+            "$date": "2023-09-01T10:30:00Z"
+        },
+        "major": "Frontend Engineering",
+        "gpa": {
+            "$numberDecimal": "3.92"
+        },
+        "isInternational": true,
+        "skills": [
+            "JavaScript",
+            "React",
+            "TypeScript",
+            "CSS"
+        ],
+        "courses": [
+            {
+                "courseCode": "WEB-301",
+                "credits": 3,
+                "grade": "A+"
+            },
+            {
+                "courseCode": "UI-201",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -73.9352,
+                40.7306
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwMg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260003"
+        },
+        "name": {
+            "first": "Arpit",
+            "last": "Kataria"
+        },
+        "age": 25,
+        "enrollmentDate": {
+            "$date": "2021-07-20T08:00:00Z"
+        },
+        "major": "Machine Learning",
+        "gpa": {
+            "$numberDecimal": "3.45"
+        },
+        "isInternational": false,
+        "skills": [
+            "Python",
+            "PyTorch",
+            "Keras",
+            "Pandas"
+        ],
+        "courses": [
+            {
+                "courseCode": "ML-501",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "COMP-401",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                2.3522,
+                48.8566
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Tech Pioneer",
+            "amount": 10000,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwMw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260004"
+        },
+        "name": {
+            "first": "Priya",
+            "last": "Patel"
+        },
+        "age": 25,
+        "enrollmentDate": {
+            "$date": "2024-01-10T14:00:00Z"
+        },
+        "major": "Cloud Computing",
+        "gpa": {
+            "$numberDecimal": "3.78"
+        },
+        "isInternational": true,
+        "skills": [
+            "AWS",
+            "Docker",
+            "Kubernetes",
+            "Go"
+        ],
+        "courses": [
+            {
+                "courseCode": "CLOUD-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "DEVOPS-101",
+                "credits": 2,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                139.6917,
+                35.6895
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwNA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260005"
+        },
+        "name": {
+            "first": "Rohan",
+            "last": "Singh"
+        },
+        "age": 26,
+        "enrollmentDate": {
+            "$date": "2020-06-05T11:15:00Z"
+        },
+        "major": "Cybersecurity",
+        "gpa": {
+            "$numberDecimal": "3.21"
+        },
+        "isInternational": false,
+        "skills": [
+            "C++",
+            "Networking",
+            "Cryptography",
+            "Penetration Testing"
+        ],
+        "courses": [
+            {
+                "courseCode": "SEC-501",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "NET-401",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                51.5074,
+                -0.1278
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Security Excellence",
+            "amount": 12000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwNQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260006"
+        },
+        "name": {
+            "first": "Neha",
+            "last": "Gupta"
+        },
+        "age": 26,
+        "enrollmentDate": {
+            "$date": "2023-02-20T09:45:00Z"
+        },
+        "major": "Mobile Development",
+        "gpa": {
+            "$numberDecimal": "3.98"
+        },
+        "isInternational": false,
+        "skills": [
+            "Swift",
+            "Kotlin",
+            "Flutter",
+            "Firebase"
+        ],
+        "courses": [
+            {
+                "courseCode": "MOB-301",
+                "credits": 3,
+                "grade": "A+"
+            },
+            {
+                "courseCode": "MOBILE-API-201",
+                "credits": 3,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -87.6298,
+                41.8781
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwNg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260007"
+        },
+        "name": {
+            "first": "Aditya",
+            "last": "Rao"
+        },
+        "age": 27,
+        "enrollmentDate": {
+            "$date": "2022-05-10T13:20:00Z"
+        },
+        "major": "Backend Engineering",
+        "gpa": {
+            "$numberDecimal": "3.56"
+        },
+        "isInternational": true,
+        "skills": [
+            "Java",
+            "Spring Boot",
+            "MongoDB",
+            "PostgreSQL"
+        ],
+        "courses": [
+            {
+                "courseCode": "BACKEND-401",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "DB-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -34.6037,
+                -58.3816
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Full Ride Tech",
+            "amount": 25000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwNw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260008"
+        },
+        "name": {
+            "first": "Sana",
+            "last": "Khan"
+        },
+        "age": 27,
+        "enrollmentDate": {
+            "$date": "2023-10-02T10:00:00Z"
+        },
+        "major": "Artificial Intelligence",
+        "gpa": {
+            "$numberDecimal": "3.88"
+        },
+        "isInternational": false,
+        "skills": [
+            "Python",
+            "NLP",
+            "Computer Vision",
+            "Scikit-learn"
+        ],
+        "courses": [
+            {
+                "courseCode": "AI-301",
+                "credits": 4,
+                "grade": "A"
+            },
+            {
+                "courseCode": "NLP-201",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                1.3521,
+                103.8198
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwOA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260009"
+        },
+        "name": {
+            "first": "Vikram",
+            "last": "Desai"
+        },
+        "age": 28,
+        "enrollmentDate": {
+            "$date": "2021-09-15T08:30:00Z"
+        },
+        "major": "DevOps Engineering",
+        "gpa": {
+            "$numberDecimal": "3.42"
+        },
+        "isInternational": true,
+        "skills": [
+            "Terraform",
+            "Jenkins",
+            "GitLab",
+            "Prometheus"
+        ],
+        "courses": [
+            {
+                "courseCode": "DEVOPS-501",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "INFRASTRUCTURE-301",
+                "credits": 3,
+                "grade": "B"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -43.1729,
+                -22.9068
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Infrastructure Award",
+            "amount": 8000,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAwOQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260010"
+        },
+        "name": {
+            "first": "Ishita",
+            "last": "Nair"
+        },
+        "age": 28,
+        "enrollmentDate": {
+            "$date": "2023-08-22T12:00:00Z"
+        },
+        "major": "Game Development",
+        "gpa": {
+            "$numberDecimal": "3.65"
+        },
+        "isInternational": false,
+        "skills": [
+            "C#",
+            "Unity",
+            "Unreal Engine",
+            "3D Graphics"
+        ],
+        "courses": [
+            {
+                "courseCode": "GAME-301",
+                "credits": 4,
+                "grade": "A"
+            },
+            {
+                "courseCode": "GRAPHICS-201",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                121.5598,
+                31.2304
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxMA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260011"
+        },
+        "name": {
+            "first": "Arjun",
+            "last": "Verma"
+        },
+        "age": 29,
+        "enrollmentDate": {
+            "$date": "2020-01-08T09:00:00Z"
+        },
+        "major": "Full Stack Development",
+        "gpa": {
+            "$numberDecimal": "3.73"
+        },
+        "isInternational": false,
+        "skills": [
+            "JavaScript",
+            "Node.js",
+            "React",
+            "Express"
+        ],
+        "courses": [
+            {
+                "courseCode": "FULLSTACK-401",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "MERN-301",
+                "credits": 3,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                55.2708,
+                25.2048
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Startup Fund",
+            "amount": 18000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxMQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260012"
+        },
+        "name": {
+            "first": "Kavya",
+            "last": "Mishra"
+        },
+        "age": 29,
+        "enrollmentDate": {
+            "$date": "2024-03-18T15:30:00Z"
+        },
+        "major": "Blockchain Development",
+        "gpa": {
+            "$numberDecimal": "3.91"
+        },
+        "isInternational": true,
+        "skills": [
+            "Solidity",
+            "Web3.js",
+            "Ethereum",
+            "Smart Contracts"
+        ],
+        "courses": [
+            {
+                "courseCode": "BLOCKCHAIN-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "CRYPTO-101",
+                "credits": 2,
+                "grade": "A+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -118.2437,
+                34.0522
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxMg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260013"
+        },
+        "name": {
+            "first": "Ravi",
+            "last": "Kumar"
+        },
+        "age": 30,
+        "enrollmentDate": {
+            "$date": "2022-09-01T10:00:00Z"
+        },
+        "major": "Software Architecture",
+        "gpa": {
+            "$numberDecimal": "3.34"
+        },
+        "isInternational": true,
+        "skills": [
+            "System Design",
+            "Microservices",
+            "RabbitMQ",
+            "Scala"
+        ],
+        "courses": [
+            {
+                "courseCode": "ARCH-401",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "SYSTEMS-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -93.2650,
+                44.9537
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Architecture Grant",
+            "amount": 11000,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxMw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260014"
+        },
+        "name": {
+            "first": "Divya",
+            "last": "Roy"
+        },
+        "age": 30,
+        "enrollmentDate": {
+            "$date": "2023-11-05T14:15:00Z"
+        },
+        "major": "QA Automation",
+        "gpa": {
+            "$numberDecimal": "3.52"
+        },
+        "isInternational": false,
+        "skills": [
+            "Selenium",
+            "TestNG",
+            "Python",
+            "REST API"
+        ],
+        "courses": [
+            {
+                "courseCode": "QA-301",
+                "credits": 3,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "TESTING-201",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -81.7660,
+                41.4925
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxNA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260015"
+        },
+        "name": {
+            "first": "Harsh",
+            "last": "Pandey"
+        },
+        "age": 31,
+        "enrollmentDate": {
+            "$date": "2021-08-10T11:30:00Z"
+        },
+        "major": "Data Engineering",
+        "gpa": {
+            "$numberDecimal": "3.69"
+        },
+        "isInternational": true,
+        "skills": [
+            "Spark",
+            "Hadoop",
+            "Scala",
+            "Airflow"
+        ],
+        "courses": [
+            {
+                "courseCode": "DATAENG-501",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "BIG-DATA-401",
+                "credits": 3,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.4194,
+                37.7749
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Big Data Pioneer",
+            "amount": 20000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxNQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260016"
+        },
+        "name": {
+            "first": "Pooja",
+            "last": "Bhat"
+        },
+        "age": 31,
+        "enrollmentDate": {
+            "$date": "2024-02-12T09:15:00Z"
+        },
+        "major": "UI/UX Design",
+        "gpa": {
+            "$numberDecimal": "3.79"
+        },
+        "isInternational": false,
+        "skills": [
+            "Figma",
+            "Prototyping",
+            "Interaction Design",
+            "HTML/CSS"
+        ],
+        "courses": [
+            {
+                "courseCode": "DESIGN-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "UX-101",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -0.1276,
+                51.5073
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxNg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260017"
+        },
+        "name": {
+            "first": "Nikhil",
+            "last": "Joshi"
+        },
+        "age": 32,
+        "enrollmentDate": {
+            "$date": "2020-07-20T08:45:00Z"
+        },
+        "major": "IoT Solutions",
+        "gpa": {
+            "$numberDecimal": "3.25"
+        },
+        "isInternational": true,
+        "skills": [
+            "Embedded C",
+            "Arduino",
+            "MQTT",
+            "Raspberry Pi"
+        ],
+        "courses": [
+            {
+                "courseCode": "IOT-401",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "EMBEDDED-301",
+                "credits": 3,
+                "grade": "B-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.2711,
+                37.8044
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "IoT Innovation Grant",
+            "amount": 9000,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxNw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260018"
+        },
+        "name": {
+            "first": "Zara",
+            "last": "Ahmed"
+        },
+        "age": 32,
+        "enrollmentDate": {
+            "$date": "2023-01-16T13:00:00Z"
+        },
+        "major": "Technical Writing",
+        "gpa": {
+            "$numberDecimal": "3.86"
+        },
+        "isInternational": false,
+        "skills": [
+            "Markdown",
+            "API Documentation",
+            "XML",
+            "Confluence"
+        ],
+        "courses": [
+            {
+                "courseCode": "TECH-WRITE-201",
+                "credits": 2,
+                "grade": "A"
+            },
+            {
+                "courseCode": "COMM-301",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                103.8198,
+                1.3521
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxOA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260019"
+        },
+        "name": {
+            "first": "Siddharth",
+            "last": "Gupta"
+        },
+        "age": 33,
+        "enrollmentDate": {
+            "$date": "2022-10-03T10:20:00Z"
+        },
+        "major": "Database Administration",
+        "gpa": {
+            "$numberDecimal": "3.58"
+        },
+        "isInternational": false,
+        "skills": [
+            "Oracle",
+            "MySQL",
+            "PostgreSQL",
+            "Backup/Recovery"
+        ],
+        "courses": [
+            {
+                "courseCode": "DBA-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "PERF-TUNING-301",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -79.3871,
+                43.6629
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Database Excellence",
+            "amount": 13000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAxOQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260020"
+        },
+        "name": {
+            "first": "Esha",
+            "last": "Chatterjee"
+        },
+        "age": 33,
+        "enrollmentDate": {
+            "$date": "2023-12-04T16:45:00Z"
+        },
+        "major": "Solution Architecture",
+        "gpa": {
+            "$numberDecimal": "3.95"
+        },
+        "isInternational": true,
+        "skills": [
+            "Enterprise Architecture",
+            "TOGAF",
+            "Business Analysis",
+            "Visio"
+        ],
+        "courses": [
+            {
+                "courseCode": "SOLUTION-ARCH-201",
+                "credits": 3,
+                "grade": "A+"
+            },
+            {
+                "courseCode": "ENTERPRISE-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                12.5674,
+                41.9028
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyMA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260021"
+        },
+        "name": {
+            "first": "Akshay",
+            "last": "Iyer"
+        },
+        "age": 34,
+        "enrollmentDate": {
+            "$date": "2023-04-11T14:30:00Z"
+        },
+        "major": "Network Engineering",
+        "gpa": {
+            "$numberDecimal": "3.72"
+        },
+        "isInternational": true,
+        "skills": [
+            "Cisco",
+            "Routing",
+            "BGP",
+            "MPLS"
+        ],
+        "courses": [
+            {
+                "courseCode": "NET-501",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "SECURITY-NET-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -90.1848,
+                29.9511
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyMQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260022"
+        },
+        "name": {
+            "first": "Ritika",
+            "last": "Saxena"
+        },
+        "age": 34,
+        "enrollmentDate": {
+            "$date": "2022-06-15T11:00:00Z"
+        },
+        "major": "Product Management",
+        "gpa": {
+            "$numberDecimal": "3.83"
+        },
+        "isInternational": false,
+        "skills": [
+            "Product Strategy",
+            "Analytics",
+            "Roadmapping",
+            "Stakeholder Mgmt"
+        ],
+        "courses": [
+            {
+                "courseCode": "PRODUCT-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "ANALYTICS-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                144.9631,
+                -37.8136
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Product Innovation",
+            "amount": 16000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyMg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260023"
+        },
+        "name": {
+            "first": "Sameer",
+            "last": "Ahmed"
+        },
+        "age": 35,
+        "enrollmentDate": {
+            "$date": "2021-10-25T09:45:00Z"
+        },
+        "major": "Computer Vision",
+        "gpa": {
+            "$numberDecimal": "3.41"
+        },
+        "isInternational": true,
+        "skills": [
+            "OpenCV",
+            "TensorFlow",
+            "Image Processing",
+            "3D Vision"
+        ],
+        "courses": [
+            {
+                "courseCode": "CV-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "IMAGE-PROC-301",
+                "credits": 3,
+                "grade": "B"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                28.9645,
+                77.6245
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyMw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260024"
+        },
+        "name": {
+            "first": "Maya",
+            "last": "Kapoor"
+        },
+        "age": 35,
+        "enrollmentDate": {
+            "$date": "2024-05-20T10:15:00Z"
+        },
+        "major": "Cyber Threat Intelligence",
+        "gpa": {
+            "$numberDecimal": "3.94"
+        },
+        "isInternational": false,
+        "skills": [
+            "OSINT",
+            "Threat Analysis",
+            "Malware Analysis",
+            "SIEM"
+        ],
+        "courses": [
+            {
+                "courseCode": "THREAT-INT-201",
+                "credits": 3,
+                "grade": "A+"
+            },
+            {
+                "courseCode": "MALWARE-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -118.2437,
+                34.0522
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Cybersecurity Leadership",
+            "amount": 14000,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyNA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260025"
+        },
+        "name": {
+            "first": "Shantanu",
+            "last": "Tiwari"
+        },
+        "age": 36,
+        "enrollmentDate": {
+            "$date": "2020-09-10T08:00:00Z"
+        },
+        "major": "Robotics Engineering",
+        "gpa": {
+            "$numberDecimal": "3.28"
+        },
+        "isInternational": false,
+        "skills": [
+            "ROS",
+            "C++",
+            "Control Systems",
+            "SLAM"
+        ],
+        "courses": [
+            {
+                "courseCode": "ROBOT-501",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "CONTROL-301",
+                "credits": 3,
+                "grade": "B-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -84.3900,
+                33.7490
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyNQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260026"
+        },
+        "name": {
+            "first": "Aisha",
+            "last": "Mirza"
+        },
+        "age": 36,
+        "enrollmentDate": {
+            "$date": "2023-07-03T13:20:00Z"
+        },
+        "major": "API Development",
+        "gpa": {
+            "$numberDecimal": "3.81"
+        },
+        "isInternational": true,
+        "skills": [
+            "REST",
+            "GraphQL",
+            "FastAPI",
+            "API Security"
+        ],
+        "courses": [
+            {
+                "courseCode": "API-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "GRAPHQL-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -75.1652,
+                39.9526
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyNg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260027"
+        },
+        "name": {
+            "first": "Deepak",
+            "last": "Saxena"
+        },
+        "age": 37,
+        "enrollmentDate": {
+            "$date": "2022-03-08T15:00:00Z"
+        },
+        "major": "Site Reliability Engineering",
+        "gpa": {
+            "$numberDecimal": "3.50"
+        },
+        "isInternational": false,
+        "skills": [
+            "Kubernetes",
+            "Observability",
+            "Incident Response",
+            "Go"
+        ],
+        "courses": [
+            {
+                "courseCode": "SRE-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "MONITORING-301",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -117.1611,
+                32.7157
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Reliability Award",
+            "amount": 12500,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyNw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260028"
+        },
+        "name": {
+            "first": "Nidhi",
+            "last": "Verma"
+        },
+        "age": 37,
+        "enrollmentDate": {
+            "$date": "2023-08-14T12:30:00Z"
+        },
+        "major": "Augmented Reality",
+        "gpa": {
+            "$numberDecimal": "3.77"
+        },
+        "isInternational": false,
+        "skills": [
+            "Unity AR",
+            "ARCore",
+            "3D Modeling",
+            "Shader Language"
+        ],
+        "courses": [
+            {
+                "courseCode": "AR-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "VR-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                174.8860,
+                -41.2865
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyOA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260029"
+        },
+        "name": {
+            "first": "Ranveer",
+            "last": "Singh"
+        },
+        "age": 38,
+        "enrollmentDate": {
+            "$date": "2021-11-22T10:45:00Z"
+        },
+        "major": "Quantum Computing",
+        "gpa": {
+            "$numberDecimal": "3.39"
+        },
+        "isInternational": true,
+        "skills": [
+            "Qiskit",
+            "Quantum Algorithms",
+            "Python",
+            "Linear Algebra"
+        ],
+        "courses": [
+            {
+                "courseCode": "QUANTUM-401",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "QUANTUM-ALGO-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -71.0589,
+                42.3601
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAyOQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260030"
+        },
+        "name": {
+            "first": "Shreya",
+            "last": "Prabhu"
+        },
+        "age": 38,
+        "enrollmentDate": {
+            "$date": "2023-05-09T14:00:00Z"
+        },
+        "major": "Bioinformatics",
+        "gpa": {
+            "$numberDecimal": "3.89"
+        },
+        "isInternational": false,
+        "skills": [
+            "Python",
+            "Genomics",
+            "Biopython",
+            "R Statistics"
+        ],
+        "courses": [
+            {
+                "courseCode": "BIOINF-301",
+                "credits": 4,
+                "grade": "A"
+            },
+            {
+                "courseCode": "GENOMICS-201",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                73.9352,
+                40.7306
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Life Sciences Grant",
+            "amount": 17000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzMA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260031"
+        },
+        "name": {
+            "first": "Varun",
+            "last": "Sethi"
+        },
+        "age": 39,
+        "enrollmentDate": {
+            "$date": "2020-04-27T09:30:00Z"
+        },
+        "major": "Enterprise Software",
+        "gpa": {
+            "$numberDecimal": "3.31"
+        },
+        "isInternational": true,
+        "skills": [
+            "SAP",
+            "Oracle ERP",
+            "Business Process",
+            "Integration"
+        ],
+        "courses": [
+            {
+                "courseCode": "ENTERPRISE-501",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "ERP-IMPL-401",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.3321,
+                47.6062
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzMQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260032"
+        },
+        "name": {
+            "first": "Meera",
+            "last": "Deshmukh"
+        },
+        "age": 39,
+        "enrollmentDate": {
+            "$date": "2022-08-01T11:15:00Z"
+        },
+        "major": "Embedded Systems",
+        "gpa": {
+            "$numberDecimal": "3.64"
+        },
+        "isInternational": false,
+        "skills": [
+            "VHDL",
+            "Firmware",
+            "RTOS",
+            "Assembly"
+        ],
+        "courses": [
+            {
+                "courseCode": "EMBEDDED-401",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "FIRMWARE-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -80.1918,
+                25.7617
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzMg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260033"
+        },
+        "name": {
+            "first": "Sarvesh",
+            "last": "Kumar"
+        },
+        "age": 40,
+        "enrollmentDate": {
+            "$date": "2023-09-25T13:45:00Z"
+        },
+        "major": "Web Services Architecture",
+        "gpa": {
+            "$numberDecimal": "3.73"
+        },
+        "isInternational": true,
+        "skills": [
+            "AWS Lambda",
+            "Serverless",
+            "API Gateway",
+            "DynamoDB"
+        ],
+        "courses": [
+            {
+                "courseCode": "SERVERLESS-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "CLOUD-NATIVE-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -84.2733,
+                33.7490
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzMw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260034"
+        },
+        "name": {
+            "first": "Anita",
+            "last": "Malhotra"
+        },
+        "age": 40,
+        "enrollmentDate": {
+            "$date": "2024-01-15T10:00:00Z"
+        },
+        "major": "Accessibility Engineering",
+        "gpa": {
+            "$numberDecimal": "3.92"
+        },
+        "isInternational": false,
+        "skills": [
+            "WCAG",
+            "Screen Readers",
+            "HTML/CSS",
+            "Testing Automation"
+        ],
+        "courses": [
+            {
+                "courseCode": "ACCESSIBILITY-201",
+                "credits": 2,
+                "grade": "A+"
+            },
+            {
+                "courseCode": "INCLUSIVE-DESIGN-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                0.7480,
+                51.5173
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Accessibility Pioneer",
+            "amount": 10500,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzNA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260035"
+        },
+        "name": {
+            "first": "Anil",
+            "last": "Narayan"
+        },
+        "age": 41,
+        "enrollmentDate": {
+            "$date": "2021-12-06T08:30:00Z"
+        },
+        "major": "Performance Engineering",
+        "gpa": {
+            "$numberDecimal": "3.44"
+        },
+        "isInternational": false,
+        "skills": [
+            "Load Testing",
+            "Profiling",
+            "JMeter",
+            "Optimization"
+        ],
+        "courses": [
+            {
+                "courseCode": "PERF-ENG-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "LOAD-TEST-301",
+                "credits": 3,
+                "grade": "B"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                106.6452,
+                -6.2088
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzNQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260036"
+        },
+        "name": {
+            "first": "Sudha",
+            "last": "Lakshmi"
+        },
+        "age": 41,
+        "enrollmentDate": {
+            "$date": "2023-06-19T14:20:00Z"
+        },
+        "major": "Natural Language Processing",
+        "gpa": {
+            "$numberDecimal": "3.87"
+        },
+        "isInternational": true,
+        "skills": [
+            "NLTK",
+            "Transformers",
+            "BERT",
+            "Spacy"
+        ],
+        "courses": [
+            {
+                "courseCode": "NLP-301",
+                "credits": 4,
+                "grade": "A"
+            },
+            {
+                "courseCode": "TRANSFORMERS-201",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.4194,
+                37.7749
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzNg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260037"
+        },
+        "name": {
+            "first": "Nirav",
+            "last": "Patel"
+        },
+        "age": 42,
+        "enrollmentDate": {
+            "$date": "2022-07-11T09:00:00Z"
+        },
+        "major": "Fintech Development",
+        "gpa": {
+            "$numberDecimal": "3.62"
+        },
+        "isInternational": false,
+        "skills": [
+            "Trading APIs",
+            "Payment Systems",
+            "Compliance",
+            "Cryptography"
+        ],
+        "courses": [
+            {
+                "courseCode": "FINTECH-401",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "PAYMENT-SYSTEMS-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -74.0060,
+                40.7128
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "FinTech Excellence",
+            "amount": 21000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzNw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260038"
+        },
+        "name": {
+            "first": "Prithvi",
+            "last": "Nambiar"
+        },
+        "age": 42,
+        "enrollmentDate": {
+            "$date": "2023-10-30T15:15:00Z"
+        },
+        "major": "Environmental Computing",
+        "gpa": {
+            "$numberDecimal": "3.80"
+        },
+        "isInternational": false,
+        "skills": [
+            "GIS Systems",
+            "Environmental Modeling",
+            "Satellite Data",
+            "Python"
+        ],
+        "courses": [
+            {
+                "courseCode": "ENV-COMP-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "CLIMATE-DATA-101",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -87.6298,
+                41.8781
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzOA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260039"
+        },
+        "name": {
+            "first": "Kamini",
+            "last": "Reddy"
+        },
+        "age": 43,
+        "enrollmentDate": {
+            "$date": "2021-05-03T10:45:00Z"
+        },
+        "major": "Healthcare IT",
+        "gpa": {
+            "$numberDecimal": "3.53"
+        },
+        "isInternational": true,
+        "skills": [
+            "EHR Systems",
+            "HIPAA Compliance",
+            "Medical Coding",
+            "SQL"
+        ],
+        "courses": [
+            {
+                "courseCode": "HEALTHCARE-IT-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "HIPAA-SECURITY-301",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -96.8969,
+                32.8753
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzAzOQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260040"
+        },
+        "name": {
+            "first": "Rounak",
+            "last": "Banerjee"
+        },
+        "age": 43,
+        "enrollmentDate": {
+            "$date": "2023-02-27T12:00:00Z"
+        },
+        "major": "E-Commerce Development",
+        "gpa": {
+            "$numberDecimal": "3.75"
+        },
+        "isInternational": false,
+        "skills": [
+            "Shopify",
+            "WooCommerce",
+            "Payment Integration",
+            "JavaScript"
+        ],
+        "courses": [
+            {
+                "courseCode": "ECOMMERCE-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "CONVERSION-OPTI-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                120.9842,
+                14.5995
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0MA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260041"
+        },
+        "name": {
+            "first": "Tanvi",
+            "last": "Singh"
+        },
+        "age": 44,
+        "enrollmentDate": {
+            "$date": "2024-04-08T14:30:00Z"
+        },
+        "major": "Marketing Technology",
+        "gpa": {
+            "$numberDecimal": "3.76"
+        },
+        "isInternational": false,
+        "skills": [
+            "Marketing Automation",
+            "Analytics",
+            "CRM Systems",
+            "Python"
+        ],
+        "courses": [
+            {
+                "courseCode": "MARTECH-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "ANALYTICS-101",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -121.8863,
+                36.6002
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Marketing Innovation",
+            "amount": 9500,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0MQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260042"
+        },
+        "name": {
+            "first": "Chirag",
+            "last": "Sharma"
+        },
+        "age": 44,
+        "enrollmentDate": {
+            "$date": "2022-11-07T11:30:00Z"
+        },
+        "major": "Supply Chain Tech",
+        "gpa": {
+            "$numberDecimal": "3.47"
+        },
+        "isInternational": true,
+        "skills": [
+            "SAP SCM",
+            "Logistics Optimization",
+            "Blockchain",
+            "Analytics"
+        ],
+        "courses": [
+            {
+                "courseCode": "SUPPLY-CHAIN-401",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "LOGISTICS-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -74.6051,
+                40.2206
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0Mg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260043"
+        },
+        "name": {
+            "first": "Sakshi",
+            "last": "Goyal"
+        },
+        "age": 45,
+        "enrollmentDate": {
+            "$date": "2023-03-13T09:45:00Z"
+        },
+        "major": "Content Delivery Systems",
+        "gpa": {
+            "$numberDecimal": "3.82"
+        },
+        "isInternational": false,
+        "skills": [
+            "CDN Technologies",
+            "Video Streaming",
+            "P2P Networks",
+            "HTTP/2"
+        ],
+        "courses": [
+            {
+                "courseCode": "CDN-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "STREAMING-TECH-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.2207,
+                37.8716
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0Mw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260044"
+        },
+        "name": {
+            "first": "Vivek",
+            "last": "Mallik"
+        },
+        "age": 45,
+        "enrollmentDate": {
+            "$date": "2020-10-12T13:00:00Z"
+        },
+        "major": "Information Security",
+        "gpa": {
+            "$numberDecimal": "3.37"
+        },
+        "isInternational": true,
+        "skills": [
+            "PKI",
+            "Zero Trust",
+            "IAM Systems",
+            "Risk Assessment"
+        ],
+        "courses": [
+            {
+                "courseCode": "INFO-SEC-501",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "IAM-SYSTEMS-401",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -87.6298,
+                41.8781
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Security Assurance",
+            "amount": 13500,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0NA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260045"
+        },
+        "name": {
+            "first": "Prisha",
+            "last": "Yadav"
+        },
+        "age": 46,
+        "enrollmentDate": {
+            "$date": "2024-02-19T10:30:00Z"
+        },
+        "major": "Voice Technology",
+        "gpa": {
+            "$numberDecimal": "3.84"
+        },
+        "isInternational": false,
+        "skills": [
+            "Speech Recognition",
+            "Voice Synthesis",
+            "Alexa Skills",
+            "Python"
+        ],
+        "courses": [
+            {
+                "courseCode": "VOICE-TECH-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "SPEECH-PROC-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -87.9073,
+                43.0389
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0NQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260046"
+        },
+        "name": {
+            "first": "Mayank",
+            "last": "Chandra"
+        },
+        "age": 46,
+        "enrollmentDate": {
+            "$date": "2021-06-14T14:45:00Z"
+        },
+        "major": "Streaming Platforms",
+        "gpa": {
+            "$numberDecimal": "3.51"
+        },
+        "isInternational": false,
+        "skills": [
+            "Kafka",
+            "Apache Spark",
+            "Stream Processing",
+            "Scala"
+        ],
+        "courses": [
+            {
+                "courseCode": "STREAM-PROC-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "KAFKA-ARCH-301",
+                "credits": 3,
+                "grade": "B"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -75.1652,
+                39.9526
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0Ng==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260047"
+        },
+        "name": {
+            "first": "Nitya",
+            "last": "Bhat"
+        },
+        "age": 47,
+        "enrollmentDate": {
+            "$date": "2023-09-18T11:00:00Z"
+        },
+        "major": "Software Testing",
+        "gpa": {
+            "$numberDecimal": "3.68"
+        },
+        "isInternational": true,
+        "skills": [
+            "Test Management",
+            "BDD",
+            "Cucumber",
+            "Load Testing"
+        ],
+        "courses": [
+            {
+                "courseCode": "TEST-MGMT-301",
+                "credits": 3,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "BDD-201",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -118.2437,
+                34.0522
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0Nw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260048"
+        },
+        "name": {
+            "first": "Saurabh",
+            "last": "Nair"
+        },
+        "age": 47,
+        "enrollmentDate": {
+            "$date": "2022-12-05T15:30:00Z"
+        },
+        "major": "Container Orchestration",
+        "gpa": {
+            "$numberDecimal": "3.59"
+        },
+        "isInternational": false,
+        "skills": [
+            "Docker",
+            "Kubernetes",
+            "OpenShift",
+            "Container Security"
+        ],
+        "courses": [
+            {
+                "courseCode": "CONTAINER-ORCH-401",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "KUBELET-ARCH-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.3321,
+                47.6062
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Container Excellence",
+            "amount": 11500,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0OA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260049"
+        },
+        "name": {
+            "first": "Harleen",
+            "last": "Kaur"
+        },
+        "age": 48,
+        "enrollmentDate": {
+            "$date": "2024-03-25T10:15:00Z"
+        },
+        "major": "Graph Database Design",
+        "gpa": {
+            "$numberDecimal": "3.93"
+        },
+        "isInternational": false,
+        "skills": [
+            "Neo4j",
+            "Graph Theory",
+            "Cypher Query",
+            "Knowledge Graphs"
+        ],
+        "courses": [
+            {
+                "courseCode": "GRAPH-DB-201",
+                "credits": 3,
+                "grade": "A+"
+            },
+            {
+                "courseCode": "KG-DESIGN-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                7.4474,
+                46.9479
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA0OQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260050"
+        },
+        "name": {
+            "first": "Ankur",
+            "last": "Chopra"
+        },
+        "age": 48,
+        "enrollmentDate": {
+            "$date": "2021-04-19T12:45:00Z"
+        },
+        "major": "Search Engine Architecture",
+        "gpa": {
+            "$numberDecimal": "3.46"
+        },
+        "isInternational": true,
+        "skills": [
+            "Elasticsearch",
+            "Solr",
+            "Information Retrieval",
+            "Lucene"
+        ],
+        "courses": [
+            {
+                "courseCode": "SEARCH-ENG-401",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "IR-SYSTEMS-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.4194,
+                37.7749
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1MA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260051"
+        },
+        "name": {
+            "first": "Jaya",
+            "last": "Krishnan"
+        },
+        "age": 49,
+        "enrollmentDate": {
+            "$date": "2023-07-10T13:20:00Z"
+        },
+        "major": "Analytics Engineering",
+        "gpa": {
+            "$numberDecimal": "3.79"
+        },
+        "isInternational": false,
+        "skills": [
+            "dbt",
+            "Data Modeling",
+            "SQL",
+            "Tableau"
+        ],
+        "courses": [
+            {
+                "courseCode": "ANALYTICS-ENG-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "DATA-MODEL-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -84.3900,
+                33.7490
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1MQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260052"
+        },
+        "name": {
+            "first": "Vaibhav",
+            "last": "Arora"
+        },
+        "age": 49,
+        "enrollmentDate": {
+            "$date": "2020-05-11T09:00:00Z"
+        },
+        "major": "Compliance Engineering",
+        "gpa": {
+            "$numberDecimal": "3.33"
+        },
+        "isInternational": false,
+        "skills": [
+            "GDPR",
+            "Audit Automation",
+            "Risk Frameworks",
+            "Governance"
+        ],
+        "courses": [
+            {
+                "courseCode": "COMPLIANCE-501",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "GOVERNANCE-401",
+                "credits": 3,
+                "grade": "B-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.2207,
+                37.8716
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Governance Grant",
+            "amount": 10000,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1Mg==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260053"
+        },
+        "name": {
+            "first": "Ishaan",
+            "last": "Mittal"
+        },
+        "age": 50,
+        "enrollmentDate": {
+            "$date": "2024-06-03T14:00:00Z"
+        },
+        "major": "Edge Computing",
+        "gpa": {
+            "$numberDecimal": "3.85"
+        },
+        "isInternational": true,
+        "skills": [
+            "Edge AI",
+            "IoT Protocols",
+            "5G Networks",
+            "Python"
+        ],
+        "courses": [
+            {
+                "courseCode": "EDGE-COMP-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "IOT-EDGE-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -73.9352,
+                40.7306
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1Mw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260054"
+        },
+        "name": {
+            "first": "Leena",
+            "last": "Dutta"
+        },
+        "age": 50,
+        "enrollmentDate": {
+            "$date": "2022-01-24T11:45:00Z"
+        },
+        "major": "Software Security",
+        "gpa": {
+            "$numberDecimal": "3.66"
+        },
+        "isInternational": false,
+        "skills": [
+            "Static Code Analysis",
+            "SAST/DAST",
+            "Secure Coding",
+            "Threat Modeling"
+        ],
+        "courses": [
+            {
+                "courseCode": "SOFT-SEC-401",
+                "credits": 4,
+                "grade": "A-"
+            },
+            {
+                "courseCode": "THREAT-MODEL-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -79.3871,
+                43.6629
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1NA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260055"
+        },
+        "name": {
+            "first": "Ronak",
+            "last": "Saxena"
+        },
+        "age": 51,
+        "enrollmentDate": {
+            "$date": "2023-04-24T10:30:00Z"
+        },
+        "major": "API Governance",
+        "gpa": {
+            "$numberDecimal": "3.81"
+        },
+        "isInternational": false,
+        "skills": [
+            "API Standards",
+            "API Lifecycle",
+            "Documentation",
+            "Governance Frameworks"
+        ],
+        "courses": [
+            {
+                "courseCode": "API-GOV-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "STANDARDS-201",
+                "credits": 2,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                2.3522,
+                48.8566
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1NQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260056"
+        },
+        "name": {
+            "first": "Divyansh",
+            "last": "Sinha"
+        },
+        "age": 51,
+        "enrollmentDate": {
+            "$date": "2021-03-08T14:15:00Z"
+        },
+        "major": "Cloud Security",
+        "gpa": {
+            "$numberDecimal": "3.48"
+        },
+        "isInternational": true,
+        "skills": [
+            "Cloud Security Posture",
+            "CSPM Tools",
+            "Identity Management",
+            "Encryption"
+        ],
+        "courses": [
+            {
+                "courseCode": "CLOUD-SEC-401",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "CSPM-TOOLS-301",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                139.6917,
+                35.6895
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1Ng==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260057"
+        },
+        "name": {
+            "first": "Yara",
+            "last": "Hassan"
+        },
+        "age": 52,
+        "enrollmentDate": {
+            "$date": "2024-01-29T09:30:00Z"
+        },
+        "major": "Low-Code Platforms",
+        "gpa": {
+            "$numberDecimal": "3.87"
+        },
+        "isInternational": false,
+        "skills": [
+            "Mendix",
+            "OutSystems",
+            "Business Process Design",
+            "Integration"
+        ],
+        "courses": [
+            {
+                "courseCode": "LOWCODE-201",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "PROCESS-DESIGN-101",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                55.2708,
+                25.2048
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Innovation Platforms",
+            "amount": 9800,
+            "renewable": false
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1Nw==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260058"
+        },
+        "name": {
+            "first": "Tanmay",
+            "last": "Mitra"
+        },
+        "age": 52,
+        "enrollmentDate": {
+            "$date": "2022-09-19T13:00:00Z"
+        },
+        "major": "Incident Management",
+        "gpa": {
+            "$numberDecimal": "3.55"
+        },
+        "isInternational": false,
+        "skills": [
+            "Incident Response",
+            "ITIL",
+            "ServiceNow",
+            "Root Cause Analysis"
+        ],
+        "courses": [
+            {
+                "courseCode": "INCIDENT-MGMT-401",
+                "credits": 4,
+                "grade": "B+"
+            },
+            {
+                "courseCode": "ITIL-FOUNDATION-301",
+                "credits": 3,
+                "grade": "A-"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -117.1611,
+                32.7157
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1OA==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260059"
+        },
+        "name": {
+            "first": "Simran",
+            "last": "Kaur"
+        },
+        "age": 53,
+        "enrollmentDate": {
+            "$date": "2023-05-22T15:45:00Z"
+        },
+        "major": "Data Privacy",
+        "gpa": {
+            "$numberDecimal": "3.90"
+        },
+        "isInternational": true,
+        "skills": [
+            "Privacy Engineering",
+            "Data Governance",
+            "Encryption",
+            "Anonymization"
+        ],
+        "courses": [
+            {
+                "courseCode": "PRIVACY-ENG-301",
+                "credits": 3,
+                "grade": "A"
+            },
+            {
+                "courseCode": "DATA-GOV-201",
+                "credits": 2,
+                "grade": "A"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -73.9352,
+                40.7306
+            ]
+        },
+        "scholarshipDetails": null,
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA1OQ==",
+                "subType": "00"
+            }
+        }
+    },
+    {
+        "studentId": {
+            "$numberLong": "20260060"
+        },
+        "name": {
+            "first": "Aryan",
+            "last": "Bhattacharya"
+        },
+        "age": 53,
+        "enrollmentDate": {
+            "$date": "2020-02-17T10:00:00Z"
+        },
+        "major": "Observability Engineering",
+        "gpa": {
+            "$numberDecimal": "3.40"
+        },
+        "isInternational": false,
+        "skills": [
+            "OpenTelemetry",
+            "Metrics Collection",
+            "Log Aggregation",
+            "Distributed Tracing"
+        ],
+        "courses": [
+            {
+                "courseCode": "OBSERVABILITY-501",
+                "credits": 4,
+                "grade": "B"
+            },
+            {
+                "courseCode": "TRACING-SYSTEMS-401",
+                "credits": 3,
+                "grade": "B+"
+            }
+        ],
+        "campusLocation": {
+            "type": "Point",
+            "coordinates": [
+                -122.4194,
+                37.7749
+            ]
+        },
+        "scholarshipDetails": {
+            "scholarshipName": "Observability Excellence",
+            "amount": 14500,
+            "renewable": true
+        },
+        "libraryCardToken": {
+            "$binary": {
+                "base64": "c3R1ZGVudF9oYXNoXzA2MA==",
+                "subType": "00"
+            }
+        }
+    }
+]

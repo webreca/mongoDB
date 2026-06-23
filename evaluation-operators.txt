@@ -1,0 +1,688 @@
+================================================================================
+        MONGODB EVALUATION OPERATORS - COMPLETE GUIDE
+       (Beginner to Advanced Level)
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Evaluation operators for pattern matching, expressions, and custom logic
+EXAMPLES: Using 60 Student Records from data.json
+LEVEL: Beginner → Intermediate → Advanced
+
+EVALUATION OPERATORS = Pattern matching, expressions, and custom logic
+
+
+================================================================================
+PART 1: BEGINNER LEVEL
+================================================================================
+
+SECTION 1.1: WHAT ARE EVALUATION OPERATORS?
+================================================================================
+
+DEFINITION:
+  Evaluation operators perform pattern matching, expression evaluation,
+  and custom logic on documents.
+
+PURPOSE:
+  ✓ Pattern matching (regex)
+  ✓ Modulo arithmetic
+  ✓ Full-text search
+  ✓ Complex expressions
+  ✓ JavaScript evaluation (avoid)
+  ✓ Schema validation
+
+AVAILABLE OPERATORS (6 total):
+  $regex - Regular expression pattern matching
+  $mod - Modulo arithmetic operation
+  $expr - Expression evaluation
+  $text - Full-text search
+  $where - JavaScript evaluation (⚠️ AVOID)
+  $jsonSchema - JSON schema validation
+
+WHY IMPORTANT:
+  Enable complex filtering beyond simple comparisons
+  Pattern matching for flexible searching
+  Mathematical operations on numeric data
+  Full-text search on text content
+
+
+================================================================================
+SECTION 1.2: BEGINNER - $REGEX OPERATOR
+================================================================================
+
+DEFINITION:
+  $regex performs pattern matching using regular expressions
+
+SYNTAX:
+  { field: { $regex: 'pattern' } }
+  { field: { $regex: 'pattern', $options: 'flags' } }
+  { field: /pattern/flags } (shorthand)
+
+OPTIONS (Flags):
+  i  - Case insensitive (ignore case)
+  m  - Multiline (^ and $ match line boundaries)
+  x  - Ignore whitespace in pattern
+  s  - Dot (.) matches newline
+
+
+COMMON PATTERNS:
+  ^pattern   - Starts with (anchored, uses index)
+  pattern$   - Ends with (anchored)
+  .*pattern  - Contains substring
+  [0-9]+     - Contains numbers
+  ^[A-Z]     - Starts with capital letter
+
+
+BEGINNER EXAMPLE #1: Find students with first name starting with D
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ 'name.first': { $regex: '^D' } })
+
+Translation:
+  First name STARTS WITH 'D'
+
+Result:
+  Daksh Chauhan, Deepak Saxena, Divya Roy, etc.
+
+Use Case:
+  Autocomplete: User types 'D', show matching names
+
+
+BEGINNER EXAMPLE #2: Find students with last name ending in Singh
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ 'name.last': { $regex: 'Singh$' } })
+
+Translation:
+  Last name ENDS WITH 'Singh'
+
+Result:
+  All students with Singh surname
+
+Use Case:
+  Search by name suffix
+
+
+BEGINNER EXAMPLE #3: Case-insensitive search
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ major: { $regex: 'data', $options: 'i' } })
+
+Translation:
+  Major contains 'data' (case-insensitive)
+
+Result:
+  Data Science, DATA SCIENCE, DaTa ScIeNcE all match
+
+Use Case:
+  Flexible search ignoring case
+
+
+BEGINNER EXAMPLE #4: Find majors containing 'engineering'
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ major: { $regex: 'engineering', $options: 'i' } })
+
+Translation:
+  Major contains 'engineering' (any case)
+
+Result:
+  Software Engineering, Civil Engineering, etc.
+
+Use Case:
+  Substring matching
+
+
+PERFORMANCE TIP:
+  Use ^pattern (anchored) to enable index usage
+  Avoid .*pattern.* (not anchored, no index)
+
+
+================================================================================
+SECTION 1.3: BEGINNER - $MOD OPERATOR
+================================================================================
+
+DEFINITION:
+  $mod performs modulo operation (remainder after division)
+
+SYNTAX:
+  { field: { $mod: [divisor, remainder] } }
+
+MEANING:
+  field % divisor == remainder
+
+COMMON USES:
+  Even/odd numbers: { field: { $mod: [2, 0] } }
+  Divisible by N: { field: { $mod: [N, 0] } }
+  Remainder: { field: { $mod: [N, R] } }
+
+
+BEGINNER EXAMPLE #1: Find even student IDs
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ studentId: { $mod: [2, 0] } })
+
+Translation:
+  studentId % 2 == 0 (even number)
+
+Note:
+  studentId is string, would need numeric version
+
+Use Case:
+  Select students systematically (every other one)
+
+
+BEGINNER EXAMPLE #2: Find students aged divisible by 5
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ age: { $mod: [5, 0] } })
+
+Translation:
+  age % 5 == 0
+
+Result:
+  Ages: 20, 25, 30, 35, 40, 45, 50
+
+Use Case:
+  Age group analysis (5-year intervals)
+
+
+BEGINNER EXAMPLE #3: Find students every 3rd position
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({ age: { $mod: [3, 2] } })
+
+Translation:
+  age % 3 == 2
+
+Result:
+  Ages: 20, 23, 26, 29, 32, 35...
+
+Use Case:
+  Statistical sampling
+
+
+PERFORMANCE:
+  ✓ Fast operation
+  ✓ No index needed
+  ✓ Efficient for sampling
+
+
+================================================================================
+PART 2: INTERMEDIATE LEVEL
+================================================================================
+
+SECTION 2.1: INTERMEDIATE - $EXPR OPERATOR
+================================================================================
+
+DEFINITION:
+  $expr allows using aggregation expressions in queries
+  Compare fields, do calculations, complex logic
+
+SYNTAX:
+  { $expr: { expression } }
+
+ENABLES:
+  ✓ Field-to-field comparison
+  ✓ Calculations (add, multiply, divide)
+  ✓ Complex conditions (and, or, if-then)
+  ✓ Aggregation operators in queries
+
+BENEFIT:
+  Much more powerful than simple comparison
+  Use aggregation functions in find()
+
+
+INTERMEDIATE EXAMPLE #1: Compare two fields
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $expr: { $gte: ['$gpa', { $avg: [3.5, 3.9] }] }
+  })
+
+Translation:
+  GPA >= average of 3.5 and 3.9 (= 3.7)
+
+Result:
+  Students with GPA >= 3.7
+
+Use Case:
+  Dynamic threshold calculations
+
+
+INTERMEDIATE EXAMPLE #2: Complex multi-field scoring
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $expr: {
+      $gt: [
+        { $add: ['$gpa', { $divide: ['$age', 100] }] },
+        4.0
+      ]
+    }
+  })
+
+Translation:
+  (GPA + age/100) > 4.0
+
+Result:
+  Complex scoring system
+
+Use Case:
+  Composite evaluation
+
+
+INTERMEDIATE EXAMPLE #3: Conditional AND logic
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $expr: {
+      $and: [
+        { $gte: ['$gpa', 3.9] },
+        { $eq: ['$isInternational', true] }
+      ]
+    }
+  })
+
+Translation:
+  (GPA >= 3.9) AND (international = true)
+
+Result:
+  International honor students
+
+Use Case:
+  Complex eligibility rules
+
+
+================================================================================
+SECTION 2.2: INTERMEDIATE - $TEXT OPERATOR
+================================================================================
+
+DEFINITION:
+  $text performs full-text search on indexed text fields
+
+REQUIREMENT:
+  ⚠️ Text index MUST exist first!
+
+CREATE TEXT INDEX:
+  db.collection.createIndex({ field: 'text' })
+
+SYNTAX:
+  { $text: { $search: 'search string' } }
+  { $text: { $search: 'term1 OR term2' } }
+  { $text: { $search: 'term1 -term2' } } (exclude)
+
+
+INTERMEDIATE EXAMPLE #1: Basic text search
+────────────────────────────────────────────────────────────────────────────
+
+Setup:
+  db.students.createIndex({ 'scholarshipDetails.notes': 'text' })
+
+Query:
+  db.students.find({ $text: { $search: 'merit' } })
+
+Translation:
+  Find documents containing word 'merit'
+
+Result:
+  Documents with 'merit' in scholarship notes
+
+Use Case:
+  Full-text search on notes/descriptions
+
+
+INTERMEDIATE EXAMPLE #2: Multiple terms (OR)
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $text: { $search: 'international OR scholarship' }
+  })
+
+Translation:
+  Contains 'international' OR 'scholarship'
+
+Result:
+  Broader search results
+
+
+INTERMEDIATE EXAMPLE #3: Exclude terms (NOT)
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $text: { $search: 'scholarship -denied' }
+  })
+
+Translation:
+  Contains 'scholarship' but NOT 'denied'
+
+Result:
+  Refined search excluding unwanted docs
+
+
+PERFORMANCE:
+  ✓ Fast with text index
+  ⚠️ Error without index
+  ✓ Supports complex search
+
+
+================================================================================
+PART 3: ADVANCED LEVEL
+================================================================================
+
+SECTION 3.1: ADVANCED - $WHERE OPERATOR (AVOID)
+================================================================================
+
+DEFINITION:
+  $where evaluates custom JavaScript function
+
+SYNTAX:
+  { $where: function() { return condition; } }
+  { $where: 'condition as string' }
+
+⚠️ WARNING:
+  SECURITY RISK: Never use with user input
+  PERFORMANCE: Very slow - full collection scan
+  AVOID: Use $expr or other operators instead
+
+
+WHEN MIGHT SEE:
+  Legacy code
+  Very rare complex logic
+  No aggregation equivalent
+
+
+WHEN TO NEVER USE:
+  ✗ User input (code injection risk)
+  ✗ Performance critical
+  ✗ Can use other operators
+  ✗ Production code
+
+
+ADVANCED EXAMPLE #1: Multi-field logic
+────────────────────────────────────────────────────────────────────────────
+
+❌ BAD (use $expr instead):
+  db.students.find({
+    $where: function() {
+      return this.gpa > 3.5 && this.age < 25;
+    }
+  })
+
+✅ GOOD (use $expr):
+  db.students.find({
+    $expr: {
+      $and: [
+        { $gt: ['$gpa', 3.5] },
+        { $lt: ['$age', 25] }
+      ]
+    }
+  })
+
+Performance:
+  $expr: ~10-50ms
+  $where: ~500ms-5s (full scan)
+
+
+SECTION 3.2: ADVANCED - $JSONSCHEMA OPERATOR
+================================================================================
+
+DEFINITION:
+  $jsonSchema validates document against JSON Schema in queries
+
+SYNTAX:
+  { $jsonSchema: { schema definition } }
+
+USE CASE:
+  Find documents matching/violating schema
+  Data quality validation in queries
+
+
+ADVANCED EXAMPLE: Find valid documents
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['studentId', 'gpa'],
+      properties: {
+        studentId: { bsonType: 'string' },
+        gpa: {
+          bsonType: 'double',
+          minimum: 0,
+          maximum: 4.0
+        }
+      }
+    }
+  })
+
+Translation:
+  Find documents matching this schema
+
+Use Case:
+  Data quality validation
+
+
+================================================================================
+SECTION 3.3: ADVANCED - COMBINING EVALUATION OPERATORS
+================================================================================
+
+ADVANCED EXAMPLE #1: Regex with expression
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    'name.first': { $regex: '^[A-D]' },
+    $expr: { $gte: ['$gpa', 3.8] }
+  })
+
+Logic:
+  First name A-D AND GPA >= 3.8
+
+Result:
+  Selective filtering with multiple conditions
+
+
+ADVANCED EXAMPLE #2: Text search with range
+────────────────────────────────────────────────────────────────────────────
+
+Setup:
+  db.students.createIndex({ 'scholarshipDetails.notes': 'text' })
+
+Query:
+  db.students.find({
+    $text: { $search: 'scholarship' },
+    age: { $gte: 20, $lte: 25 }
+  })
+
+Logic:
+  Scholarship mentions in age range 20-25
+
+Result:
+  Refined text search with additional filters
+
+
+ADVANCED EXAMPLE #3: Complex multi-factor scoring
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $expr: {
+      $or: [
+        {
+          $and: [
+            { $gte: ['$gpa', 3.9] },
+            { $eq: ['$isInternational', true] }
+          ]
+        },
+        {
+          $and: [
+            { $gte: ['$gpa', 3.5] },
+            { $gte: [{ $size: ['$skills'] }, 5] }
+          ]
+        }
+      ]
+    }
+  })
+
+Logic:
+  (Honor + International) OR (Good GPA + Many Skills)
+
+Result:
+  Complex eligibility matrix
+  Two paths to eligibility
+
+
+================================================================================
+SECTION 3.4: ADVANCED - REAL-WORLD SCENARIOS
+================================================================================
+
+SCENARIO #1: Name autocomplete
+────────────────────────────────────────────────────────────────────────────
+
+User types: 'Dak'
+
+Query:
+  db.students.find({
+    $or: [
+      { 'name.first': { $regex: '^Dak', $options: 'i' } },
+      { 'name.last': { $regex: '^Dak', $options: 'i' } }
+    ]
+  })
+
+Result:
+  Daksh Chauhan (match in first name)
+
+
+SCENARIO #2: Dynamic threshold
+────────────────────────────────────────────────────────────────────────────
+
+Calculate average GPA, find above it:
+
+Query:
+  First get average:
+    db.students.aggregate([
+      { $group: { _id: null, avgGpa: { $avg: '$gpa' } } }
+    ])
+
+  Then find above average:
+    db.students.find({
+      $expr: { $gte: ['$gpa', 3.6] } // (example average)
+    })
+
+
+SCENARIO #3: Selective sampling
+────────────────────────────────────────────────────────────────────────────
+
+Get every 3rd student for survey:
+
+Query:
+  db.students.find({ age: { $mod: [3, 0] } })
+
+Result:
+  Statistical sample
+
+
+SCENARIO #4: Scholarship eligibility
+────────────────────────────────────────────────────────────────────────────
+
+Query:
+  db.students.find({
+    $expr: {
+      $or: [
+        { $gte: ['$gpa', 3.9] },       // Honor students
+        { $eq: ['$isInternational', true] }, // International
+        { $gte: [{ $size: ['$skills'] }, 5] } // Many skills
+      ]
+    }
+  })
+
+Result:
+  Eligible students for scholarship
+
+
+================================================================================
+SECTION 3.5: BEST PRACTICES & SUMMARY
+================================================================================
+
+BEST PRACTICE #1: Use anchored regex
+  ✓ { 'name.first': { $regex: '^D' } }
+  ✗ { 'name.first': { $regex: 'D' } }
+  Why: Index optimization
+
+BEST PRACTICE #2: Create text indexes
+  Command: db.collection.createIndex({ field: 'text' })
+  Benefit: Fast full-text search
+
+BEST PRACTICE #3: Prefer $expr over $where
+  ✓ { $expr: { $gt: ['$field1', '$field2'] } }
+  ✗ { $where: 'this.field1 > this.field2' }
+  Why: Better performance, security
+
+BEST PRACTICE #4: Combine with indexed fields first
+  { field1: value, $expr: {...} }
+  Why: Filter with index first
+
+BEST PRACTICE #5: Avoid $where in production
+  Why: Security risk with user input, slow
+
+BEST PRACTICE #6: Test regex performance
+  Use: db.collection.find({...}).explain("executionStats")
+
+BEST PRACTICE #7: Keep expressions simple
+  Complex $expr slow to evaluate
+
+
+DECISION GUIDE:
+
+Need pattern matching?
+  → Use $regex (anchored for index)
+
+Need to check modulo?
+  → Use $mod
+
+Need complex expressions?
+  → Use $expr (not $where!)
+
+Need full-text search?
+  → Use $text (with text index)
+
+Need schema validation?
+  → Use $jsonSchema
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Task                           Operator & Query
+────────────────────────────────────────────────────────────────────────────
+Name starts with D             { 'name.first': { $regex: '^D' } }
+Substring search              { field: { $regex: 'text', $options: 'i' } }
+Even numbers                  { field: { $mod: [2, 0] } }
+Age divisible by 5            { age: { $mod: [5, 0] } }
+GPA comparison                { $expr: { $gte: ['$gpa', 3.5] } }
+Multiple fields               { $expr: { $and: [...] } }
+Full-text search              { $text: { $search: 'term' } }
+Schema validation             { $jsonSchema: {...} }
+
+Remember progression:
+  Beginner: $regex and $mod for simple patterns
+  Intermediate: $expr and $text for complex queries
+  Advanced: Combinations and real-world scenarios
+
+================================================================================

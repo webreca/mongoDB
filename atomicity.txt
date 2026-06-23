@@ -1,0 +1,902 @@
+================================================================================
+                     MONGODB ATOMICITY - COMPLETE GUIDE
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Atomicity and transactions for ACID compliance
+EXAMPLES: Using 60 Student Records from data.json
+
+ATOMICITY = All-or-nothing operations: Complete entirely or not at all
+
+
+================================================================================
+SECTION 1: WHAT IS ATOMICITY?
+================================================================================
+
+DEFINITION:
+  Atomicity ensures operations complete entirely or not at all.
+  No partial updates, no inconsistent state.
+  Either ALL changes succeed OR none of them do.
+
+THE CORE GUARANTEE:
+  "Your data will never be half-updated"
+  "Operations complete fully or fail completely"
+  "No middle state possible"
+
+REAL-WORLD ANALOGY:
+  Bank transfer: Move $100 from Account A to Account B
+  Atomic: Both A -$100 and B +$100 succeed OR both fail
+  Non-atomic: A -$100 succeeds but B +$100 fails → money disappears!
+
+WHY ATOMICITY MATTERS:
+  ✓ Data consistency (no corrupt state)
+  ✓ Prevents money loss (financial accuracy)
+  ✓ Prevents duplicates (uniqueness maintained)
+  ✓ Business logic preserved
+  ✓ Peace of mind
+
+
+ATOMICITY IS PART OF ACID:
+  A - Atomicity (all or nothing)
+  C - Consistency (valid state before/after)
+  I - Isolation (concurrent operations safe)
+  D - Durability (survives failures)
+
+
+TWO TYPES OF ATOMICITY IN MONGODB:
+  1. Single-document atomicity (always available)
+  2. Multi-document atomicity (transactions, 4.0+)
+
+
+================================================================================
+SECTION 2: SINGLE-DOCUMENT ATOMICITY
+================================================================================
+
+DEFINITION:
+  Operations on single document are always atomic by default.
+  No special setup needed.
+
+SCOPE:
+  One document at a time
+  Entire document is atomic unit
+
+GUARANTEE:
+  Update entire document OR update nothing
+  Never partial update of document
+
+APPLIES TO:
+  insertOne, updateOne, replaceOne, deleteOne
+  Array operations ($push, $pull, etc.)
+  Nested document modifications
+
+EXAMPLE #1: UPDATE STUDENT GPA
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $set: { gpa: 3.90 } }
+  )
+
+Atomicity:
+  ✓ ATOMIC - Single document update
+
+Guarantee:
+  GPA is updated completely or not at all
+  Student document never left partially updated
+
+What could go wrong without atomicity:
+  ✗ GPA field partially written (corrupted value)
+  ✗ Document left in inconsistent state
+  ✓ MongoDB prevents this - always atomic
+
+
+EXAMPLE #2: ADD SKILL TO ARRAY
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $push: { skills: 'JavaScript' } }
+  )
+
+Atomicity:
+  ✓ ATOMIC - Still single document
+
+Guarantee:
+  'JavaScript' added to array completely or not at all
+  Array never left in inconsistent state
+
+
+EXAMPLE #3: REPLACE ENTIRE DOCUMENT
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.replaceOne(
+    { studentId: '20260001' },
+    {
+      studentId: '20260001',
+      name: { first: 'Daksh', last: 'Chauhan' },
+      age: 21,
+      major: 'Data Science',
+      gpa: 3.95
+    }
+  )
+
+Atomicity:
+  ✓ ATOMIC - Whole document replaced
+
+Guarantee:
+  Entire replacement succeeds or fails
+  Never partially replaced
+
+
+BENEFIT OF SINGLE-DOCUMENT ATOMICITY:
+  ✓ No setup needed
+  ✓ No transactions overhead
+  ✓ Always safe
+  ✓ Default behavior
+
+
+DESIGN TIP:
+  Store related data in single document
+  Example: Put scholarshipDetails inside student document
+  Benefit: Automatically atomic, no transactions needed
+
+
+================================================================================
+SECTION 3: MULTI-DOCUMENT ATOMICITY (TRANSACTIONS)
+================================================================================
+
+DEFINITION:
+  ACID transactions for multiple documents across one or more collections.
+  All operations succeed together or all are rolled back.
+
+REQUIREMENTS:
+  ✓ MongoDB 4.0 or later
+  ✓ Replica set (3+ nodes, can't use standalone)
+  ✓ Session support
+
+WHEN YOU NEED IT:
+  Multiple documents must be updated together
+  Failure of one operation should rollback others
+  Cross-collection operations must be atomic
+
+BENEFIT:
+  Data consistency across multiple documents
+  All-or-nothing guarantee for complex operations
+
+
+BASIC TRANSACTION SYNTAX:
+────────────────────────────────────────────────────────────────────────────
+
+Step 1: Start session
+  const session = db.getMongo().startSession()
+
+Step 2: Begin transaction
+  session.startTransaction()
+
+Step 3: Perform operations (add session parameter)
+  db.students.updateOne(..., { session: session })
+
+Step 4: Commit or abort
+  session.commitTransaction()  // Success
+  session.abortTransaction()   // Rollback
+
+Step 5: End session
+  session.endSession()
+
+
+REAL TRANSACTION WITH ERROR HANDLING:
+────────────────────────────────────────────────────────────────────────────
+
+const session = db.getMongo().startSession();
+
+try {
+  session.startTransaction();
+
+  // Operation 1
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $set: { gpa: 3.90 } },
+    { session: session }
+  );
+
+  // Operation 2
+  db.students.updateOne(
+    { studentId: '20260002' },
+    { $set: { gpa: 3.85 } },
+    { session: session }
+  );
+
+  // If we reach here, all operations succeeded
+  session.commitTransaction();
+  console.log('Transaction successful');
+
+} catch (error) {
+  // If error occurs, rollback
+  session.abortTransaction();
+  console.log('Transaction failed, rolled back');
+
+} finally {
+  session.endSession();
+}
+
+
+================================================================================
+SECTION 4: REAL-WORLD EXAMPLE - SCHOLARSHIP TRANSFER
+================================================================================
+
+SCENARIO:
+  Transfer $5,000 scholarship from Student A to Student B
+  Three operations must all succeed or all fail
+
+OPERATIONS:
+  1. Reduce Student A scholarship by 5000
+  2. Increase Student B scholarship by 5000
+  3. Log audit record
+
+WITHOUT TRANSACTION (DANGER):
+────────────────────────────────────────────────────────────────────────────
+
+db.students.updateOne(
+  { studentId: '20260001' },
+  { $inc: { 'scholarshipDetails.amount': -5000 } }  // Operation 1 - SUCCESS
+);
+
+db.students.updateOne(
+  { studentId: '20260002' },
+  { $inc: { 'scholarshipDetails.amount': 5000 } }   // Operation 2 - FAILS!
+);
+
+db.auditLog.insertOne(
+  { action: 'transfer', from: '20260001', to: '20260002', amount: 5000 }
+);
+
+PROBLEM:
+  ✗ Operation 1 succeeded - Student A lost $5,000
+  ✗ Operation 2 failed - Student B didn't gain $5,000
+  ✗ Operation 3 never ran - no audit record
+  ✗ RESULT: $5,000 DISAPPEARED, INCONSISTENT STATE
+
+
+WITH TRANSACTION (SAFE):
+────────────────────────────────────────────────────────────────────────────
+
+const session = db.getMongo().startSession();
+
+try {
+  session.startTransaction();
+
+  // Operation 1
+  db.students.updateOne(
+    { studentId: '20260001' },
+    { $inc: { 'scholarshipDetails.amount': -5000 } },
+    { session: session }
+  );
+
+  // Operation 2
+  db.students.updateOne(
+    { studentId: '20260002' },
+    { $inc: { 'scholarshipDetails.amount': 5000 } },
+    { session: session }
+  );
+
+  // Operation 3
+  db.auditLog.insertOne(
+    { action: 'transfer', from: '20260001', to: '20260002', amount: 5000 },
+    { session: session }
+  );
+
+  // All operations succeeded
+  session.commitTransaction();
+  console.log('Transfer successful');
+
+} catch (error) {
+  // If ANY operation failed
+  session.abortTransaction();
+
+  // RESULT: All changes ROLLED BACK
+  // Student A gets money back
+  // Student B didn't lose anything
+  // No audit record
+  // CONSISTENT STATE RESTORED
+
+  console.log('Transfer failed, all changes rolled back');
+
+} finally {
+  session.endSession();
+}
+
+RESULT WITH ATOMICITY:
+  ✓ All operations succeed - transfer complete, audit logged
+  ✓ Any operation fails - all rolled back, money stays with A
+  ✓ NEVER partial update
+  ✓ ALWAYS consistent state
+
+
+================================================================================
+SECTION 5: ATOMICITY FAILURE SCENARIOS
+================================================================================
+
+SCENARIO #1: DATABASE EXCEPTION
+────────────────────────────────────────────────────────────────────────────
+
+What happens:
+  Operation 1 succeeds (Student A -5000)
+  Operation 2 throws exception (validation error)
+  Operation 3 never runs
+
+With transaction:
+  Exception caught in catch block
+  session.abortTransaction() called
+  Operation 1 is ROLLED BACK
+  Student A gets money back
+  Final state: No changes made
+
+
+SCENARIO #2: DUPLICATE KEY ERROR
+────────────────────────────────────────────────────────────────────────────
+
+What happens:
+  Operation 1 succeeds (reduce A)
+  Operation 2 succeeds (increase B)
+  Operation 3 fails (audit log already exists - duplicate key)
+
+With transaction:
+  Operation 3 throws error
+  Catch block catches it
+  session.abortTransaction() called
+  Operations 1 and 2 are ROLLED BACK
+  Student A and B back to original amounts
+
+
+SCENARIO #3: NETWORK FAILURE
+────────────────────────────────────────────────────────────────────────────
+
+What happens:
+  Operation 1 succeeds
+  Operation 2 succeeds
+  Network timeout before commit
+
+With transaction:
+  No explicit commit sent
+  MongoDB auto-aborts transaction
+  All changes ROLLED BACK
+  Application retries
+
+
+KEY POINT:
+  Any failure = FULL ROLLBACK
+  Atomicity maintained
+  Never partial update
+
+
+================================================================================
+SECTION 6: ACID PROPERTIES IN MONGODB
+================================================================================
+
+ATOMICITY:
+  Definition: All-or-nothing operations
+  Single-document: Always atomic (no setup)
+  Multi-document: Atomic with transactions
+  Guarantee: Never partial update
+
+CONSISTENCY:
+  Definition: Database valid before and after
+  How: Schema validation, business rules
+  Ensures: No invalid data, constraints maintained
+  Example: GPA always 0.0-4.0, amounts non-negative
+
+ISOLATION:
+  Definition: Concurrent transactions don't interfere
+  Default: Snapshot isolation (read committed)
+  Prevents: Dirty reads, non-repeatable reads
+  Implementation: Version snapshots
+
+DURABILITY:
+  Definition: Committed data survives failures
+  How: Write to journal and replicate to majority
+  Assurance: Data persists after server restart
+  Guarantee: w: 'majority' confirms durability
+
+
+MONGODB'S ACID GUARANTEE:
+  Single document: A + C + I + D
+  Multi-document: A + C + I + D (via transactions)
+
+
+================================================================================
+SECTION 7: USE CASES FOR ATOMICITY
+================================================================================
+
+USE CASE #1: FINANCIAL TRANSACTION
+────────────────────────────────────────────────────────────────────────────
+
+Operation: Transfer funds between accounts
+
+Atomic operations:
+  1. Debit source account
+  2. Credit destination account
+  3. Log transaction
+
+Why atomic:
+  Can't have A debited without B credited
+  Can't have transaction without log
+  Money cannot disappear or duplicate
+
+Solution: Multi-document transaction
+
+
+USE CASE #2: INVENTORY UPDATE
+────────────────────────────────────────────────────────────────────────────
+
+Operation: Sell item
+
+Atomic operations:
+  1. Reduce stock count
+  2. Create sales order
+  3. Update order status
+
+Why atomic:
+  Can't reduce stock without creating order
+  Can't create order without reducing stock
+  Prevents overselling and orphaned orders
+
+Solution: Multi-document transaction
+
+
+USE CASE #3: GRADE ENTRY
+────────────────────────────────────────────────────────────────────────────
+
+Operation: Record student grade
+
+Atomic operations:
+  1. Insert grade record
+  2. Update student GPA
+  3. Update cumulative statistics
+
+Why atomic:
+  Can't insert grade without updating GPA
+  GPA and grade must match
+  Statistics must be accurate
+
+Solution: Multi-document transaction
+
+
+USE CASE #4: COURSE ENROLLMENT
+────────────────────────────────────────────────────────────────────────────
+
+Operation: Enroll student in course
+
+Atomic operations:
+  1. Add course to student courses array
+  2. Create enrollment record
+  3. Update course capacity
+
+Why atomic:
+  Student and enrollment records must be in sync
+  Capacity must match enrollments
+  No orphaned records
+
+Solution: Multi-document transaction
+
+
+USE CASE #5: SIMPLE PROFILE UPDATE
+────────────────────────────────────────────────────────────────────────────
+
+Operation: Update student profile fields
+
+Atomic by default:
+  All profile fields in single document
+  Single updateOne is atomic
+
+Why atomic:
+  Profile stays consistent
+
+Solution: Single-document atomicity (free!)
+
+
+================================================================================
+SECTION 8: ISOLATION LEVELS
+================================================================================
+
+DEFINITION:
+  Isolation controls how concurrent transactions interact
+  Prevents one transaction from seeing another's uncommitted changes
+
+MONGODB DEFAULT:
+  Snapshot isolation (equivalent to read committed)
+
+ISOLATION PREVENTS:
+  Dirty reads: Seeing uncommitted data
+  Non-repeatable reads: Data changing within transaction
+  Phantom reads: New data appearing mid-transaction
+
+
+EXAMPLE: ISOLATION IN ACTION
+────────────────────────────────────────────────────────────────────────────
+
+Without isolation:
+  Transaction 1: Read GPA (3.85)
+  Transaction 2: Update GPA to 3.90
+  Transaction 1: Read GPA again (3.90) - DIFFERENT!
+
+With isolation (snapshot):
+  Transaction 1: Read GPA (3.85) - snapshot taken
+  Transaction 2: Update GPA to 3.90
+  Transaction 1: Read GPA again (3.85) - same value!
+  Result: Repeatable reads within transaction
+
+
+ISOLATION LEVELS IN MONGODB:
+  Read Committed: Default, safe
+  Repeatable Read: Stronger guarantee
+  Serializable: Strictest, slowest
+
+
+================================================================================
+SECTION 9: SINGLE vs MULTI-DOCUMENT ATOMICITY
+================================================================================
+
+SINGLE-DOCUMENT:
+
+When:
+  Always available (default)
+
+Scope:
+  One document at a time
+
+Example:
+  db.students.updateOne({ studentId: '20260001' }, { $set: { gpa: 3.90 } })
+
+Setup:
+  None required
+
+Performance:
+  Zero overhead, fastest
+
+Use:
+  Simple updates, array operations
+
+MULTI-DOCUMENT (TRANSACTIONS):
+
+When:
+  MongoDB 4.0+, replica set
+
+Scope:
+  Multiple documents, multiple collections
+
+Example:
+  session.startTransaction()
+  [multiple operations]
+  session.commitTransaction()
+
+Setup:
+  Session management required
+
+Performance:
+  Overhead: 10-30ms per transaction
+
+Use:
+  Complex multi-step operations
+
+DECISION:
+  Single document? → Use default atomicity
+  Multiple documents? → Use transaction
+  Simple operation? → Don't need transaction
+  Complex operation? → Use transaction
+
+
+================================================================================
+SECTION 10: TRANSACTION BEST PRACTICES
+================================================================================
+
+PRACTICE #1: DESIGN FOR SINGLE DOCUMENT
+  Embed related data in single document
+  Example: scholarshipDetails inside student doc
+  Benefit: Atomic by default, no transaction needed
+
+PRACTICE #2: TRANSACTIONS ONLY WHEN NEEDED
+  Don't use for single-document operations
+  Transactions have overhead
+  Use only for multi-document complexity
+
+PRACTICE #3: KEEP TRANSACTIONS SHORT
+  Keep operation count low
+  Keep execution time short
+  Minimize lock hold time
+  Don't fetch large datasets inside transaction
+
+PRACTICE #4: ALWAYS ERROR HANDLE
+  Use try-catch block
+  Always call session.abortTransaction() in catch
+  Ensures rollback on failure
+
+PRACTICE #5: USE WRITE CONCERN WITH TRANSACTIONS
+  Use { w: 'majority' } with transactions
+  Ensures transaction durability
+  Example: { writeConcern: { w: 'majority' } }
+
+PRACTICE #6: TEST FAILURE CASES
+  Test what happens when one operation fails
+  Verify rollback works
+  Test network failures
+  Test exception scenarios
+
+PRACTICE #7: MONITOR TRANSACTION PERFORMANCE
+  Track transaction duration
+  Monitor lock contention
+  Identify slow transactions
+  Optimize as needed
+
+
+================================================================================
+SECTION 11: COMMON MISTAKES
+================================================================================
+
+MISTAKE #1: EXPECTING ATOMICITY WITHOUT TRANSACTION
+────────────────────────────────────────────────────────────────────────────
+
+Wrong:
+  // Two separate operations - NOT atomic!
+  db.students.updateOne({ id: 'A' }, { $inc: { amount: -5000 } });
+  db.students.updateOne({ id: 'B' }, { $inc: { amount: 5000 } });
+
+Problem:
+  First succeeds, second fails → inconsistent
+  Money transferred but recipient doesn't have it
+
+Right:
+  // Use transaction for atomicity
+  session.startTransaction();
+  [both operations with session]
+  session.commitTransaction();
+
+
+MISTAKE #2: LONG-RUNNING TRANSACTIONS
+────────────────────────────────────────────────────────────────────────────
+
+Wrong:
+  session.startTransaction();
+  // Fetch 1 million documents
+  let docs = db.students.find({}).toArray(); // SLOW!
+  // Process
+  // Update
+  session.commitTransaction();
+
+Problem:
+  Locks held for long time
+  Blocks other operations
+  Reduced concurrency
+
+Right:
+  // Fetch BEFORE transaction
+  let docs = db.students.find({}).toArray();
+
+  session.startTransaction();
+  // Process and update quickly
+  session.commitTransaction();
+
+
+MISTAKE #3: TRANSACTIONS ON STANDALONE
+────────────────────────────────────────────────────────────────────────────
+
+Wrong:
+  // Single MongoDB server
+  session.startTransaction();
+  // Transaction not supported!
+
+Problem:
+  Transactions require replica set
+  Won't work on standalone
+
+Right:
+  Set up replica set (minimum 3 nodes)
+  Then use transactions
+
+
+MISTAKE #4: NO ERROR HANDLING
+────────────────────────────────────────────────────────────────────────────
+
+Wrong:
+  session.startTransaction();
+  db.students.updateOne(...);
+  db.audit.insertOne(...);
+  session.commitTransaction();
+  // No try-catch!
+
+Problem:
+  If insertOne fails, no rollback
+  Partial update remains
+
+Right:
+  try {
+    session.startTransaction();
+    db.students.updateOne(...);
+    db.audit.insertOne(...);
+    session.commitTransaction();
+  } catch(e) {
+    session.abortTransaction();
+  } finally {
+    session.endSession();
+  }
+
+
+MISTAKE #5: IGNORING ISOLATION ISSUES
+────────────────────────────────────────────────────────────────────────────
+
+Wrong:
+  Assume serializability without testing
+  Run concurrent transactions
+  See race conditions
+
+Right:
+  Test concurrent scenarios
+  Understand isolation guarantees
+  Use read-only transactions for consistency
+
+
+================================================================================
+SECTION 12: ROLLBACK BEHAVIOR
+================================================================================
+
+WHAT HAPPENS DURING ROLLBACK:
+────────────────────────────────────────────────────────────────────────────
+
+1. All changes since transaction start are UNDONE
+2. Document state reverted to pre-transaction
+3. All inserts rolled back (as if never happened)
+4. All updates reversed (original values restored)
+5. All deletes reversed (documents restored)
+
+
+EXAMPLE ROLLBACK:
+────────────────────────────────────────────────────────────────────────────
+
+Initial state:
+  Student A: $10,000 scholarship
+  Student B: $5,000 scholarship
+
+Transaction:
+  Operation 1: Reduce A by 5000 (A = 5000) ✓
+  Operation 2: Increase B by 5000 (B = 10000) ✓
+  Operation 3: Log transaction... ERROR! ✗
+
+Rollback:
+  Operation 1 reversed: A = 10000 (restored)
+  Operation 2 reversed: B = 5000 (restored)
+  Operation 3: Never happened
+
+Final state:
+  Student A: $10,000 scholarship
+  Student B: $5,000 scholarship
+  (BACK TO ORIGINAL)
+
+
+KEY POINT:
+  Rollback is COMPLETE
+  All or nothing, no partial state
+  Atomicity guaranteed
+
+
+================================================================================
+SECTION 13: PERFORMANCE IMPLICATIONS
+================================================================================
+
+SINGLE-DOCUMENT ATOMICITY:
+  Cost: Zero overhead
+  Latency: No additional time
+  Throughput: No impact
+  Always available, always free
+
+MULTI-DOCUMENT TRANSACTIONS:
+  Cost: Noticeable overhead
+  Latency: ~10-30ms additional
+  Throughput: 10-50% reduction with high concurrency
+  Only use when necessary
+
+TRANSACTION OVERHEAD BREAKDOWN:
+  Lock acquisition: ~1-2ms
+  Write conflict check: ~2-5ms
+  Replication wait (w:'majority'): ~5-20ms
+  Total per transaction: ~10-30ms
+
+FACTORS AFFECTING PERFORMANCE:
+  ✓ Number of operations (more = slower)
+  ✓ Transaction duration (longer = slower)
+  ✓ Lock contention (more conflicts = slower)
+  ✓ Write concern (majority = slower)
+  ✓ Network latency (affects replication)
+
+OPTIMIZATION:
+  Keep transactions short (< 100ms)
+  Minimize operations (2-5 ops typical)
+  Pre-fetch data before transaction
+  Avoid hot spots (heavily contended documents)
+
+
+================================================================================
+SECTION 14: DECISION TREE
+================================================================================
+
+Question: Can operation affect single document?
+  YES → Use single-document atomicity (default)
+  NO → Continue
+
+Question: Are multiple documents interdependent?
+  NO → Use separate operations
+  YES → Continue
+
+Question: MongoDB 4.0+ with replica set?
+  NO → Redesign for single-document
+  YES → Continue
+
+Question: How complex is operation?
+  Simple (2-3 ops) → Use transaction
+  Complex (many ops) → Redesign if possible, then transaction
+
+USE TRANSACTION FOR:
+  ✓ Multi-document interdependencies
+  ✓ All-or-nothing requirements
+  ✓ Complex workflows
+
+
+================================================================================
+SECTION 15: SUMMARY
+================================================================================
+
+ATOMICITY DEFINITION:
+  All-or-nothing: Complete entirely or fail completely
+  Never partial updates
+  Always consistent state
+
+TWO TYPES:
+  Single-document: Always atomic (free!)
+  Multi-document: Atomic with transactions (4.0+)
+
+WHEN TO USE:
+  Single-doc: Default for simple operations
+  Transactions: Only for multi-document complex ops
+
+KEY BENEFITS:
+  ✓ Data consistency
+  ✓ Prevents money loss
+  ✓ Prevents duplicates
+  ✓ Business logic preserved
+
+BEST PRACTICE:
+  Design for single-document atomicity first
+  Use transactions only when necessary
+  Keep transactions short
+  Always error-handle
+
+ACID GUARANTEE:
+  MongoDB 4.0+ with replica set = ACID transactions
+  Single document = Atomic by default
+  Combine for complete data safety
+
+
+================================================================================
+                              END OF GUIDE
+================================================================================
+
+QUICK REFERENCE:
+
+Operation Type         Atomicity?   Solution
+────────────────────────────────────────────────────────────────────────────
+Single document        ✓ YES        Automatic (no setup)
+Multiple documents     ✗ NO         Use transaction
+Financial transfer     ✗ NO         Use transaction
+Grade + GPA update     ✗ NO         Use transaction
+Update profile         ✓ YES        Automatic
+Inventory + order      ✗ NO         Use transaction
+
+Remember:
+  Single document = Atomic by default ✓
+  Multiple documents = Need transaction
+  Transactions have overhead, use only when needed
+  Always error-handle with try-catch-finally
+  Keep transactions short
+
+================================================================================

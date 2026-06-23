@@ -1,0 +1,412 @@
+{
+  "title": "MongoDB Transactions - Complete Guide (Beginner to Advanced)",
+  "description": "Comprehensive guide on ACID transactions, multi-document atomicity, and data consistency",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "transactions_overview": {
+    "definition": "Transactions group multiple operations into atomic, all-or-nothing units ensuring data consistency",
+    "concept": "ACID properties: All operations succeed or all fail, no partial updates",
+    "purpose": [
+      "Ensure data consistency across multiple documents",
+      "Prevent partial updates if failures occur",
+      "Enable complex multi-step operations",
+      "Maintain financial accuracy",
+      "Support relationships between collections"
+    ],
+    "acid_properties": [
+      "Atomicity: All or nothing (entire transaction succeeds or fails)",
+      "Consistency: Data stays in valid state",
+      "Isolation: Concurrent transactions don't interfere",
+      "Durability: Committed data persists"
+    ],
+    "requirements": [
+      "MongoDB 4.0+ (replica set or sharded cluster)",
+      "WiredTiger storage engine",
+      "Multi-document transactions require replica set"
+    ],
+    "when_to_use": "Multiple operations needing atomic consistency (transfers, enrollments, financial)"
+  },
+  "section_1_beginner_concepts": {
+    "title": "BEGINNER: Transaction Concepts",
+    "definitions": [
+      {
+        "term": "Transaction",
+        "definition": "Group of operations executed as atomic unit",
+        "behavior": "All succeed or all fail, no partial updates"
+      },
+      {
+        "term": "ACID",
+        "definition": "Guarantees for data integrity",
+        "components": "Atomicity, Consistency, Isolation, Durability"
+      },
+      {
+        "term": "Atomicity",
+        "definition": "All-or-nothing execution",
+        "example": "Transfer $1000: debit one account AND credit other, or neither"
+      },
+      {
+        "term": "Session",
+        "definition": "Context for transaction operations",
+        "requirement": "Required to execute transaction"
+      },
+      {
+        "term": "Rollback",
+        "definition": "Undo all changes if transaction fails",
+        "example": "If commit fails, all changes reversed"
+      }
+    ]
+  },
+  "section_2_beginner_basic_transaction": {
+    "title": "BEGINNER: Basic Transactions",
+    "definition": "Simple multi-document transaction ensuring consistency",
+    "syntax": "Start session → Start transaction → Operations → Commit/Abort",
+    "beginner_examples": [
+      {
+        "title": "Transfer scholarship between students",
+        "scenario": "Move $5000 from Alice's scholarship to Bob's",
+        "without_transaction": [
+          "Debit Alice: -5000",
+          "Network failure happens",
+          "Credit Bob: fails to execute",
+          "Result: $5000 lost!"
+        ],
+        "with_transaction": [
+          "Start transaction",
+          "Debit Alice: -5000",
+          "Credit Bob: +5000",
+          "Network failure: Transaction rolled back",
+          "Result: Both unchanged (SAFE!)"
+        ],
+        "code": "session = db.getMongo().startSession()\nsession.startTransaction()\ndb.students.updateOne({name: 'Alice'}, {$inc: {scholarship: -5000}}, {session})\ndb.students.updateOne({name: 'Bob'}, {$inc: {scholarship: 5000}}, {session})\nsession.commitTransaction()"
+      },
+      {
+        "title": "Simple ACID guarantee",
+        "query": "Transaction ensures: Debt removed AND credit added, never just one",
+        "benefit": "No data inconsistency"
+      }
+    ]
+  },
+  "section_3_beginner_session": {
+    "title": "BEGINNER: Sessions and Basic Syntax",
+    "definition": "Session is context for executing transactions",
+    "syntax": "db.getMongo().startSession() returns session object",
+    "beginner_examples": [
+      {
+        "title": "Create session",
+        "query": "session = db.getMongo().startSession()",
+        "result": "Session object for transaction use"
+      },
+      {
+        "title": "Start transaction",
+        "query": "session.startTransaction()",
+        "behavior": "Begins transaction context"
+      },
+      {
+        "title": "Commit transaction",
+        "query": "session.commitTransaction()",
+        "behavior": "Applies all changes, ends transaction"
+      },
+      {
+        "title": "Abort transaction",
+        "query": "session.abortTransaction()",
+        "behavior": "Rolls back all changes, ends transaction"
+      },
+      {
+        "title": "End session",
+        "query": "session.endSession()",
+        "behavior": "Closes session"
+      }
+    ]
+  },
+  "section_4_beginner_error_handling": {
+    "title": "BEGINNER: Error Handling in Transactions",
+    "definition": "Handle transaction failures and retries",
+    "beginner_examples": [
+      {
+        "title": "Try-catch with transaction",
+        "query": "try {\n  session.startTransaction()\n  // operations\n  session.commitTransaction()\n} catch (err) {\n  session.abortTransaction()\n  throw err\n} finally {\n  session.endSession()\n}",
+        "behavior": "Abort on error, clean up session"
+      },
+      {
+        "title": "Check transaction success",
+        "query": "result = session.commitTransaction()\nif (result.ok === 1) { // success\n} else { // failure\n  session.abortTransaction()\n}",
+        "behavior": "Verify commit before proceeding"
+      }
+    ]
+  },
+  "section_5_intermediate_isolation_levels": {
+    "title": "INTERMEDIATE: Isolation Levels",
+    "definition": "Control how concurrent transactions interact",
+    "levels": [
+      {
+        "level": "Snapshot (default)",
+        "isolation": "Read own writes, others' committed data",
+        "concurrent": "Doesn't see uncommitted from other transactions"
+      },
+      {
+        "level": "Serializable",
+        "isolation": "Highest isolation, serialized execution",
+        "cost": "Slower, but maximum safety"
+      }
+    ],
+    "intermediate_examples": [
+      {
+        "title": "Set isolation level",
+        "query": "session.startTransaction({ readConcern: 'snapshot', writeConcern: 'majority' })",
+        "behavior": "Snapshot isolation (default)"
+      }
+    ]
+  },
+  "section_6_intermediate_multi_document": {
+    "title": "INTERMEDIATE: Multi-Document Transactions",
+    "definition": "Transactions spanning multiple documents and collections",
+    "intermediate_examples": [
+      {
+        "title": "Two collections, two operations",
+        "query": "Transaction updates students AND enrollments atomically",
+        "example": "Enroll student: add to enrollments collection, update student.enrollmentCount"
+      },
+      {
+        "title": "Complex enrollment",
+        "operations": [
+          "Insert new enrollment document",
+          "Update student enrollmentCount",
+          "Update course enrollmentCount",
+          "Deduct from student balance"
+        ],
+        "atomicity": "All succeed or all fail"
+      }
+    ]
+  },
+  "section_7_intermediate_constraints": {
+    "title": "INTERMEDIATE: Transaction Constraints",
+    "constraints": [
+      {
+        "constraint": "Time limit",
+        "default": "60 seconds",
+        "configurable": true
+      },
+      {
+        "constraint": "Size limit",
+        "maximum": "16 MB per transaction",
+        "note": "All write operations combined"
+      },
+      {
+        "constraint": "Read/Write scope",
+        "note": "Can read/write across databases",
+        "limitation": "Cannot read outside transaction collection"
+      }
+    ]
+  },
+  "section_8_advanced_write_conflicts": {
+    "title": "ADVANCED: Write Conflicts & Retries",
+    "definition": "Handle conflicts when transactions modify same documents",
+    "advanced_examples": [
+      {
+        "title": "Conflict detection",
+        "scenario": "Two transactions modify same document",
+        "behavior": "One succeeds, other gets conflict error",
+        "solution": "Retry transaction"
+      },
+      {
+        "title": "Retry logic",
+        "query": "maxRetries = 3\nfor (i = 0; i < maxRetries; i++) {\n  try {\n    session.startTransaction()\n    // operations\n    session.commitTransaction()\n    break\n  } catch (err) {\n    if (err.transientError) {\n      session.abortTransaction()\n      // retry\n    } else {\n      throw err\n    }\n  }\n}",
+        "behavior": "Retry on transient errors"
+      }
+    ]
+  },
+  "section_9_advanced_deadlock_prevention": {
+    "title": "ADVANCED: Deadlock Prevention",
+    "definition": "Avoid circular locks between concurrent transactions",
+    "strategies": [
+      {
+        "strategy": "Consistent ordering",
+        "description": "Always acquire locks in same order",
+        "example": "Always update users before orders"
+      },
+      {
+        "strategy": "Short transactions",
+        "description": "Minimize time holding locks",
+        "benefit": "Lower probability of deadlock"
+      },
+      {
+        "strategy": "Isolation levels",
+        "description": "Choose appropriate isolation to prevent conflicts"
+      }
+    ]
+  },
+  "section_10_advanced_distributed_transactions": {
+    "title": "ADVANCED: Distributed Transactions",
+    "definition": "Transactions across sharded clusters",
+    "requirements": [
+      "MongoDB 4.2+",
+      "Sharded cluster",
+      "Each shard replica set"
+    ],
+    "advanced_examples": [
+      {
+        "title": "Cross-shard transaction",
+        "scenario": "Update documents on different shards atomically",
+        "example": "Transfer funds between customers on different shards"
+      }
+    ]
+  },
+  "section_11_use_cases": {
+    "beginner": [
+      {
+        "use_case": "Financial transfer",
+        "example": "Move scholarship between students",
+        "need": "Ensure both debit and credit happen"
+      },
+      {
+        "use_case": "Order creation",
+        "example": "Create order, deduct inventory, update balance",
+        "need": "All or nothing (don't sell if balance insufficient)"
+      },
+      {
+        "use_case": "Enrollment",
+        "example": "Add course, update counts, charge fee",
+        "need": "Atomic consistency"
+      }
+    ],
+    "intermediate": [
+      {
+        "use_case": "Complex workflow",
+        "example": "Multi-step process with rollback",
+        "need": "All-or-nothing atomicity"
+      },
+      {
+        "use_case": "Inventory management",
+        "example": "Decrease inventory, create shipment, update stats",
+        "need": "Consistent state"
+      },
+      {
+        "use_case": "Accounting",
+        "example": "Journal entry across accounts",
+        "need": "Balanced accounting (debits = credits)"
+      }
+    ],
+    "advanced": [
+      {
+        "use_case": "Payment processing",
+        "example": "Multi-currency transaction",
+        "need": "ACID guarantees, distributed across shards"
+      },
+      {
+        "use_case": "Cross-border transfers",
+        "example": "Complex workflows with retries",
+        "need": "Deadlock prevention, conflict handling"
+      },
+      {
+        "use_case": "High-throughput systems",
+        "example": "Many concurrent transactions",
+        "need": "Isolation, performance optimization"
+      }
+    ]
+  },
+  "section_12_best_practices": {
+    "practice_1_keep_short": {
+      "rule": "Keep transactions as short as possible",
+      "good": "Only operations requiring atomicity in transaction",
+      "avoid": "Including unrelated operations",
+      "why": "Reduces lock time, lowers deadlock probability"
+    },
+    "practice_2_error_handling": {
+      "rule": "Always handle errors with proper rollback",
+      "good": "Try-catch with abortTransaction in catch",
+      "avoid": "Forgetting to abort on error",
+      "why": "Prevents orphaned transactions"
+    },
+    "practice_3_retry_logic": {
+      "rule": "Implement retry logic for transient errors",
+      "good": "Retry on WriteConflict errors",
+      "avoid": "Failing immediately",
+      "why": "Improves reliability under concurrency"
+    },
+    "practice_4_consistent_ordering": {
+      "rule": "Always operate on documents in same order",
+      "good": "Sort IDs before updating",
+      "why": "Prevents deadlocks"
+    },
+    "practice_5_write_concern_majority": {
+      "rule": "Use w: majority for important transactions",
+      "good": "session.startTransaction({ writeConcern: { w: 'majority' } })",
+      "why": "Ensures durability"
+    }
+  },
+  "section_13_common_mistakes": {
+    "mistake_1_nested_transactions": {
+      "mistake": "Start transaction inside transaction",
+      "problem": "Not supported",
+      "solution": "Use single transaction for all operations"
+    },
+    "mistake_2_forgetting_rollback": {
+      "mistake": "Not aborting on error",
+      "problem": "Locks held, resources wasted",
+      "solution": "Always abortTransaction in error handler"
+    },
+    "mistake_3_no_retry": {
+      "mistake": "Don't retry on WriteConflict",
+      "problem": "Fails even though retry would succeed",
+      "solution": "Implement retry logic"
+    },
+    "mistake_4_long_transactions": {
+      "mistake": "Too many operations in one transaction",
+      "problem": "High lock contention, deadlock risk",
+      "solution": "Keep transactions short and focused"
+    },
+    "mistake_5_wrong_isolation": {
+      "mistake": "Use wrong isolation level for use case",
+      "problem": "Inconsistent reads or performance issues",
+      "solution": "Choose appropriate isolation level"
+    },
+    "mistake_6_no_session_cleanup": {
+      "mistake": "Forget to endSession()",
+      "problem": "Session hangs, memory leak",
+      "solution": "Always call endSession in finally block"
+    }
+  },
+  "section_14_performance_implications": {
+    "title": "Performance Considerations",
+    "overhead": "Transactions have overhead compared to single operations",
+    "factors": [
+      "Lock acquisition time",
+      "Conflict resolution",
+      "Commit latency"
+    ],
+    "optimization": [
+      "Keep transactions short",
+      "Use snapshot isolation (default)",
+      "Minimize concurrent conflicts",
+      "Choose appropriate write concern"
+    ]
+  },
+  "section_15_progression": {
+    "beginner": [
+      "ACID concepts",
+      "Basic transaction syntax",
+      "Session creation",
+      "Commit/abort"
+    ],
+    "intermediate": [
+      "Error handling",
+      "Isolation levels",
+      "Multi-document transactions",
+      "Constraints"
+    ],
+    "advanced": [
+      "Write conflicts",
+      "Deadlock prevention",
+      "Distributed transactions",
+      "Performance tuning"
+    ]
+  },
+  "summary": {
+    "core_concept": "Transactions ensure atomic, consistent operations across multiple documents",
+    "key_syntax": "session.startTransaction() → operations → session.commitTransaction()",
+    "acid_guarantee": "All operations succeed or all fail, data stays consistent",
+    "minimum_requirement": "Replica set with MongoDB 4.0+",
+    "best_practice": "Keep short, implement retry logic, handle errors properly",
+    "progression": "Beginner: Basic transactions → Intermediate: Multi-document, isolation → Advanced: Conflicts, distributed"
+  }
+}

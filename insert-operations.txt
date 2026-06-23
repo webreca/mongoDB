@@ -1,0 +1,905 @@
+================================================================================
+           MONGODB INSERT OPERATIONS - insertOne vs insertMany
+================================================================================
+
+DATE: June 23, 2024
+TOPIC: Comparing insert operations with use cases
+EXAMPLES: Using 60 Student Records from data.json
+
+TWO MAIN INSERT METHODS:
+  insertOne()   → Insert exactly 1 document
+  insertMany()  → Insert 2 or more documents
+
+
+================================================================================
+SECTION 1: QUICK OVERVIEW
+================================================================================
+
+┌──────────────────┬──────────────────┬──────────────────────────┐
+│ ASPECT           │ insertOne        │ insertMany               │
+├──────────────────┼──────────────────┼──────────────────────────┤
+│ Documents        │ 1 document       │ 2 or more documents      │
+│ Return Value     │ Single ObjectId  │ Array of ObjectIds       │
+│ Performance      │ Slow for bulk    │ Fast for bulk (2-3x)     │
+│ Use For          │ Single records   │ Bulk import, batches     │
+│ Error Handling   │ Stops on error   │ Can continue (ordered)    │
+│ Network Calls    │ Multiple calls   │ Single call              │
+│ Real-time        │ Good (immediate) │ Good (batch processing)  │
+│ Typical Count    │ 1 document       │ 10 to millions           │
+└──────────────────┴──────────────────┴──────────────────────────┘
+
+
+================================================================================
+SECTION 2: insertOne() - SINGLE DOCUMENT INSERTION
+================================================================================
+
+WHAT IS insertOne()?
+  Inserts exactly one document into collection
+  Returns immediately with the inserted document's _id
+  Simple and straightforward
+
+SYNTAX:
+  db.collection.insertOne(document)
+
+RETURNS:
+  {
+    acknowledged: true,
+    insertedId: ObjectId("...")
+  }
+
+
+EXAMPLE #1: INSERT SINGLE STUDENT
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.insertOne({
+    studentId: 20260001,
+    name: { first: "Daksh", last: "Chauhan" },
+    age: 20,
+    major: "Data Science",
+    gpa: 3.85,
+    isInternational: false,
+    skills: ["Python", "SQL", "TensorFlow"],
+    courses: [
+      { courseCode: "DS-401", credits: 4, grade: "A" },
+      { courseCode: "STAT-301", credits: 3, grade: "A-" }
+    ]
+  })
+
+Result:
+  {
+    acknowledged: true,
+    insertedId: ObjectId("507f1f77bcf86cd799439011")
+  }
+
+Use Case:
+  New student registration via form
+  One person signs up at a time
+
+
+EXAMPLE #2: INSERT WITH ERROR HANDLING
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  try {
+    const result = db.students.insertOne(newStudent)
+    console.log("Student inserted:", result.insertedId)
+  } catch (error) {
+    if (error.code === 11000) {
+      console.log("Error: Duplicate student ID")
+    } else {
+      console.log("Insert failed:", error.message)
+    }
+  }
+
+Use Case:
+  Registration form with error messages
+  Handle duplicate entries
+
+
+REAL-WORLD SCENARIOS FOR insertOne:
+
+1. USER REGISTRATION:
+   User fills form, submits → insertOne creates new student record
+   Code:
+     const newStudent = {
+       studentId: generateId(),
+       name: { first: firstName, last: lastName },
+       age: parseInt(ageInput),
+       major: majorDropdown
+     }
+     db.students.insertOne(newStudent)
+
+2. STUDENT LOGIN SESSION:
+   Student logs in → insertOne creates session record
+   Code:
+     db.sessions.insertOne({
+       studentId: userId,
+       loginTime: new Date(),
+       ipAddress: clientIP,
+       userAgent: browser
+     })
+
+3. CREATE EVENT LOG:
+   Student views course → insertOne logs action
+   Code:
+     db.activityLog.insertOne({
+       studentId: userId,
+       action: "viewed_course",
+       courseId: "CS-401",
+       timestamp: new Date()
+     })
+
+4. ADD GRADE COMMENT:
+   Teacher comments on grade → insertOne adds comment
+   Code:
+     db.gradeComments.insertOne({
+       studentId: studentId,
+       courseId: courseId,
+       comment: "Good work on assignment",
+       timestamp: new Date()
+     })
+
+
+CHARACTERISTICS:
+  ✓ Inserts exactly 1 document
+  ✓ Simple syntax
+  ✓ Good for real-time single inserts
+  ✓ Fast for single record (~1-5ms)
+  ✓ Ideal for web forms
+  ✓ Immediate feedback available
+
+✗ Slow when called repeatedly (60x insertOne ≈ 60-300ms)
+✗ Multiple network round trips
+✗ Not ideal for bulk operations
+
+
+PERFORMANCE FOR SINGLE INSERT:
+  Time: ~1-5 milliseconds
+  Network calls: 1
+  Best for: Single real-time records
+
+
+================================================================================
+SECTION 3: insertMany() - MULTIPLE DOCUMENT INSERTION
+================================================================================
+
+WHAT IS insertMany()?
+  Inserts multiple documents in single operation
+  Returns array of inserted document _ids
+  Much faster for bulk operations
+
+SYNTAX:
+  db.collection.insertMany([document1, document2, ...], options)
+
+RETURNS:
+  {
+    acknowledged: true,
+    insertedIds: [ObjectId(...), ObjectId(...), ...]
+  }
+
+
+EXAMPLE #1: INSERT 3 STUDENTS
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  db.students.insertMany([
+    {
+      studentId: 20260001,
+      name: { first: "Daksh", last: "Chauhan" },
+      age: 20,
+      major: "Data Science",
+      gpa: 3.85
+    },
+    {
+      studentId: 20260002,
+      name: { first: "Anaya", last: "Sharma" },
+      age: 20,
+      major: "Frontend Engineering",
+      gpa: 3.92
+    },
+    {
+      studentId: 20260003,
+      name: { first: "Arpit", last: "Kataria" },
+      age: 25,
+      major: "Machine Learning",
+      gpa: 3.45
+    }
+  ])
+
+Result:
+  {
+    acknowledged: true,
+    insertedIds: [
+      ObjectId("507f1f77bcf86cd799439011"),
+      ObjectId("507f1f77bcf86cd799439012"),
+      ObjectId("507f1f77bcf86cd799439013")
+    ]
+  }
+
+Use Case:
+  Bulk student import
+  Multiple records at once
+
+
+EXAMPLE #2: INSERT ALL 60 STUDENTS
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  const allStudents = [
+    { studentId: 20260001, name: { first: "Daksh", ... }, ... },
+    { studentId: 20260002, name: { first: "Anaya", ... }, ... },
+    { studentId: 20260003, name: { first: "Arpit", ... }, ... },
+    ... (all 60 students) ...
+  ]
+
+  const result = db.students.insertMany(allStudents)
+  console.log("Inserted " + result.insertedIds.length + " students")
+
+Result:
+  Inserted 60 students
+  Returns: Array of 60 ObjectIds
+
+Use Case:
+  Initial database seeding
+  Bulk import of student roster
+
+
+EXAMPLE #3: INSERT WITH ERROR HANDLING (ordered: false)
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  const students = [...]  // Some valid, some with errors
+
+  const result = db.students.insertMany(students, {
+    ordered: false  // Continue on errors
+  })
+
+  console.log("Successfully inserted: " + result.insertedIds.length)
+  console.log("Total attempted: " + students.length)
+  console.log("Failed: " + (students.length - result.insertedIds.length))
+
+Result:
+  Valid documents inserted, invalid ones skipped
+  Partial insert allowed
+
+Use Case:
+  CSV import where some rows may be invalid
+  Continue processing despite errors
+
+
+EXAMPLE #4: INSERT WITH ERROR HANDLING (ordered: true)
+────────────────────────────────────────────────────────────────────────────
+
+Command:
+  try {
+    const result = db.students.insertMany(students, {
+      ordered: true  // Stop on first error (default)
+    })
+    console.log("Inserted " + result.insertedIds.length + " students")
+  } catch (error) {
+    console.log("Insert stopped at error: " + error.message)
+    console.log("Note: Some documents may have been inserted")
+  }
+
+Result:
+  Stops at first error
+  Documents before error are inserted
+  Documents after error are NOT inserted
+
+Use Case:
+  Critical inserts (all-or-nothing required)
+  Financial transactions
+  Data consistency critical
+
+
+REAL-WORLD SCENARIOS FOR insertMany:
+
+1. IMPORT CSV FILE (60 Students):
+   Admin uploads CSV → Parse → insertMany all records
+   Code:
+     const fs = require('fs')
+     const csvParser = require('csv-parser')
+     const students = []
+
+     fs.createReadStream('students.csv')
+       .pipe(csvParser())
+       .on('data', row => {
+         students.push(parseRow(row))
+       })
+       .on('end', () => {
+         const result = db.students.insertMany(students)
+         console.log("Imported: " + result.insertedIds.length)
+       })
+
+2. DATABASE MIGRATION:
+   Move students from old system
+   Code:
+     const oldStudents = fetchFromOldDatabase()
+     const result = db.students.insertMany(oldStudents)
+     console.log("Migrated: " + result.insertedIds.length + " students")
+
+3. TEST DATA GENERATION:
+   Create 100 test students for QA
+   Code:
+     const testStudents = generateMockData(100)
+     db.students.insertMany(testStudents)
+
+4. BATCH LOG PROCESSING:
+   Process queue of 1000 activity logs
+   Code:
+     const logs = dequeueActivityLogs(1000)
+     db.activityLog.insertMany(logs)
+
+5. DATA BACKUP RESTORATION:
+   Restore from backup file
+   Code:
+     const backupData = readBackupFile()
+     db.students.insertMany(backupData)
+
+6. INITIAL DATABASE SETUP:
+   Populate database with initial data
+   Code:
+     db.students.insertMany(INITIAL_STUDENT_DATA)
+
+
+OPTIONS FOR insertMany:
+
+1. ordered (default: true)
+   ✓ ordered: true  → Stop on first error
+   ✓ ordered: false → Continue on errors
+
+2. bypassDocumentValidation (default: false)
+   ✓ false → Validate documents
+   ✓ true  → Skip validation
+
+
+CHARACTERISTICS:
+  ✓ Inserts 2 or more documents
+  ✓ Much faster for bulk (2-3x vs repeated insertOne)
+  ✓ Single network round trip
+  ✓ Perfect for imports
+  ✓ Essential for batch operations
+  ✓ Can handle many documents
+
+✗ Higher memory usage (builds array in memory)
+✗ More complex when handling partial failures
+✗ Not ideal for single record (unnecessary overhead)
+
+
+PERFORMANCE FOR 60 INSERTS:
+  Time: ~50-150ms for all 60 documents
+  Network calls: 1
+  Best for: Bulk operations
+
+
+================================================================================
+SECTION 4: PERFORMANCE COMPARISON
+================================================================================
+
+SCENARIO: INSERT ALL 60 STUDENTS
+
+METHOD 1: Loop with insertOne (60 separate calls)
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  students.forEach(student => {
+    db.students.insertOne(student)
+  })
+
+Time breakdown:
+  Each insertOne: ~2-5ms
+  60 students: 60 × (2-5ms) = 120-300ms
+
+Network calls: 60 (one per student)
+
+Result:
+  Total time: ~120-300ms
+  Process: Sequential inserts
+
+
+METHOD 2: Single insertMany call
+────────────────────────────────────────────────────────────────────────────
+
+Code:
+  db.students.insertMany(students)
+
+Time breakdown:
+  Single call: ~50-150ms for all 60
+
+Network calls: 1 (all at once)
+
+Result:
+  Total time: ~50-150ms
+  Process: Parallel inserts
+
+
+COMPARISON:
+────────────────────────────────────────────────────────────────────────────
+
+insertOne loop:  120-300ms  (60 network calls)
+insertMany:       50-150ms  (1 network call)
+
+SPEEDUP: insertMany is 2-3x FASTER
+
+
+SCENARIO: INSERT SINGLE STUDENT
+
+METHOD 1: insertOne
+────────────────────────────────────────────────────────────────────────────
+Code: db.students.insertOne(student)
+Time: ~1-5ms
+Network calls: 1
+
+METHOD 2: insertMany with array
+────────────────────────────────────────────────────────────────────────────
+Code: db.students.insertMany([student])
+Time: ~2-8ms
+Network calls: 1
+
+DIFFERENCE: ~1-3ms (minimal, not significant)
+
+RECOMMENDATION: Use insertOne (simpler code)
+
+
+SPEED BENCHMARK SUMMARY:
+────────────────────────────────────────────────────────────────────────────
+
+Operation              | insertOne   | insertMany  | Winner
+-----------------------+-------------+-------------+---------
+Insert 1 student      | 1-5ms       | 2-8ms       | insertOne
+Insert 10 students    | 20-50ms     | 10-25ms     | insertMany
+Insert 60 students    | 120-300ms   | 50-150ms    | insertMany (2-3x)
+Insert 1000 records   | 2-5sec      | 500-1500ms  | insertMany (2-3x)
+
+
+================================================================================
+SECTION 5: REAL-WORLD USE CASE MATRIX
+================================================================================
+
+USE CASE #1: WEB FORM REGISTRATION
+────────────────────────────────────────────────────────────────────────────
+Scenario: User fills form, submits, gets registered
+
+Records: 1 student
+Recommendation: insertOne
+
+Code:
+  const newStudent = {
+    studentId: generateId(),
+    name: { first: req.body.firstName, last: req.body.lastName },
+    age: parseInt(req.body.age),
+    major: req.body.major,
+    email: req.body.email
+  }
+  const result = db.students.insertOne(newStudent)
+  res.json({ success: true, studentId: result.insertedId })
+
+Why: Single record, immediate feedback needed
+
+
+USE CASE #2: CSV IMPORT (60 STUDENTS)
+────────────────────────────────────────────────────────────────────────────
+Scenario: Admin uploads students.csv with 60 records
+
+Records: 60 students
+Recommendation: insertMany
+
+Code:
+  const students = parseCSV(csvFile)
+  const result = db.students.insertMany(students)
+  res.json({
+    message: "Import complete",
+    inserted: result.insertedIds.length
+  })
+
+Why: Many records, bulk operation, performance critical
+
+
+USE CASE #3: DATABASE MIGRATION
+────────────────────────────────────────────────────────────────────────────
+Scenario: Migrate all students from legacy system
+
+Records: Variable (could be thousands)
+Recommendation: insertMany (in batches for very large datasets)
+
+Code:
+  const oldStudents = legacyDB.getAllStudents()
+  const result = db.students.insertMany(oldStudents)
+  console.log("Migrated: " + result.insertedIds.length + " students")
+
+Why: One-time operation, many records, speed important
+
+
+USE CASE #4: CREATE LOGIN SESSION
+────────────────────────────────────────────────────────────────────────────
+Scenario: Student logs in, create session record
+
+Records: 1 session
+Recommendation: insertOne
+
+Code:
+  db.sessions.insertOne({
+    studentId: userId,
+    loginTime: new Date(),
+    ipAddress: clientIP,
+    expiresAt: expiryTime
+  })
+
+Why: Single real-time record
+
+
+USE CASE #5: BATCH PROCESS 1000 ACTIVITY LOGS
+────────────────────────────────────────────────────────────────────────────
+Scenario: Queue processor: process batch of 1000 activity logs
+
+Records: 1000 logs
+Recommendation: insertMany (in chunks of ~1000)
+
+Code:
+  const batch = dequeueActivityLogs(1000)
+  const result = db.activityLog.insertMany(batch)
+  console.log("Processed: " + result.insertedIds.length + " logs")
+
+Why: Bulk operation, high volume, batch processing
+
+
+USE CASE #6: GENERATE TEST DATA
+────────────────────────────────────────────────────────────────────────────
+Scenario: QA team needs 1000 test students for testing
+
+Records: 1000 test students
+Recommendation: insertMany
+
+Code:
+  const testData = generateMockStudents(1000)
+  db.test_students.insertMany(testData)
+  console.log("Created 1000 test students")
+
+Why: One-time operation, many records, setup
+
+
+================================================================================
+SECTION 6: ERROR HANDLING
+================================================================================
+
+ERRORS WITH insertOne:
+─────────────────────────────────────────────────────────────────────────
+
+1. Duplicate Key Error (E11000):
+   Cause: Duplicate _id or unique field
+   Example: Inserting student with existing studentId
+   Handling:
+     try {
+       db.students.insertOne(student)
+     } catch (error) {
+       if (error.code === 11000) {
+         console.log("Duplicate: Student already exists")
+       }
+     }
+
+2. Validation Error:
+   Cause: Missing required field or wrong type
+   Example: age as string "25" instead of number 25
+   Handling:
+     Validate before insert
+     Use schema validation in MongoDB
+
+3. Connection Error:
+   Cause: Database connection lost
+   Example: Network timeout
+   Handling:
+     Implement retry logic
+     Use connection pooling
+
+
+ERRORS WITH insertMany:
+─────────────────────────────────────────────────────────────────────────
+
+ORDERED: true (DEFAULT - STOP ON ERROR)
+────────────────────────────────────────
+
+Behavior:
+  - Stops at first error
+  - Documents before error: INSERTED
+  - Documents after error: NOT INSERTED
+  - PARTIAL INSERT
+
+Example:
+  Array: [Doc1✓, Doc2✓, Doc3✗ (duplicate), Doc4, Doc5]
+  Result: Doc1 and Doc2 inserted, Doc3, Doc4, Doc5 not inserted
+
+Code:
+  try {
+    const result = db.students.insertMany(students)  // ordered: true
+  } catch (error) {
+    console.log("Error:", error.message)
+    console.log("Inserted before error:", result.insertedIds.length)
+  }
+
+Use Case:
+  All-or-nothing requirements
+  Financial transactions
+
+
+ORDERED: false (CONTINUE ON ERROR)
+────────────────────────────────────────
+
+Behavior:
+  - Continues on errors
+  - Valid documents: INSERTED
+  - Invalid documents: SKIPPED
+  - PARTIAL INSERT (but with more documents)
+
+Example:
+  Array: [Doc1✓, Doc2✗, Doc3✓, Doc4✗, Doc5✓]
+  Result: Doc1, Doc3, Doc5 inserted; Doc2, Doc4 skipped
+
+Code:
+  const result = db.students.insertMany(students, { ordered: false })
+  console.log("Inserted: " + result.insertedIds.length)
+  console.log("Failed: " + (students.length - result.insertedIds.length))
+
+Use Case:
+  CSV imports with occasional bad rows
+  Bulk operations where partial success acceptable
+
+
+================================================================================
+SECTION 7: WHEN TO USE EACH
+================================================================================
+
+USE insertOne() WHEN:
+  ✓ Inserting single document
+  ✓ Web form submission
+  ✓ Real-time single record
+  ✓ User registration
+  ✓ Create session/log entry
+  ✓ Immediate response needed
+  ✓ Adding one record at a time
+
+EXAMPLES:
+  db.students.insertOne(newStudent)           // Form submission
+  db.sessions.insertOne(loginSession)         // User login
+  db.activityLog.insertOne(userAction)        // Log action
+  db.gradeComment.insertOne(teacherComment)  // Add comment
+
+
+USE insertMany() WHEN:
+  ✓ Inserting 2 or more documents
+  ✓ Bulk import (CSV, JSON)
+  ✓ Database migration
+  ✓ Batch processing
+  ✓ Test data generation
+  ✓ Performance critical
+  ✓ One-time operations
+
+EXAMPLES:
+  db.students.insertMany(csvData)      // Import CSV
+  db.students.insertMany(legacyData)  // Migrate database
+  db.logs.insertMany(batchOfLogs)     // Process batch
+  db.test_db.insertMany(testData)     // Setup test data
+
+
+================================================================================
+SECTION 8: BEST PRACTICES
+================================================================================
+
+✓ BEST PRACTICE #1: Use insertOne for single records
+  db.students.insertOne(newStudent)
+  Benefit: Simpler code, appropriate for use case
+
+✓ BEST PRACTICE #2: Use insertMany for bulk operations
+  db.students.insertMany(studentArray)
+  Benefit: 2-3x faster than repeated insertOne
+
+✓ BEST PRACTICE #3: Validate data before inserting
+  if (!validate(student)) throw new Error("Invalid data")
+  db.students.insertOne(student)
+  Benefit: Prevent validation errors
+
+✓ BEST PRACTICE #4: Use ordered: false for imports
+  db.students.insertMany(data, { ordered: false })
+  Benefit: Continue on errors instead of stopping
+
+✓ BEST PRACTICE #5: Check insertedIds count
+  const result = db.students.insertMany(data)
+  if (result.insertedIds.length !== data.length) {
+    console.log("Some inserts failed")
+  }
+  Benefit: Verify all documents were inserted
+
+✓ BEST PRACTICE #6: Handle errors appropriately
+  try {
+    db.students.insertOne(student)
+  } catch (error) {
+    if (error.code === 11000) {
+      // Handle duplicate
+    } else {
+      // Handle other error
+    }
+  }
+  Benefit: Graceful error handling
+
+✓ BEST PRACTICE #7: Use batch sizes for very large imports
+  Process 1000 at a time instead of 100,000 at once
+  for (let i = 0; i < data.length; i += 1000) {
+    db.students.insertMany(data.slice(i, i + 1000))
+  }
+  Benefit: Prevent memory issues
+
+
+================================================================================
+SECTION 9: CODE EXAMPLES
+================================================================================
+
+EXAMPLE 1: SIMPLE FORM SUBMISSION
+────────────────────────────────────────────────────────────────────────────
+
+app.post('/register', (req, res) => {
+  const newStudent = {
+    studentId: generateId(),
+    name: {
+      first: req.body.firstName,
+      last: req.body.lastName
+    },
+    age: parseInt(req.body.age),
+    major: req.body.major,
+    email: req.body.email
+  }
+
+  try {
+    const result = db.students.insertOne(newStudent)
+    res.json({ success: true, studentId: result.insertedId })
+  } catch (error) {
+    if (error.code === 11000) {
+      res.status(400).json({ error: "Student already exists" })
+    } else {
+      res.status(500).json({ error: error.message })
+    }
+  }
+})
+
+
+EXAMPLE 2: CSV IMPORT WITH ERROR HANDLING
+────────────────────────────────────────────────────────────────────────────
+
+function importCSV(filePath) {
+  const students = []
+
+  // Parse CSV file
+  fs.createReadStream(filePath)
+    .pipe(csv())
+    .on('data', (row) => {
+      students.push({
+        studentId: row.id,
+        name: { first: row.firstName, last: row.lastName },
+        age: parseInt(row.age),
+        major: row.major
+      })
+    })
+    .on('end', () => {
+      // Insert all students
+      const result = db.students.insertMany(students, {
+        ordered: false  // Continue on errors
+      })
+
+      console.log("Import Summary:")
+      console.log("- Total records: " + students.length)
+      console.log("- Successfully inserted: " + result.insertedIds.length)
+      console.log("- Failed: " + (students.length - result.insertedIds.length))
+    })
+}
+
+
+EXAMPLE 3: BATCH PROCESSING
+────────────────────────────────────────────────────────────────────────────
+
+function processBatch(dataArray, batchSize = 1000) {
+  let processed = 0
+
+  for (let i = 0; i < dataArray.length; i += batchSize) {
+    const batch = dataArray.slice(i, i + batchSize)
+    const result = db.collection.insertMany(batch)
+
+    processed += result.insertedIds.length
+    console.log("Processed: " + processed + " / " + dataArray.length)
+  }
+
+  console.log("All done!")
+}
+
+
+EXAMPLE 4: TRANSACTION (MULTIPLE OPERATIONS)
+────────────────────────────────────────────────────────────────────────────
+
+// Insert student and create welcome log
+try {
+  const studentResult = db.students.insertOne(newStudent)
+
+  db.activityLog.insertOne({
+    studentId: studentResult.insertedId,
+    action: "registered",
+    timestamp: new Date()
+  })
+
+  console.log("Student registered and log created")
+} catch (error) {
+  console.log("Registration failed: " + error.message)
+}
+
+
+================================================================================
+SECTION 10: SUMMARY & DECISION TREE
+================================================================================
+
+QUICK DECISION TREE:
+────────────────────────────────────────────────────────────────────────────
+
+How many documents to insert?
+  ├─ 1 document?
+  │  └─ Use: insertOne()
+  │     Examples: Form submission, session creation, single action log
+  │
+  └─ 2 or more documents?
+     ├─ Is it bulk operation (CSV import, migration, batch)?
+     │  ├─ YES → Use: insertMany()
+     │  │ Examples: Import 60 students, migrate database, batch logs
+     │  │
+     │  └─ NO (occasional multiple inserts)
+     │     └─ Use: insertOne() in loop (or use insertMany() for speed)
+
+PERFORMANCE RULE:
+────────────────────────────────────────────────────────────────────────────
+
+1 document:     insertOne is best
+2-100 documents: insertMany is 2-3x faster
+100+ documents: insertMany is 2-3x faster
+                (use batching for very large sets)
+
+
+KEY DIFFERENCES SUMMARY:
+────────────────────────────────────────────────────────────────────────────
+
+insertOne:
+  ✓ Single document
+  ✓ Simple syntax
+  ✓ Real-time
+  ✓ Good for forms
+  ✗ Slow for bulk
+
+insertMany:
+  ✓ Multiple documents
+  ✓ Fast for bulk (2-3x)
+  ✓ Batch processing
+  ✓ Imports/migration
+  ✗ More complex error handling
+
+
+================================================================================
+                              FINAL RECOMMENDATION
+================================================================================
+
+RULE OF THUMB:
+
+  1 student?      → insertOne()
+  60 students?    → insertMany()
+  1 form submit?  → insertOne()
+  CSV import?     → insertMany()
+  1 log entry?    → insertOne()
+  1000 logs?      → insertMany() (in batches)
+
+BEST PRACTICE:
+
+  Real-time single: insertOne()
+  Bulk/batch:       insertMany()
+
+PERFORMANCE:
+
+  insertMany is 2-3x FASTER for bulk operations
+
+CHOOSE WISELY!
+
+================================================================================
+                              END OF GUIDE
+================================================================================

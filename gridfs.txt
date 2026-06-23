@@ -1,0 +1,613 @@
+================================================================================
+MONGODB GRIDFS - COMPLETE GUIDE (BEGINNER TO ADVANCED)
+================================================================================
+Storing and retrieving large files in MongoDB
+
+================================================================================
+OVERVIEW
+================================================================================
+
+GridFS is MongoDB's specification for storing files larger than 16MB.
+
+MongoDB has a 16MB limit for a single document. If you need to store files
+larger than this (like videos, large PDFs), GridFS divides the file into
+smaller chunks and stores them separately.
+
+KEY CONCEPTS:
+- File divided into 255KB chunks by default
+- Metadata stored in fs.files collection
+- Chunk data stored in fs.chunks collection
+- Retrieve files by name or ID
+- Stream files for efficiency
+
+COMMON USE CASES:
+- Store video files
+- Store high-resolution images
+- Store PDFs and documents
+- Store audio files
+- Archive large datasets
+- Keep files with database
+
+================================================================================
+SECTION 1: BEGINNER - GRIDFS FUNDAMENTALS
+================================================================================
+
+CONCEPT 1: How GridFS Works
+---------------------------
+GridFS divides large files into chunks:
+
+Original file: 1GB video.mp4
+                |
+                v
+GridFS chunking (255KB per chunk)
+                |
+        +-------+---------+-------+
+        |       |         |       |
+      Chunk   Chunk     Chunk ... Chunk
+        1       2         3       (4000 chunks)
+
+Each chunk stored as separate document
+Metadata stored in separate collection
+
+
+CONCEPT 2: GridFS Collections
+----------------------------
+GridFS uses two collections:
+
+1. fs.files - Metadata about the file
+   {
+     _id: ObjectId,
+     filename: 'video.mp4',
+     length: 1073741824,  // Total file size
+     chunkSize: 255000,
+     uploadDate: ISODate,
+     metadata: { ... }
+   }
+
+2. fs.chunks - File data
+   {
+     _id: ObjectId,
+     files_id: ObjectId,  // Reference to fs.files
+     n: 0,  // Chunk number
+     data: BinData(...)  // Binary chunk data
+   }
+
+
+CONCEPT 3: When to Use GridFS
+-----------------------------
+USE GridFS when:
+- File > 16MB
+- Must keep file with database
+- Want simple file management with DB
+- Don't have separate file storage
+
+AVOID GridFS when:
+- File < 16MB
+- Have S3/GCS available
+- Need very high performance
+- Have separate blob storage
+
+
+CONCEPT 4: GridFSBucket API
+---------------------------
+Modern GridFS interaction uses GridFSBucket API (Node.js):
+
+const bucket = new GridFSBucket(db);
+bucket.openUploadStream(filename, options);
+bucket.openDownloadStream(fileId);
+bucket.openDownloadStreamByName(filename);
+bucket.delete(fileId);
+bucket.find(query);
+
+
+================================================================================
+SECTION 2: BEGINNER - UPLOADING FILES
+================================================================================
+
+EXAMPLE 1: Upload File from Local Filesystem
+---------------------------------------------
+const bucket = new GridFSBucket(db);
+const fs = require('fs');
+
+const uploadStream = bucket.openUploadStream('image.jpg');
+
+fs.createReadStream('local_image.jpg')
+  .pipe(uploadStream)
+  .on('error', (error) => {
+    console.error('Upload error:', error);
+  });
+
+uploadStream.on('finish', () => {
+  console.log('File uploaded successfully');
+  console.log('File ID:', uploadStream.id);
+});
+
+Result:
+- Image file split into chunks
+- Metadata stored in fs.files
+- Chunks stored in fs.chunks
+- Application gets file ID
+
+
+EXAMPLE 2: Upload File from Buffer
+-----------------------------------
+const imageBuffer = fs.readFileSync('image.jpg');
+
+bucket.uploadFromStream('image.jpg', imageBuffer, (error, file) => {
+  if (error) {
+    console.error('Upload failed:', error);
+  } else {
+    console.log('Uploaded:', file._id);
+  }
+});
+
+Good for: Files already in memory
+
+
+EXAMPLE 3: Upload with Metadata
+-------------------------------
+const uploadStream = bucket.openUploadStream('report.pdf', {
+  metadata: {
+    originalName: 'Q1_Report.pdf',
+    uploadedBy: 'alice@example.com',
+    uploadedAt: new Date(),
+    department: 'Finance',
+    confidential: true
+  }
+});
+
+fs.createReadStream('report.pdf').pipe(uploadStream);
+
+Result: File stored with associated metadata
+
+
+EXAMPLE 4: Upload from Stream (e.g., HTTP Request)
+--------------------------------------------------
+// In an Express.js route
+app.post('/upload', (req, res) => {
+  const bucket = new GridFSBucket(db);
+
+  const uploadStream = bucket.openUploadStream(req.file.filename);
+
+  req.file.data.pipe(uploadStream)
+    .on('finish', (file) => {
+      res.json({ message: 'File uploaded', fileId: uploadStream.id });
+    });
+});
+
+Good for: Web uploads
+
+
+================================================================================
+SECTION 3: BEGINNER - DOWNLOADING FILES
+================================================================================
+
+EXAMPLE 1: Download File by Name
+--------------------------------
+const bucket = new GridFSBucket(db);
+const fs = require('fs');
+
+const downloadStream = bucket.openDownloadStreamByName('image.jpg');
+
+downloadStream
+  .pipe(fs.createWriteStream('downloaded_image.jpg'))
+  .on('finish', () => {
+    console.log('File downloaded');
+  });
+
+Result: File reconstructed from chunks and saved locally
+
+
+EXAMPLE 2: Download File by ID
+------------------------------
+const ObjectId = require('mongodb').ObjectId;
+const bucket = new GridFSBucket(db);
+
+const fileId = ObjectId('...');
+
+const downloadStream = bucket.openDownloadStream(fileId);
+
+downloadStream
+  .pipe(fs.createWriteStream('output.mp4'))
+  .on('finish', () => {
+    console.log('Video downloaded');
+  });
+
+
+EXAMPLE 3: Stream to HTTP Response
+----------------------------------
+// In Express.js route
+app.get('/download/:fileId', (req, res) => {
+  const bucket = new GridFSBucket(db);
+  const fileId = ObjectId(req.params.fileId);
+
+  const downloadStream = bucket.openDownloadStream(fileId);
+
+  downloadStream.pipe(res);
+});
+
+Good for: Web downloads
+
+
+EXAMPLE 4: Download in Chunks
+-----------------------------
+const downloadStream = bucket.openDownloadStream(fileId);
+
+let chunkCount = 0;
+downloadStream.on('data', (chunk) => {
+  chunkCount++;
+  console.log(`Received chunk ${chunkCount}`);
+  // Process chunk individually
+});
+
+downloadStream.on('end', () => {
+  console.log(`Finished, total chunks: ${chunkCount}`);
+});
+
+
+================================================================================
+SECTION 4: BEGINNER - LISTING & DELETING FILES
+================================================================================
+
+EXAMPLE 1: List All Files
+--------------------------
+const bucket = new GridFSBucket(db);
+
+bucket.find({}).toArray((error, files) => {
+  files.forEach(file => {
+    console.log(`${file.filename} - ${file.length} bytes`);
+  });
+});
+
+Result:
+image.jpg - 2048576 bytes
+video.mp4 - 1073741824 bytes
+document.pdf - 5242880 bytes
+
+
+EXAMPLE 2: List Files with Filter
+----------------------------------
+bucket.find({ metadata: { department: 'Finance' } })
+  .toArray((error, files) => {
+    files.forEach(file => {
+      console.log(`${file.filename} - uploaded by ${file.metadata.uploadedBy}`);
+    });
+  });
+
+
+EXAMPLE 3: Delete File
+---------------------
+const fileId = ObjectId('...');
+
+bucket.delete(fileId, (error) => {
+  if (error) {
+    console.error('Delete failed:', error);
+  } else {
+    console.log('File deleted (and all its chunks)');
+  }
+});
+
+Result:
+- Metadata document removed from fs.files
+- All chunk documents removed from fs.chunks
+- Automatic cleanup - no orphaned chunks
+
+
+EXAMPLE 4: Delete Multiple Files
+---------------------------------
+// Find and delete all old reports
+bucket.find({ 'metadata.type': 'report' }).toArray((error, files) => {
+  files.forEach(file => {
+    if (file.uploadDate < oneYearAgo) {
+      bucket.delete(file._id);
+    }
+  });
+});
+
+
+================================================================================
+SECTION 5: INTERMEDIATE - FILE METADATA
+================================================================================
+
+EXAMPLE 1: Upload with Rich Metadata
+-------------------------------------
+const uploadStream = bucket.openUploadStream('presentation.pptx', {
+  metadata: {
+    title: 'Q1 2024 Results',
+    author: 'alice@example.com',
+    department: 'Sales',
+    confidential: true,
+    tags: ['quarterly', 'results', '2024'],
+    version: 1,
+    checksum: 'abc123...'  // For integrity checking
+  }
+});
+
+fs.createReadStream('presentation.pptx').pipe(uploadStream);
+
+
+EXAMPLE 2: Search Files by Metadata
+-----------------------------------
+// Find all confidential files uploaded in 2024
+bucket.find({
+  'metadata.confidential': true,
+  uploadDate: {
+    $gte: ISODate('2024-01-01'),
+    $lt: ISODate('2025-01-01')
+  }
+}).toArray((error, files) => {
+  console.log(`Found ${files.length} confidential files`);
+});
+
+
+EXAMPLE 3: Update File Metadata (Not Data)
+-------------------------------------------
+// Update fs.files collection directly
+db.fs.files.updateOne(
+  { _id: ObjectId('...') },
+  { $set: {
+      'metadata.lastAccessDate': new Date(),
+      'metadata.accessCount': { $inc: 1 }
+    }
+  }
+);
+
+Note: Cannot update file data itself, only metadata
+
+
+EXAMPLE 4: File Integrity Check
+-------------------------------
+// Store hash on upload
+const crypto = require('crypto');
+const hash = crypto.createHash('sha256');
+
+fs.createReadStream('file.bin')
+  .on('data', (chunk) => hash.update(chunk))
+  .on('end', () => {
+    const fileHash = hash.digest('hex');
+
+    const uploadStream = bucket.openUploadStream('file.bin', {
+      metadata: { sha256: fileHash }
+    });
+
+    fs.createReadStream('file.bin').pipe(uploadStream);
+  });
+
+// On download, verify hash matches
+
+
+================================================================================
+SECTION 6: INTERMEDIATE - CHUNKING & STREAMING
+================================================================================
+
+EXAMPLE 1: Custom Chunk Size
+---------------------------
+// Default chunk size is 255KB
+// For larger files, increase chunk size
+
+const uploadStream = bucket.openUploadStream('largefile.bin', {
+  chunkSize: 1024 * 1024  // 1MB chunks instead of 255KB
+});
+
+fs.createReadStream('largefile.bin').pipe(uploadStream);
+
+Trade-off:
+- Larger chunks: Fewer documents, but larger memory usage
+- Smaller chunks: More documents, but more precise streaming
+
+
+EXAMPLE 2: Progress Tracking on Upload
+--------------------------------------
+const fs = require('fs');
+const uploadStream = bucket.openUploadStream('large.mp4');
+const fileSize = fs.statSync('large.mp4').size;
+
+let uploadedBytes = 0;
+
+fs.createReadStream('large.mp4')
+  .on('data', (chunk) => {
+    uploadedBytes += chunk.length;
+    const percent = (uploadedBytes / fileSize * 100).toFixed(1);
+    console.log(`Upload progress: ${percent}%`);
+  })
+  .pipe(uploadStream);
+
+
+EXAMPLE 3: Pause and Resume Download
+-------------------------------------
+const downloadStream = bucket.openDownloadStream(fileId);
+const writeStream = fs.createWriteStream('output.bin');
+
+downloadStream.pipe(writeStream);
+
+// Pause
+downloadStream.pause();
+console.log('Download paused');
+
+// Resume
+setTimeout(() => {
+  downloadStream.resume();
+  console.log('Download resumed');
+}, 5000);
+
+
+EXAMPLE 4: Partial Download (Range Request)
+-------------------------------------------
+// Download only middle portion of file
+const downloadStream = bucket.openDownloadStream(fileId, {
+  start: 1000,  // Start at byte 1000
+  end: 2000     // End at byte 2000
+});
+
+downloadStream.pipe(fs.createWriteStream('partial.bin'));
+
+Good for: HTTP range requests (video scrubbing)
+
+
+================================================================================
+SECTION 7: ADVANCED - PRODUCTION PATTERNS
+================================================================================
+
+PATTERN 1: File Versioning
+---------------------------
+// Store version in filename or metadata
+const uploadStream = bucket.openUploadStream(
+  `document-v${version}.pdf`,
+  { metadata: { version, originalName } }
+);
+
+fs.createReadStream('document.pdf').pipe(uploadStream);
+
+// List all versions
+bucket.find({ filename: /^document-v/ }).toArray();
+
+
+PATTERN 2: File Expiration
+--------------------------
+// Set TTL on fs.files collection
+db.fs.files.createIndex({ uploadDate: 1 }, { expireAfterSeconds: 2592000 });
+// Files automatically deleted after 30 days
+
+
+PATTERN 3: Virus Scanning Integration
+-------------------------------------
+// After upload, scan file before making available
+const uploadStream = bucket.openUploadStream(filename, {
+  metadata: { scanned: false, infected: false }
+});
+
+fs.createReadStream(file).pipe(uploadStream).on('finish', () => {
+  // Send to virus scanner
+  scanFile(filename).then(result => {
+    db.fs.files.updateOne(
+      { filename },
+      { $set: { 'metadata.scanned': true, 'metadata.infected': result } }
+    );
+  });
+});
+
+
+PATTERN 4: Storage Quotas
+------------------------
+// Track user storage usage
+function getStorageUsage(userId) {
+  return bucket.find({
+    'metadata.userId': userId
+  }).toArray().then(files => {
+    return files.reduce((total, file) => total + file.length, 0);
+  });
+}
+
+// Check quota before upload
+const userQuota = 1024 * 1024 * 1024;  // 1GB
+const usage = await getStorageUsage(userId);
+if (usage + fileSize > userQuota) {
+  throw new Error('Storage quota exceeded');
+}
+
+
+================================================================================
+SECTION 8: BEST PRACTICES
+================================================================================
+
+1. CONSIDER ALTERNATIVES
+   - For images/videos, use S3/GCS instead
+   - GridFS adds overhead
+   - External storage is often better for media
+
+2. USE STREAMING
+   - Always pipe streams
+   - Don't load entire file in memory
+   - Essential for large files
+
+3. STORE METADATA
+   - Upload date, user, type, tags
+   - Makes files discoverable
+   - Enables searching and filtering
+
+4. CLEAN UP OLD FILES
+   - Set TTL indexes for automatic deletion
+   - Or run cleanup jobs
+   - Don't let files accumulate
+
+5. VERIFY FILE INTEGRITY
+   - Store checksums (SHA-256)
+   - Verify on download
+   - Detect corruption
+
+6. MONITOR STORAGE
+   - Track total storage usage
+   - Set quotas for users
+   - Alert on excessive usage
+
+7. BACKUP GridFS FILES
+   - Back up both fs.files and fs.chunks
+   - Or back up to separate storage
+   - Critical for data safety
+
+
+================================================================================
+SECTION 9: COMMON MISTAKES & SOLUTIONS
+================================================================================
+
+MISTAKE 1: Loading Entire File in Memory
+-----------------------------------------
+Wrong:
+const file = fs.readFileSync('huge.mp4');  // Out of memory!
+bucket.uploadFromStream('huge.mp4', file);
+
+Fix: Use streams
+fs.createReadStream('huge.mp4').pipe(uploadStream);
+
+
+MISTAKE 2: Not Handling Upload Errors
+------------------------------------
+Wrong:
+uploadStream.pipe(fs.createReadStream(file));
+// What if it fails?
+
+Fix:
+uploadStream.on('error', (err) => {
+  console.error('Upload failed:', err);
+  bucket.delete(uploadStream.id);  // Clean up
+});
+
+
+MISTAKE 3: Orphaned Chunks
+---------------------------
+Problem: Deleting fs.files document manually leaves chunks
+
+Fix: Always use bucket.delete()
+bucket.delete(fileId);  // Cleans up both metadata and chunks
+
+
+MISTAKE 4: No Backup Strategy
+------------------------------
+Problem: GridFS files lost if database fails
+
+Fix:
+- Backup entire database
+- Or back up to separate storage
+- Test restore procedures
+
+
+================================================================================
+SUMMARY
+================================================================================
+
+GridFS enables storing files larger than 16MB:
+
+1. Divides files into 255KB chunks by default
+2. Stores metadata in fs.files collection
+3. Stores chunks in fs.chunks collection
+4. Use streams for efficiency
+5. Always use GridFSBucket API
+6. Store metadata for discoverability
+7. Delete using bucket.delete()
+8. Consider external storage (S3) as alternative
+9. Implement backup strategy
+10. Use for documents, videos, large datasets
+
+GridFS is valuable for keeping files with database, but external storage
+often better for high-volume media.
+================================================================================

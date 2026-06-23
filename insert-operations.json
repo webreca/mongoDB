@@ -1,0 +1,438 @@
+{
+  "title": "MongoDB Insert Operations - insertOne vs insertMany Guide",
+  "description": "Complete comparison of insert operations with use cases and performance",
+  "date": "2024-06-23",
+  "totalStudents": 60,
+  "quick_comparison": {
+    "insertOne": {
+      "inserts": "Single document",
+      "typical_count": "1 document",
+      "best_for": "Individual records, real-time inserts",
+      "performance": "Slow for bulk",
+      "syntax": "db.collection.insertOne(document)",
+      "returns": "InsertedId"
+    },
+    "insertMany": {
+      "inserts": "Multiple documents",
+      "typical_count": "2 to many",
+      "best_for": "Bulk import, batch operations",
+      "performance": "Fast for bulk",
+      "syntax": "db.collection.insertMany([documents])",
+      "returns": "Array of InsertedIds"
+    }
+  },
+  "section_1_insertOne": {
+    "title": "insertOne() - Single Document Insertion",
+    "description": "Insert one document at a time",
+    "syntax": "db.collection.insertOne(document)",
+    "returns": {
+      "acknowledged": true,
+      "insertedId": "ObjectId(...)"
+    },
+    "characteristics": [
+      "Inserts exactly 1 document",
+      "Returns InsertedId immediately",
+      "Fast for single record",
+      "Simple to use",
+      "Useful for real-time data",
+      "No bulk operations overhead"
+    ],
+    "basic_examples": [
+      {
+        "example": "Insert single student",
+        "command": "db.students.insertOne({ studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, age: 20, major: 'Data Science', gpa: 3.85 })",
+        "result": "Acknowledged, insertedId: ObjectId(...)",
+        "use_case": "Add new student to system"
+      },
+      {
+        "example": "Insert student with all fields",
+        "command": "db.students.insertOne({ studentId: 20260002, name: { first: 'Anaya', last: 'Sharma' }, age: 20, major: 'Frontend Engineering', gpa: 3.92, isInternational: true, skills: [...], courses: [...] })",
+        "result": "Document inserted with generated _id",
+        "use_case": "Complete student registration"
+      }
+    ],
+    "real_world_scenarios": [
+      {
+        "scenario": "New Student Registration",
+        "description": "User fills form and submits one new student record",
+        "code": "db.students.insertOne({ studentId: generateId(), name: { first: firstName, last: lastName }, age: age, major: selectedMajor })"
+      },
+      {
+        "scenario": "Add Student Course",
+        "description": "Student enrolls in new course",
+        "code": "db.students.updateOne({ studentId: 20260001 }, { $push: { courses: { courseCode: 'NEW-101', credits: 3, grade: 'In Progress' } } })"
+      },
+      {
+        "scenario": "Create Student Session",
+        "description": "Student logs in, create session record",
+        "code": "db.sessions.insertOne({ studentId: 20260001, loginTime: new Date(), ipAddress: '192.168.1.1' })"
+      },
+      {
+        "scenario": "Single Event Log",
+        "description": "Log single user action",
+        "code": "db.activityLog.insertOne({ studentId: 20260001, action: 'viewed_course', timestamp: new Date() })"
+      }
+    ],
+    "performance_characteristics": [
+      "Time per insert: ~1-5ms",
+      "Ideal for: Single real-time inserts",
+      "Overhead: Minimal per operation",
+      "Not for: Bulk operations (slow when called repeatedly)"
+    ],
+    "error_handling": [
+      {
+        "scenario": "Duplicate _id",
+        "error": "E11000 duplicate key error",
+        "example": "Inserting student with existing _id"
+      },
+      {
+        "scenario": "Validation Error",
+        "error": "Document failed validation",
+        "example": "Missing required fields"
+      },
+      {
+        "scenario": "Type Mismatch",
+        "error": "Type error",
+        "example": "age as string instead of number"
+      }
+    ]
+  },
+  "section_2_insertMany": {
+    "title": "insertMany() - Multiple Document Insertion",
+    "description": "Insert multiple documents in single operation",
+    "syntax": "db.collection.insertMany([doc1, doc2, ..., docN], options)",
+    "returns": {
+      "acknowledged": true,
+      "insertedIds": ["ObjectId(...)", "ObjectId(...)", "..."]
+    },
+    "characteristics": [
+      "Inserts 2 or more documents",
+      "Returns array of InsertedIds",
+      "Fast for bulk operations",
+      "Single database round trip",
+      "Can handle ordered/unordered inserts",
+      "Essential for batch imports"
+    ],
+    "basic_examples": [
+      {
+        "example": "Insert 3 students",
+        "command": "db.students.insertMany([ { studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, ... }, { studentId: 20260002, name: { first: 'Anaya', last: 'Sharma' }, ... }, { studentId: 20260003, name: { first: 'Arpit', last: 'Kataria' }, ... } ])",
+        "result": "Acknowledged, insertedIds: [ObjectId(...), ObjectId(...), ObjectId(...)]",
+        "documents_inserted": 3
+      },
+      {
+        "example": "Insert all 60 students",
+        "command": "db.students.insertMany([...all 60 student records...])",
+        "result": "Acknowledged, insertedIds: [60 ObjectIds]",
+        "documents_inserted": 60
+      },
+      {
+        "example": "Insert with ordered option",
+        "command": "db.students.insertMany([docs], { ordered: false })",
+        "result": "Insert all valid docs even if some have errors",
+        "documents_inserted": "Variable (depends on errors)"
+      }
+    ],
+    "options": {
+      "ordered": {
+        "true": "Stop on first error (default)",
+        "false": "Continue inserting valid documents"
+      },
+      "bypassDocumentValidation": {
+        "true": "Skip schema validation",
+        "false": "Perform validation (default)"
+      }
+    },
+    "real_world_scenarios": [
+      {
+        "scenario": "Bulk Student Import",
+        "description": "Import 60 students from CSV file",
+        "code": "const students = parseCSV(csvFile); db.students.insertMany(students)"
+      },
+      {
+        "scenario": "Database Migration",
+        "description": "Migrate students from old system",
+        "code": "const oldStudents = fetchFromOldDB(); db.students.insertMany(oldStudents)"
+      },
+      {
+        "scenario": "Test Data Setup",
+        "description": "Insert test data for QA",
+        "code": "const testData = generateTestStudents(100); db.students.insertMany(testData)"
+      },
+      {
+        "scenario": "Batch Log Processing",
+        "description": "Insert batch of activity logs",
+        "code": "const logs = processLogFile(); db.activityLog.insertMany(logs)"
+      },
+      {
+        "scenario": "Data Backup Restore",
+        "description": "Restore from backup file",
+        "code": "const backupData = readBackup(); db.students.insertMany(backupData)"
+      }
+    ],
+    "performance_characteristics": [
+      "Time for 60 docs: ~50-150ms (single operation)",
+      "vs insertOne 60 times: ~60-300ms (60 operations)",
+      "Speedup: 2-3x faster than 60 separate insertOne calls",
+      "Ideal for: Bulk operations, imports, batches"
+    ]
+  },
+  "section_3_detailed_comparison": {
+    "comparison_table": [
+      {
+        "aspect": "Number of Documents",
+        "insertOne": "1 document",
+        "insertMany": "2 or more documents",
+        "impact": "insertOne for single, insertMany for bulk"
+      },
+      {
+        "aspect": "Return Value",
+        "insertOne": "Single ObjectId",
+        "insertMany": "Array of ObjectIds",
+        "impact": "Different ways to access inserted IDs"
+      },
+      {
+        "aspect": "Performance",
+        "insertOne": "Slow for 60 docs (~60-300ms for 60 calls)",
+        "insertMany": "Fast for 60 docs (~50-150ms single call)",
+        "impact": "insertMany 2-3x faster for bulk"
+      },
+      {
+        "aspect": "Error Handling",
+        "insertOne": "Stops immediately on error",
+        "insertMany": "Can continue or stop (ordered option)",
+        "impact": "insertMany more flexible for error scenarios"
+      },
+      {
+        "aspect": "Database Trips",
+        "insertOne": "N trips for N documents",
+        "insertMany": "1 trip for all documents",
+        "impact": "insertMany reduces network overhead"
+      },
+      {
+        "aspect": "Network Traffic",
+        "insertOne": "Multiple small requests",
+        "insertMany": "Single large request",
+        "impact": "insertMany more efficient"
+      },
+      {
+        "aspect": "Typical Use",
+        "insertOne": "Real-time single records",
+        "insertMany": "Bulk import, batches",
+        "impact": "Different purposes, use accordingly"
+      },
+      {
+        "aspect": "Code Complexity",
+        "insertOne": "Simple, single call",
+        "insertMany": "Build array first, then insert",
+        "impact": "insertOne simpler for single record"
+      },
+      {
+        "aspect": "Memory Usage",
+        "insertOne": "Minimal",
+        "insertMany": "More (builds array in memory)",
+        "impact": "insertOne better for memory-constrained systems"
+      }
+    ]
+  },
+  "section_4_performance_analysis": {
+    "scenario_insert_60_students": {
+      "requirement": "Insert all 60 student records into database",
+      "method_1_insertOne_loop": {
+        "approach": "Loop 60 times calling insertOne",
+        "code": "students.forEach(student => { db.students.insertOne(student) })",
+        "time_estimate": "60-300ms (60 separate operations)",
+        "database_trips": 60,
+        "network_calls": 60
+      },
+      "method_2_insertMany": {
+        "approach": "Single insertMany call with all 60",
+        "code": "db.students.insertMany(students)",
+        "time_estimate": "50-150ms (1 operation)",
+        "database_trips": 1,
+        "network_calls": 1
+      },
+      "performance_winner": "insertMany - 2-3x faster",
+      "speedup_calculation": "60 calls × ~2-5ms = 120-300ms vs 1 call × ~50-150ms"
+    },
+    "scenario_insert_1_student": {
+      "requirement": "Insert single new student",
+      "method_1_insertOne": {
+        "code": "db.students.insertOne(student)",
+        "time_estimate": "1-5ms",
+        "approach": "Direct insertion"
+      },
+      "method_2_insertMany": {
+        "code": "db.students.insertMany([student])",
+        "time_estimate": "2-8ms",
+        "approach": "Wrapped in array, bulk operation overhead"
+      },
+      "performance_winner": "insertOne - simpler, slightly faster",
+      "difference": "Minimal (~1-3ms difference)"
+    }
+  },
+  "section_5_real_world_comparison": {
+    "use_case_1_registration_form": {
+      "title": "User Registration Form",
+      "scenario": "User fills form and submits single new student",
+      "recommended": "insertOne",
+      "code": "const newStudent = { studentId: generateId(), name: formData.name, major: formData.major }; const result = db.students.insertOne(newStudent); return result.insertedId",
+      "why": "Single record, real-time insertion, immediate response needed"
+    },
+    "use_case_2_import_csv": {
+      "title": "Import CSV File (60 students)",
+      "scenario": "Admin uploads CSV with 60 student records",
+      "recommended": "insertMany",
+      "code": "const students = parseCSV(file); const result = db.students.insertMany(students); console.log('Imported ' + result.insertedIds.length + ' students')",
+      "why": "Bulk operation, multiple records, performance critical"
+    },
+    "use_case_3_database_migration": {
+      "title": "Migrate from Old System",
+      "scenario": "Transfer all students from legacy database",
+      "recommended": "insertMany",
+      "code": "const oldStudents = fetchFromOldDB(); const result = db.students.insertMany(oldStudents); console.log('Migrated ' + result.insertedIds.length + ' students')",
+      "why": "One-time bulk operation, many records"
+    },
+    "use_case_4_create_session": {
+      "title": "User Login - Create Session",
+      "scenario": "Student logs in, create session record",
+      "recommended": "insertOne",
+      "code": "db.sessions.insertOne({ studentId: userId, loginTime: new Date(), ipAddress: clientIP })",
+      "why": "Single real-time record, immediate response"
+    },
+    "use_case_5_batch_processing": {
+      "title": "Process Batch of Records",
+      "scenario": "Process 1000 activity logs from queue",
+      "recommended": "insertMany",
+      "code": "const logs = dequeueActivityLogs(1000); db.activityLog.insertMany(logs)",
+      "why": "Many records, batch operation"
+    },
+    "use_case_6_test_data": {
+      "title": "Generate Test Data",
+      "scenario": "Create 100 test students for QA",
+      "recommended": "insertMany",
+      "code": "const testStudents = generateTestData(100); db.students.insertMany(testStudents)",
+      "why": "Bulk operation, one-time setup"
+    }
+  },
+  "section_6_error_handling": {
+    "insertOne_errors": [
+      {
+        "error": "E11000 duplicate key error",
+        "cause": "Duplicate _id or unique field",
+        "example": "Inserting student with existing studentId",
+        "handling": "Catch error and retry or inform user"
+      },
+      {
+        "error": "Document validation failed",
+        "cause": "Schema validation error",
+        "example": "Missing required field",
+        "handling": "Validate before insert or fix data"
+      },
+      {
+        "error": "Type error",
+        "cause": "Wrong data type",
+        "example": "age as string instead of int",
+        "handling": "Convert data type before insert"
+      }
+    ],
+    "insertMany_errors": [
+      {
+        "error": "E11000 duplicate key error (ordered: true)",
+        "cause": "First duplicate stops insertion",
+        "behavior": "Documents before error inserted, documents after not inserted",
+        "handling": "Use ordered: false to skip errors and continue"
+      },
+      {
+        "error": "E11000 duplicate key error (ordered: false)",
+        "cause": "Continue on errors",
+        "behavior": "Valid documents inserted, invalid ones skipped",
+        "handling": "Check insertedIds count vs documents sent"
+      },
+      {
+        "error": "Partial write",
+        "cause": "Some documents valid, some invalid",
+        "behavior": "Valid ones inserted (if ordered: false)",
+        "handling": "Validate array before insert to prevent partials"
+      }
+    ],
+    "ordered_vs_unordered": {
+      "ordered_true_default": {
+        "behavior": "Stop on first error",
+        "use_case": "Critical inserts where all-or-nothing required",
+        "example": "Financial transactions"
+      },
+      "ordered_false": {
+        "behavior": "Continue inserting valid documents",
+        "use_case": "Bulk imports where some errors acceptable",
+        "example": "CSV import with occasional bad rows"
+      }
+    }
+  },
+  "section_7_code_examples": {
+    "example_1_simple_insertOne": {
+      "title": "Insert Single Student",
+      "code": "const result = db.students.insertOne({\n  studentId: 20260001,\n  name: { first: 'Daksh', last: 'Chauhan' },\n  age: 20,\n  major: 'Data Science',\n  gpa: 3.85\n});\nconsole.log('Inserted:', result.insertedId);",
+      "use_case": "Manual registration"
+    },
+    "example_2_simple_insertMany": {
+      "title": "Insert All 60 Students",
+      "code": "const students = [\n  { studentId: 20260001, name: { first: 'Daksh', last: 'Chauhan' }, ... },\n  { studentId: 20260002, name: { first: 'Anaya', last: 'Sharma' }, ... },\n  ... (all 60 students)\n];\nconst result = db.students.insertMany(students);\nconsole.log('Inserted ' + result.insertedIds.length + ' students');",
+      "use_case": "Bulk import"
+    },
+    "example_3_insertMany_with_options": {
+      "title": "Insert with Error Handling",
+      "code": "const students = [...data...];\nconst result = db.students.insertMany(students, { ordered: false });\nconsole.log('Successfully inserted: ' + result.insertedIds.length);\nconsole.log('Total attempted: ' + students.length);",
+      "use_case": "Robust bulk import"
+    },
+    "example_4_insertOne_error_handling": {
+      "title": "Insert with Error Handling",
+      "code": "try {\n  const result = db.students.insertOne(newStudent);\n  console.log('Student inserted:', result.insertedId);\n} catch (error) {\n  if (error.code === 11000) {\n    console.log('Duplicate student ID');\n  } else {\n    console.log('Insert failed:', error.message);\n  }\n}",
+      "use_case": "Registration with error messages"
+    }
+  },
+  "section_8_best_practices": [
+    {
+      "practice": "Use insertOne for single records",
+      "example": "db.students.insertOne(newStudent)",
+      "benefit": "Simpler code, faster for single record"
+    },
+    {
+      "practice": "Use insertMany for bulk operations",
+      "example": "db.students.insertMany(studentArray)",
+      "benefit": "2-3x faster than repeated insertOne"
+    },
+    {
+      "practice": "Validate data before inserting",
+      "example": "if (!validate(student)) throw error",
+      "benefit": "Prevent validation errors"
+    },
+    {
+      "practice": "Use ordered: false for imports",
+      "example": "db.students.insertMany(data, { ordered: false })",
+      "benefit": "Continue on errors"
+    },
+    {
+      "practice": "Check insertedIds count",
+      "example": "console.log(result.insertedIds.length)",
+      "benefit": "Verify all documents were inserted"
+    },
+    {
+      "practice": "Handle errors appropriately",
+      "example": "try/catch block with specific error handling",
+      "benefit": "Better error recovery"
+    },
+    {
+      "practice": "Use batch sizes for very large imports",
+      "example": "Insert 1000 at a time instead of all 100k",
+      "benefit": "Prevent memory issues"
+    }
+  ],
+  "summary": {
+    "insertOne": "Use for single documents (registration, individual inserts)",
+    "insertMany": "Use for multiple documents (imports, bulk operations)",
+    "performance": "insertMany 2-3x faster for bulk operations",
+    "rule": "1 document? insertOne. 2+ documents? insertMany",
+    "key_point": "Choose based on your use case: single vs bulk"
+  }
+}
